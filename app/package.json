@@ -1,0 +1,18 @@
+{
+  "name": "zecwallet-v1.0",
+  "productName": "Zecwallet FullNode",
+  "version": "0.18.1",
+  "description": "Zecwallet FullNode",
+  "main": "./main.prod.js",
+  "author": {
+    "name": "Aditya Kulkarni",
+    "email": "aditya@zecwallet.co",
+    "url": "https://github.com/adityapk00/zecwallet-electron"
+  },
+  "scripts": {
+    "electron-rebuild": "node -r ../internals/scripts/BabelRegister.js ../internals/scripts/ElectronRebuild.js",
+    "postinstall": "yarn electron-rebuild"
+  },
+  "license": "MIT",
+  "dependencies": {}
+}
