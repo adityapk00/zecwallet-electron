@@ -3,10 +3,9 @@ import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import routes from '../constants/routes.json';
 import styles from './Home.css';
+import type State from './AppState';
 
-type Props = {
-  balance: number
-};
+type Props = State;
 
 export default class Send extends Component<Props> {
   props: Props;

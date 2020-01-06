@@ -5,44 +5,17 @@ import routes from '../constants/routes.json';
 import styles from './Home.css';
 import type State from './AppState';
 
-type Props = {};
+type Props = State;
 
-export default class Home extends Component<Props, State> {
-  timerID: IntervalID;
-
-  constructor(props: Props) {
-    super(props);
-    this.state = { balance: 0 };
-  }
-
-  componentDidMount() {
-    this.timerID = setInterval(() => this.tick(), 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID);
-  }
-
-  tick() {
-    const { balance } = this.state;
-    this.setState({ balance: balance + 1 });
-  }
+export default class Home extends Component<Props> {
+  props: Props;
 
   render() {
-    const { balance } = this.state;
+    const { balance } = this.props;
     return (
       <div className={styles.container} data-tid="container">
         <h2>Hello Home {balance} </h2>
-        <Link
-          to={{
-            pathname: routes.SEND,
-            state: {
-              balance
-            }
-          }}
-        >
-          Send
-        </Link>
+        <Link to={routes.SEND}>Send</Link>
       </div>
     );
   }
