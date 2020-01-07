@@ -11,29 +11,30 @@ import RPC from './rpc';
 type Props = {};
 
 export default class RouteApp extends React.Component<Props, State> {
-  timerID: IntervalID;
+  rpc: RPC;
 
   constructor(props) {
     super(props);
 
-    this.state = { balance: new Balance(12) };
+    this.state = { balance: new Balance(12), addresses: [] };
   }
 
   componentDidMount() {
-    if (this.timerID) {
-      clearInterval(this.timerID);
+    if (!this.rpc) {
+      this.rpc = new RPC(this.setBalance, this.setAddresses);
+      this.rpc.configure();
     }
-
-    this.timerID = setInterval(() => this.tick(), 1000);
   }
 
   componentWillUnmount() {}
 
-  async tick() {
-    // Fetch updated balance
-    const result = await RPC.fetchBalance();
-    this.setState({ balance: new Balance(result.total) });
-  }
+  setBalance = (balance: Balance) => {
+    this.setState({ balance });
+  };
+
+  setAddresses = (addresses: [Addres]) => {
+    this.setState({ addresses });
+  };
 
   render() {
     return (

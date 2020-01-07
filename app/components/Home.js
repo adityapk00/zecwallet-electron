@@ -11,11 +11,21 @@ export default class Home extends Component<Props> {
   props: Props;
 
   render() {
-    const { balance } = this.props;
+    const { balance, addresses } = this.props;
+
     return (
       <div className={styles.container} data-tid="container">
         <h2>Hello Home {balance.total} </h2>
         <Link to={routes.SEND}>Send</Link>
+        <ul>
+          {addresses.map(address => {
+            return (
+              <li key={address.address}>
+                {address.balance} / {address.address}
+              </li>
+            );
+          })}
+        </ul>
       </div>
     );
   }
