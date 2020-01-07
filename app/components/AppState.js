@@ -1,9 +1,18 @@
 // eslint-disable-next-line max-classes-per-file
-export class Balance {
+export class TotalBalance {
+  // Total t address, confirmed
   transparent: number;
 
+  // Total t address, unconfirmed
+  unconfirmedTransparent: number;
+
+  // Total private, confirmed + spendable
   private: number;
 
+  // Total private, unconfirmed or not spendable
+  unconfirmedPrivate: number;
+
+  // Total confirmed + spendable
   total: number;
 
   constructor(total: number) {
@@ -11,7 +20,7 @@ export class Balance {
   }
 }
 
-export class Address {
+export class AddressBalance {
   address: string;
 
   balance: number;
@@ -24,7 +33,7 @@ export class Address {
 
 // eslint-disable-next-line max-classes-per-file
 export default class AppState {
-  balance: Balance;
+  totalBalance: TotalBalance;
 
-  addresses: [Address];
+  addressesWithBalance: [AddressBalance];
 }

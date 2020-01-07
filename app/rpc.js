@@ -1,19 +1,20 @@
 import axios from 'axios';
-import { Balance, Address } from './components/AppState';
+import _ from 'underscore';
+import { TotalBalance, AddressBalance } from './components/AppState';
 
 export default class RPC {
-  fnSetBalance: Balance => void;
+  fnSetTotalBalance: TotalBalance => void;
 
-  fnSetAddresses: ([Address]) => void;
+  fnSetAddressesWithBalance: ([AddressBalance]) => void;
 
   timerID: TimerID;
 
   constructor(
-    fnSetBalance: Balance => void,
-    fnSetAddresses: ([Address]) => void
+    fnSetTotalBalance: TotalBalance => void,
+    fnSetAddressesWithBalance: ([AddressBalance]) => void
   ) {
-    this.fnSetBalance = fnSetBalance;
-    this.fnSetAddresses = fnSetAddresses;
+    this.fnSetTotalBalance = fnSetTotalBalance;
+    this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
   }
 
   async configure() {
@@ -30,32 +31,28 @@ export default class RPC {
   async fetchBalance() {
     const response = await RPC.doRPC('z_gettotalbalance', [0]);
 
-    const balance = new Balance(response.result.total);
+    const balance = new TotalBalance(response.result.total);
 
-    this.fnSetBalance(balance);
+    this.fnSetTotalBalance(balance);
   }
 
   // Fetch all addresses and their associated balances
   async fetchAddresses() {
-    const response = await RPC.doRPC('z_listaddresses', []);
+    const response = await RPC.doRPC('z_listunspent', []);
 
-    // response.result has all the addresses.
-    const justAddresses = response.result;
+    // response.result has all the unspent notes.
+    const unspentNotes = response.result;
+    const groups = _.groupBy(unspentNotes, 'address');
 
-    // Now, for each address, get the balance.
-    const balancePromises = justAddresses.map(async address => {
-      const balanceResponse = await RPC.doRPC('z_getbalance', [address]);
-      return { address, balance: balanceResponse.result };
+    const addresses = Object.keys(groups).map(address => {
+      const balance = groups[address].reduce(
+        (prev, obj) => prev + obj.amount,
+        0
+      );
+      return new AddressBalance(address, balance);
     });
 
-    const balances = await Promise.all(balancePromises);
-
-    // Go over all the addresses
-    const addresses: [Address] = balances.map(
-      v => new Address(v.address, v.balance)
-    );
-
-    this.fnSetAddresses(addresses);
+    this.fnSetAddressesWithBalance(addresses);
   }
 
   static async doRPC(method: string, params: []) {

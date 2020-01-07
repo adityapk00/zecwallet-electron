@@ -5,7 +5,7 @@ import App from './containers/App';
 import Home from './components/Home';
 import Send from './components/Send';
 
-import State, { Balance } from './components/AppState';
+import State, { AddressBalance, TotalBalance } from './components/AppState';
 import RPC from './rpc';
 
 type Props = {};
@@ -16,23 +16,23 @@ export default class RouteApp extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    this.state = { balance: new Balance(12), addresses: [] };
+    this.state = { balance: new TotalBalance(12), addresses: [] };
   }
 
   componentDidMount() {
     if (!this.rpc) {
-      this.rpc = new RPC(this.setBalance, this.setAddresses);
+      this.rpc = new RPC(this.setTotalBalance, this.setAddressesWithBalances);
       this.rpc.configure();
     }
   }
 
   componentWillUnmount() {}
 
-  setBalance = (balance: Balance) => {
+  setTotalBalance = (balance: TotalBalance) => {
     this.setState({ balance });
   };
 
-  setAddresses = (addresses: [Addres]) => {
+  setAddressesWithBalances = (addresses: [AddressBalance]) => {
     this.setState({ addresses });
   };
 
