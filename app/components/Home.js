@@ -14,7 +14,7 @@ export default class Home extends Component<Props> {
     const { balance } = this.props;
     return (
       <div className={styles.container} data-tid="container">
-        <h2>Hello Home {balance} </h2>
+        <h2>Hello Home {balance.total} </h2>
         <Link to={routes.SEND}>Send</Link>
       </div>
     );

@@ -5,7 +5,8 @@ import App from './containers/App';
 import Home from './components/Home';
 import Send from './components/Send';
 
-import type State from './components/AppState';
+import State, { Balance } from './components/AppState';
+import RPC from './rpc';
 
 type Props = {};
 
@@ -15,7 +16,7 @@ export default class RouteApp extends React.Component<Props, State> {
   constructor(props) {
     super(props);
 
-    this.state = { balance: 0 };
+    this.state = { balance: new Balance(12) };
   }
 
   componentDidMount() {
@@ -28,9 +29,10 @@ export default class RouteApp extends React.Component<Props, State> {
 
   componentWillUnmount() {}
 
-  tick() {
-    const { balance } = this.state;
-    this.setState({ balance: balance + 1 });
+  async tick() {
+    // Fetch updated balance
+    const result = await RPC.fetchBalance();
+    this.setState({ balance: new Balance(result.total) });
   }
 
   render() {

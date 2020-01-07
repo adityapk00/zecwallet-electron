@@ -14,7 +14,7 @@ export default class Send extends Component<Props> {
     const { balance } = this.props;
     return (
       <div className={styles.container} data-tid="container">
-        <h2>Welcome to send {balance}</h2>
+        <h2>Welcome to send {balance.total}</h2>
         <Link to={routes.HOME}>Back Home</Link>
       </div>
     );
