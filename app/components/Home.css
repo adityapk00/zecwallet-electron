@@ -1,7 +1,15 @@
 .well {
+  overflow: hidden;
   background-color: #000000;
   padding: 1em;
+}
+
+.balancebox {
   margin: 1em;
+}
+
+.txbox {
+  margin-bottom: 1em;
 }
 
 .highlight {
@@ -17,7 +25,7 @@
 }
 
 .small {
-  font-size: 0.4em;
+  font-size: 0.5em;
 }
 
 .sublight {
@@ -27,4 +35,19 @@
 
 .zecsmallpart {
   padding-left: 0.1em;
+}
+
+.txtype {
+  width: 20%;
+  float: left;
+}
+
+.txaddress {
+  width: 60%;
+  float: left;
+}
+
+.txamount {
+  width: 20%;
+  float: right;
 }

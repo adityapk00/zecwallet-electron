@@ -31,6 +31,21 @@ export class AddressBalance {
   }
 }
 
+// List of transactions. TODO: Handle memos, multiple addresses etc...
+export class Transaction {
+  address: string;
+
+  type: string;
+
+  amount: number;
+
+  confirmations: number;
+
+  txid: string;
+
+  time: number;
+}
+
 // eslint-disable-next-line max-classes-per-file
 export default class AppState {
   // The total confirmed and unconfirmed balance in this wallet
@@ -43,4 +58,7 @@ export default class AppState {
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
   addresses: [string];
+
+  // List of all T and Z transactions
+  transactions: [Transaction];
 }

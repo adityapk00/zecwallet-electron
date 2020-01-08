@@ -1,21 +1,28 @@
 import axios from 'axios';
 import _ from 'underscore';
-import { TotalBalance, AddressBalance } from './components/AppState';
-import { resolveConfig } from 'prettier';
+import {
+  TotalBalance,
+  AddressBalance,
+  Transaction
+} from './components/AppState';
 
 export default class RPC {
   fnSetTotalBalance: TotalBalance => void;
 
   fnSetAddressesWithBalance: ([AddressBalance]) => void;
 
+  fnSetTransactionsList: ([Transaction]) => void;
+
   timerID: TimerID;
 
   constructor(
     fnSetTotalBalance: TotalBalance => void,
-    fnSetAddressesWithBalance: ([AddressBalance]) => void
+    fnSetAddressesWithBalance: ([AddressBalance]) => void,
+    fnSetTransactionsList: ([Transaction]) => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
+    this.fnSetTransactionsList = fnSetTransactionsList;
   }
 
   async configure() {
@@ -27,6 +34,7 @@ export default class RPC {
   async refresh() {
     this.fetchTotalBalance();
     this.fetchTandZAddressesWithBalances();
+    this.fetchTandZTransactions();
   }
 
   // This method will get the total balances
@@ -71,6 +79,25 @@ export default class RPC {
     const addresses = zaddresses.concat(taddresses);
 
     this.fnSetAddressesWithBalance(addresses);
+  }
+
+  // Fetch all T and Z transactions
+  async fetchTandZTransactions() {
+    const tresponse = await RPC.doRPC('listtransactions', []);
+
+    const txlist = tresponse.result.map(tx => {
+      const transaction = new Transaction();
+      transaction.address = tx.address;
+      transaction.type = tx.category;
+      transaction.amount = tx.amount;
+      transaction.confirmations = tx.confirmations;
+      transaction.txid = tx.txid;
+      transaction.time = tx.time;
+
+      return transaction;
+    });
+
+    this.fnSetTransactionsList(txlist);
   }
 
   static async doRPC(method: string, params: []) {
