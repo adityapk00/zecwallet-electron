@@ -33,7 +33,14 @@ export class AddressBalance {
 
 // eslint-disable-next-line max-classes-per-file
 export default class AppState {
+  // The total confirmed and unconfirmed balance in this wallet
   totalBalance: TotalBalance;
 
+  // The list of all t and z addresses that have a current balance. That is, the list of
+  // addresses that have a (confirmed or unconfirmed) UTXO or note pending.
   addressesWithBalance: [AddressBalance];
+
+  // List of all addresses in the wallet, including change addresses and addresses
+  // that don't have any balance or are unused
+  addresses: [string];
 }

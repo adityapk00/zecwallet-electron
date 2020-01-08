@@ -1,14 +1,30 @@
-.container {
-  position: absolute;
-  top: 30%;
-  left: 10px;
-  text-align: center;
+.well {
+  background-color: #000000;
+  padding: 1em;
+  margin: 1em;
 }
 
-.container h2 {
-  font-size: 5rem;
+.highlight {
+  color: #c3921f;
 }
 
-.container a {
-  font-size: 1.4rem;
+.xlarge {
+  font-size: 2.5em;
+}
+
+.large {
+  font-size: 1.8em;
+}
+
+.small {
+  font-size: 0.4em;
+}
+
+.sublight {
+  color: #6a6a6a;
+  font-size: 0.8em;
+}
+
+.zecsmallpart {
+  padding-left: 0.1em;
 }

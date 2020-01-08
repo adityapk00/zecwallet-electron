@@ -1,6 +1,7 @@
 import axios from 'axios';
 import _ from 'underscore';
 import { TotalBalance, AddressBalance } from './components/AppState';
+import { resolveConfig } from 'prettier';
 
 export default class RPC {
   fnSetTotalBalance: TotalBalance => void;
@@ -24,33 +25,50 @@ export default class RPC {
   }
 
   async refresh() {
-    this.fetchBalance();
-    this.fetchAddresses();
+    this.fetchTotalBalance();
+    this.fetchTandZAddressesWithBalances();
   }
 
-  async fetchBalance() {
+  // This method will get the total balances
+  async fetchTotalBalance() {
     const response = await RPC.doRPC('z_gettotalbalance', [0]);
 
     const balance = new TotalBalance(response.result.total);
+    balance.private = response.result.private;
+    balance.transparent = response.result.transparent;
 
     this.fnSetTotalBalance(balance);
   }
 
   // Fetch all addresses and their associated balances
-  async fetchAddresses() {
-    const response = await RPC.doRPC('z_listunspent', []);
+  async fetchTandZAddressesWithBalances() {
+    const zresponse = RPC.doRPC('z_listunspent', []);
+    const tresponse = RPC.doRPC('listunspent', []);
 
+    // Do the Z addresses
     // response.result has all the unspent notes.
-    const unspentNotes = response.result;
-    const groups = _.groupBy(unspentNotes, 'address');
-
-    const addresses = Object.keys(groups).map(address => {
-      const balance = groups[address].reduce(
+    const unspentNotes = (await zresponse).result;
+    const zgroups = _.groupBy(unspentNotes, 'address');
+    const zaddresses = Object.keys(zgroups).map(address => {
+      const balance = zgroups[address].reduce(
         (prev, obj) => prev + obj.amount,
         0
       );
       return new AddressBalance(address, balance);
     });
+
+    // Do the T addresses
+    const unspentTXOs = (await tresponse).result;
+    const tgroups = _.groupBy(unspentTXOs, 'address');
+    const taddresses = Object.keys(tgroups).map(address => {
+      const balance = tgroups[address].reduce(
+        (prev, obj) => prev + obj.amount,
+        0
+      );
+      return new AddressBalance(address, balance);
+    });
+
+    const addresses = zaddresses.concat(taddresses);
 
     this.fnSetAddressesWithBalance(addresses);
   }
