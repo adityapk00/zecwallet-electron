@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 /* eslint-disable react/prop-types */
 // @flow
 import React, { Component } from 'react';
@@ -30,6 +31,21 @@ function splitZecAmountIntoBigSmall(zecValue: number) {
   return { bigPart, smallPart };
 }
 
+function splitStringIntoChunks(s: string, numChunks: number) {
+  if (numChunks > s.length) return [s];
+  if (s.length < 16) return [s];
+
+  const chunkSize = Math.round(s.length / numChunks);
+  const chunks = [];
+  for (let i = 0; i < numChunks - 1; i++) {
+    chunks.push(s.substr(i * chunkSize, chunkSize));
+  }
+  // Last chunk might contain un-even length
+  chunks.push(s.substr((numChunks - 1) * chunkSize));
+
+  return chunks;
+}
+
 // eslint-disable-next-line react/prop-types
 const BalanceBlockHighlight = ({ zecValue, usdValue }) => {
   const { bigPart, smallPart } = splitZecAmountIntoBigSmall(zecValue);
@@ -37,7 +53,7 @@ const BalanceBlockHighlight = ({ zecValue, usdValue }) => {
   return (
     <div style={{ float: 'left', padding: '1em' }}>
       <div className={[styles.highlight, styles.xlarge].join(' ')}>
-        ZEC {bigPart}
+        <span>ZEC {bigPart}</span>
         <span className={[styles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
         </span>
@@ -59,7 +75,7 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
         {topLabel}
       </div>
       <div className={[styles.highlight, styles.large].join(' ')}>
-        ZEC {bigPart}{' '}
+        <span>ZEC {bigPart}</span>
         <span className={[styles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
         </span>
@@ -85,7 +101,7 @@ const TxItemBlock = ({ transaction }) => {
 
   return (
     <div>
-      <div className={[styles.small, styles.sublight].join(' ')}>
+      <div className={[styles.small, styles.sublight, styles.txdate].join(' ')}>
         {datePart}
       </div>
       <div className={[styles.well, styles.txbox].join(' ')}>
@@ -95,11 +111,13 @@ const TxItemBlock = ({ transaction }) => {
         </div>
         <div className={styles.txaddress}>
           <div className={styles.highlight}>&quot;Label&quot;</div>
-          <div>{address}</div>
+          <div className={styles.fixedfont}>
+            {splitStringIntoChunks(address, 6).join(' ')}
+          </div>
         </div>
         <div className={[styles.txamount].join(' ')}>
           <div>
-            ZEC {bigPart}{' '}
+            <span>ZEC {bigPart}</span>
             <span className={[styles.small, styles.zecsmallpart].join(' ')}>
               {smallPart}
             </span>
@@ -113,11 +131,39 @@ const TxItemBlock = ({ transaction }) => {
   );
 };
 
-export default class Home extends Component<AppState> {
+type HomeState = {
+  height: number
+};
+
+export default class Home extends Component<AppState, HomeState> {
   props: AppState;
+
+  constructor(props: AppState) {
+    super(props);
+
+    this.state = { height: 0 };
+  }
+
+  componentDidMount() {
+    this.updateDimensions();
+    window.addEventListener('resize', this.updateDimensions.bind(this));
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateDimensions.bind(this));
+  }
+
+  /**
+   * Calculate & Update state of height, needed for the scrolling
+   */
+  updateDimensions() {
+    const updateHeight = window.innerHeight - 200; // TODO: This should be the height of the balance box.
+    this.setState({ height: updateHeight });
+  }
 
   render() {
     const { totalBalance, transactions } = this.props;
+    const { height } = this.state;
 
     return (
       <>
@@ -137,13 +183,11 @@ export default class Home extends Component<AppState> {
             usdValue="12.12"
           />
         </div>
-        <div>
-          <Link to={routes.SEND}>Send</Link>
-          <ul>
-            {transactions.map(tx => {
-              return <TxItemBlock transaction={tx} />;
-            })}
-          </ul>
+        <Link to={routes.SEND}>Send</Link>
+        <div className={styles.txlistcontainer} style={{ height }}>
+          {transactions.map(tx => {
+            return <TxItemBlock key={tx.txid} transaction={tx} />;
+          })}
         </div>
       </>
     );

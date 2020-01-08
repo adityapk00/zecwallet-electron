@@ -85,7 +85,7 @@ export default class RPC {
   async fetchTandZTransactions() {
     const tresponse = await RPC.doRPC('listtransactions', []);
 
-    const txlist = tresponse.result.map(tx => {
+    const ttxlist = tresponse.result.map(tx => {
       const transaction = new Transaction();
       transaction.address = tx.address;
       transaction.type = tx.category;
@@ -97,7 +97,56 @@ export default class RPC {
       return transaction;
     });
 
-    this.fnSetTransactionsList(txlist);
+    this.fnSetTransactionsList(ttxlist);
+
+    // Now get Z txns
+    const zaddresses = await RPC.doRPC('z_listaddresses', []);
+
+    const alltxnsPromise = zaddresses.result.map(async zaddr => {
+      // For each zaddr, get the list of incoming transactions
+      const incomingTxns = await RPC.doRPC('z_listreceivedbyaddress', [zaddr]);
+      const txns = incomingTxns.result
+        .filter(itx => !itx.change)
+        .map(incomingTx => {
+          return {
+            address: zaddr,
+            txid: incomingTx.txid,
+            memo: incomingTx.memo,
+            amount: incomingTx.amount
+          };
+        });
+
+      return txns;
+    });
+
+    const alltxns = (await Promise.all(alltxnsPromise)).flat();
+
+    // Now, for each tx in the array, call gettransaction
+    const ztxlist = await Promise.all(
+      alltxns.map(async tx => {
+        const txresponse = await RPC.doRPC('gettransaction', [tx.txid]);
+
+        const transaction = new Transaction();
+        transaction.address = tx.address;
+        transaction.type = 'receive';
+        transaction.amount = tx.amount;
+        transaction.confirmations = txresponse.result.confirmations;
+        transaction.txid = tx.txid;
+        transaction.time = txresponse.result.time;
+
+        return transaction;
+      })
+    );
+
+    // Now concat the t and z transactions, and call the update function again
+    const alltxlist = ttxlist.concat(ztxlist).sort((tx1, tx2) => {
+      if (tx1.confirmations === tx2.confirmations) {
+        return tx1.time - tx2.time;
+      }
+      return tx1.confirmations - tx2.confirmations;
+    });
+
+    this.fnSetTransactionsList(alltxlist);
   }
 
   static async doRPC(method: string, params: []) {

@@ -1,15 +1,22 @@
 .well {
   overflow: hidden;
   background-color: #000000;
-  padding: 1em;
+  padding: 16px;
 }
 
 .balancebox {
-  margin: 1em;
+  margin: 16px;
+}
+
+.txlistcontainer {
+  overflow-y: auto;
 }
 
 .txbox {
-  margin-bottom: 1em;
+  margin-left: 16px;
+  margin-right: 16px;
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .highlight {
@@ -17,24 +24,32 @@
 }
 
 .xlarge {
-  font-size: 2.5em;
+  font-size: 40px;
 }
 
 .large {
-  font-size: 1.8em;
+  font-size: 24px;
 }
 
 .small {
-  font-size: 0.5em;
+  font-size: 14px;
+}
+
+.fixedfont {
+  font-family: monospace;
 }
 
 .sublight {
   color: #6a6a6a;
-  font-size: 0.8em;
+  font-size: 12px;
 }
 
 .zecsmallpart {
-  padding-left: 0.1em;
+  padding-left: 2px;
+}
+
+.txdate {
+  margin-left: 16px;
 }
 
 .txtype {
