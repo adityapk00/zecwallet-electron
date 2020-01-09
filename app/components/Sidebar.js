@@ -8,8 +8,6 @@ import routes from '../constants/routes.json';
 const SidebarMenuItem = ({ name, routeName, currentRoute }) => {
   let isActive = false;
 
-  console.log(`'${currentRoute}' : '${routeName}'`);
-
   if (
     (currentRoute.endsWith('app.html') && routeName === routes.HOME) ||
     currentRoute === routeName
@@ -21,8 +19,6 @@ const SidebarMenuItem = ({ name, routeName, currentRoute }) => {
   if (isActive) {
     activeColorClass = styles.sidebarmenuitemactive;
   }
-
-  console.log(activeColorClass);
 
   return (
     <div className={[styles.sidebarmenuitem, activeColorClass].join(' ')}>
@@ -36,7 +32,6 @@ const SidebarMenuItem = ({ name, routeName, currentRoute }) => {
 class Sidebar extends Component {
   render() {
     const { location } = this.props;
-    console.log(location);
 
     return (
       <div className={styles.sidebar}>
@@ -53,6 +48,21 @@ class Sidebar extends Component {
         <SidebarMenuItem
           name="Receive"
           routeName={routes.RECEIVE}
+          currentRoute={location.pathname}
+        />
+        <SidebarMenuItem
+          name="Address Book"
+          routeName={routes.ADDRESSBOOK}
+          currentRoute={location.pathname}
+        />
+        <SidebarMenuItem
+          name="Settings"
+          routeName={routes.SETTINGS}
+          currentRoute={location.pathname}
+        />
+        <SidebarMenuItem
+          name="zcashd"
+          routeName={routes.ZCASHD}
           currentRoute={location.pathname}
         />
       </div>

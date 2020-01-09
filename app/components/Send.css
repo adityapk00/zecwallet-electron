@@ -1,0 +1,23 @@
+.sendcontainer {
+  margin: 16px;
+}
+
+.inputbox {
+  width: calc(100% - 16px);
+  min-height: 38px;
+  padding-left: 8px;
+  padding-right: 8px;
+  font-size: 18px;
+  border-color: darkgray;
+  border-radius: 4px;
+  background-color: darkgray;
+}
+
+
+.toaddrcontainer {
+  overflow-y: auto;
+}
+
+.buttoncontainer {
+  text-align: center;
+}

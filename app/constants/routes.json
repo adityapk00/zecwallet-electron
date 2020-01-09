@@ -1,5 +1,8 @@
 {
   "HOME": "/",
   "SEND": "/send",
-  "RECEIVE": "/receive"
+  "RECEIVE": "/receive",
+  "ADDRESSBOOK": "/addressbook",
+  "SETTINGS": "/settings",
+  "ZCASHD": "/zcashd"
 }

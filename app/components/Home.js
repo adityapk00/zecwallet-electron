@@ -2,10 +2,9 @@
 /* eslint-disable react/prop-types */
 // @flow
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import dateformat from 'dateformat';
-import routes from '../constants/routes.json';
 import styles from './Home.css';
+import cstyles from './Common.css';
 import AppState from './AppState';
 import Sidebar from './Sidebar';
 
@@ -53,13 +52,13 @@ const BalanceBlockHighlight = ({ zecValue, usdValue }) => {
 
   return (
     <div style={{ float: 'left', padding: '1em' }}>
-      <div className={[styles.highlight, styles.xlarge].join(' ')}>
+      <div className={[cstyles.highlight, cstyles.xlarge].join(' ')}>
         <span>ZEC {bigPart}</span>
-        <span className={[styles.small, styles.zecsmallpart].join(' ')}>
+        <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
         </span>
       </div>
-      <div className={[styles.sublight, styles.small].join(' ')}>
+      <div className={[cstyles.sublight, cstyles.small].join(' ')}>
         USD {usdValue}
       </div>
     </div>
@@ -75,13 +74,13 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
       <div className={[styles.sublight, styles.small].join(' ')}>
         {topLabel}
       </div>
-      <div className={[styles.highlight, styles.large].join(' ')}>
+      <div className={[cstyles.highlight, cstyles.large].join(' ')}>
         <span>ZEC {bigPart}</span>
-        <span className={[styles.small, styles.zecsmallpart].join(' ')}>
+        <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
         </span>
       </div>
-      <div className={[styles.sublight, styles.small].join(' ')}>
+      <div className={[cstyles.sublight, cstyles.small].join(' ')}>
         USD {usdValue}
       </div>
     </div>
@@ -104,28 +103,30 @@ const TxItemBlock = ({ transaction }) => {
 
   return (
     <div>
-      <div className={[styles.small, styles.sublight, styles.txdate].join(' ')}>
+      <div
+        className={[cstyles.small, cstyles.sublight, styles.txdate].join(' ')}
+      >
         {datePart}
       </div>
-      <div className={[styles.well, styles.txbox].join(' ')}>
+      <div className={[cstyles.well, styles.txbox].join(' ')}>
         <div className={styles.txtype}>
           <div>{transaction.type}</div>
-          <div className={styles.sublight}>{timePart}</div>
+          <div className={cstyles.sublight}>{timePart}</div>
         </div>
         <div className={styles.txaddress}>
-          <div className={styles.highlight}>&quot;Label&quot;</div>
-          <div className={styles.fixedfont}>
+          <div className={cstyles.highlight}>&quot;Label&quot;</div>
+          <div className={cstyles.fixedfont}>
             {splitStringIntoChunks(address, 6).join(' ')}
           </div>
         </div>
         <div className={[styles.txamount].join(' ')}>
           <div>
             <span>ZEC {bigPart}</span>
-            <span className={[styles.small, styles.zecsmallpart].join(' ')}>
+            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
               {smallPart}
             </span>
           </div>
-          <div className={[styles.sublight, styles.small].join(' ')}>
+          <div className={[cstyles.sublight, cstyles.small].join(' ')}>
             USD 12.12
           </div>
         </div>
@@ -174,7 +175,7 @@ export default class Home extends Component<AppState, HomeState> {
           <Sidebar />
         </div>
         <div style={{ width: '70%', float: 'right' }}>
-          <div className={[styles.well, styles.balancebox].join(' ')}>
+          <div className={[cstyles.well, styles.balancebox].join(' ')}>
             <BalanceBlockHighlight
               zecValue={totalBalance.total}
               usdValue="12.12"
