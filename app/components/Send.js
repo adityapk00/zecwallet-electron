@@ -1,9 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import routes from '../constants/routes.json';
 import styles from './Home.css';
 import type State from './AppState';
+import Sidebar from './Sidebar';
 
 type Props = State;
 
@@ -11,11 +10,12 @@ export default class Send extends Component<Props> {
   props: Props;
 
   render() {
-    const { balance } = this.props;
     return (
-      <div className={styles.container} data-tid="container">
-        <h2>Welcome to send {balance.total}</h2>
-        <Link to={routes.HOME}>Back Home</Link>
+      <div style={{ overflow: 'hidden' }}>
+        <div style={{ width: '30%', float: 'left' }}>
+          <Sidebar />
+        </div>
+        <div style={{ width: '70%', float: 'right' }}>Send Content</div>
       </div>
     );
   }

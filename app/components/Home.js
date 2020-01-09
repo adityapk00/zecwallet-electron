@@ -7,6 +7,7 @@ import dateformat from 'dateformat';
 import routes from '../constants/routes.json';
 import styles from './Home.css';
 import AppState from './AppState';
+import Sidebar from './Sidebar';
 
 function splitZecAmountIntoBigSmall(zecValue: number) {
   if (!zecValue) {
@@ -88,7 +89,9 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
 };
 
 const TxItemBlock = ({ transaction }) => {
-  const { bigPart, smallPart } = splitZecAmountIntoBigSmall(transaction.amount);
+  const { bigPart, smallPart } = splitZecAmountIntoBigSmall(
+    Math.abs(transaction.amount)
+  );
 
   const txDate = new Date(transaction.time * 1000);
   const datePart = dateformat(txDate, 'mmm dd, yyyy');
@@ -166,30 +169,34 @@ export default class Home extends Component<AppState, HomeState> {
     const { height } = this.state;
 
     return (
-      <>
-        <div className={[styles.well, styles.balancebox].join(' ')}>
-          <BalanceBlockHighlight
-            zecValue={totalBalance.total}
-            usdValue="12.12"
-          />
-          <BalanceBlock
-            topLabel="Shileded"
-            zecValue={totalBalance.private}
-            usdValue="12.12"
-          />
-          <BalanceBlock
-            topLabel="Transparent"
-            zecValue={totalBalance.transparent}
-            usdValue="12.12"
-          />
+      <div style={{ overflow: 'hidden' }}>
+        <div style={{ width: '30%', float: 'left' }}>
+          <Sidebar />
         </div>
-        <Link to={routes.SEND}>Send</Link>
-        <div className={styles.txlistcontainer} style={{ height }}>
-          {transactions.map(tx => {
-            return <TxItemBlock key={tx.txid} transaction={tx} />;
-          })}
+        <div style={{ width: '70%', float: 'right' }}>
+          <div className={[styles.well, styles.balancebox].join(' ')}>
+            <BalanceBlockHighlight
+              zecValue={totalBalance.total}
+              usdValue="12.12"
+            />
+            <BalanceBlock
+              topLabel="Shileded"
+              zecValue={totalBalance.private}
+              usdValue="12.12"
+            />
+            <BalanceBlock
+              topLabel="Transparent"
+              zecValue={totalBalance.transparent}
+              usdValue="12.12"
+            />
+          </div>
+          <div className={styles.txlistcontainer} style={{ height }}>
+            {transactions.map(tx => {
+              return <TxItemBlock key={tx.txid} transaction={tx} />;
+            })}
+          </div>
         </div>
-      </>
+      </div>
     );
   }
 }

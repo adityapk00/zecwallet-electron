@@ -15,7 +15,7 @@
 .txbox {
   margin-left: 16px;
   margin-right: 16px;
-  margin-top: 8px;
+  margin-top: 4px;
   margin-bottom: 16px;
 }
 
@@ -53,12 +53,12 @@
 }
 
 .txtype {
-  width: 20%;
+  width: 15%;
   float: left;
 }
 
 .txaddress {
-  width: 60%;
+  width: 65%;
   float: left;
 }
 

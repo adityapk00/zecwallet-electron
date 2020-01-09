@@ -1,4 +1,5 @@
 {
   "HOME": "/",
-  "SEND": "/send"
+  "SEND": "/send",
+  "RECEIVE": "/receive"
 }
