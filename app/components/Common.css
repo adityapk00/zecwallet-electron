@@ -1,12 +1,10 @@
 .well {
-  overflow: hidden;
+  display: flex;
   background-color: #000000;
   padding: 16px;
 }
-
-.wellnooverflow {
-  background-color: #000000;
-  padding: 16px;
+.verticalflex {
+  flex-direction: column;
 }
 
 .highlight {

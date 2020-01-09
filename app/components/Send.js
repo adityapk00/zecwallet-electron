@@ -10,11 +10,20 @@ import Sidebar from './Sidebar';
 type Props = State;
 
 class ToAddr {
+  static idCounter: number = 0;
+
+  id: number;
+
   to: string;
 
   amount: number;
 
   memo: string;
+
+  constructor() {
+    // eslint-disable-next-line no-plusplus
+    this.id = ToAddr.idCounter++;
+  }
 }
 
 class SendState {
@@ -35,12 +44,13 @@ const Spacer = () => {
 const ToAddrBox = () => {
   return (
     <div>
-      <div className={cstyles.well}>
+      <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
         <div className={[cstyles.sublight].join(' ')}>To</div>
         <input type="text" className={styles.inputbox} />
         <Spacer />
         <div className={[cstyles.sublight].join(' ')}>Amount</div>
         <input type="text" className={styles.inputbox} />
+        <Spacer />
       </div>
       <Spacer />
     </div>
@@ -82,6 +92,32 @@ export default class Send extends Component<Props, SendState> {
   render() {
     const { height } = this.state;
 
+    const customStyles = {
+      option: (provided, state) => ({
+        ...provided,
+        color: state.isSelected ? '#c3921f;' : 'white',
+        background: '#212124;',
+        padding: 20
+      }),
+      menu: provided => ({
+        ...provided,
+        background: '#212124;'
+      }),
+      control: () => ({
+        // none of react-select's styles are passed to <Control />
+        display: 'flex',
+        alignItems: 'center',
+        flexWrap: 'flex',
+        background: '#212124;'
+      }),
+      singleValue: (provided, state) => {
+        const opacity = state.isDisabled ? 0.5 : 1;
+        const transition = 'opacity 300ms';
+
+        return { ...provided, opacity, transition, color: '#ffffff' };
+      }
+    };
+
     const options = [
       { value: 'chocolate', label: 'Chocolate' },
       { value: 'strawberry', label: 'Strawberry' },
@@ -95,21 +131,22 @@ export default class Send extends Component<Props, SendState> {
         </div>
         <div style={{ width: '70%', float: 'right' }}>
           <div className={styles.sendcontainer}>
-            <div className={cstyles.wellnooverflow}>
+            <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
               <div className={[cstyles.sublight].join(' ')}>Send From</div>
-              <Select options={options} classNamePrefix="from-address" />
+              <Select options={options} styles={customStyles} />
             </div>
 
             <Spacer />
 
             <div className={styles.toaddrcontainer} style={{ height }}>
               {// eslint-disable-next-line react/destructuring-assignment
-              this.state.toaddrs.map((toaddr, index) => {
-                // eslint-disable-next-line react/no-array-index-key
-                return <ToAddrBox key={index} />;
+              this.state.toaddrs.map(toaddr => {
+                return <ToAddrBox key={toaddr.id} />;
               })}
               <div style={{ textAlign: 'right' }}>
-                <button type="button" onClick={this.addToAddr}>+</button>
+                <button type="button" onClick={this.addToAddr}>
+                  +
+                </button>
               </div>
             </div>
 
