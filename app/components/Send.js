@@ -53,7 +53,6 @@ export default class Send extends Component<Props, SendState> {
   constructor(props: Props) {
     super(props);
 
-    console.log('Creating new Send');
     this.state = new SendState();
   }
 
@@ -120,7 +119,6 @@ export default class Send extends Component<Props, SendState> {
   };
 
   render() {
-    console.log('Rendering send');
     const { height } = this.state;
     const { sendPageState } = this.props;
 

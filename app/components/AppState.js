@@ -77,14 +77,14 @@ export default class AppState {
 
   // The list of all t and z addresses that have a current balance. That is, the list of
   // addresses that have a (confirmed or unconfirmed) UTXO or note pending.
-  addressesWithBalance: [AddressBalance];
+  addressesWithBalance: AddressBalance[];
 
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
-  addresses: [string];
+  addresses: string[];
 
   // List of all T and Z transactions
-  transactions: [Transaction];
+  transactions: Transaction[];
 
   // The state of the send page, as the user constructs a transaction
   sendPageState: SendPageState;

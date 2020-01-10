@@ -4,6 +4,7 @@ import routes from './constants/routes.json';
 import App from './containers/App';
 import Home from './components/Home';
 import Send from './components/Send';
+import Receive from './components/Receive';
 
 import AppState, {
   AddressBalance,
@@ -35,7 +36,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
       this.rpc = new RPC(
         this.setTotalBalance,
         this.setAddressesWithBalances,
-        this.setTransactionList
+        this.setTransactionList,
+        this.setAllAddresses
       );
       this.rpc.configure();
     }
@@ -47,13 +49,16 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.setState({ totalBalance });
   };
 
-  setAddressesWithBalances = (addressesWithBalance: [AddressBalance]) => {
-    console.log('addresses with balance updated');
+  setAddressesWithBalances = (addressesWithBalance: AddressBalance[]) => {
     this.setState({ addressesWithBalance });
   };
 
-  setTransactionList = (transactions: [Transaction]) => {
+  setTransactionList = (transactions: Transaction[]) => {
     this.setState({ transactions });
+  };
+
+  setAllAddresses = (addresses: string[]) => {
+    this.setState({ addresses });
   };
 
   setSendPageState = (sendPageState: SendPageState) => {
@@ -61,8 +66,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
   };
 
   render() {
-    const { addressesWithBalance, sendPageState } = this.state;
-
+    const { addressesWithBalance, addresses, sendPageState } = this.state;
+    console.log(`Route rendeing ${addresses.length} addresses`);
     return (
       <App>
         <Switch>
@@ -75,6 +80,10 @@ export default class RouteApp extends React.Component<Props, AppState> {
                 setSendPageState={this.setSendPageState}
               />
             )}
+          />
+          <Route
+            path={routes.RECEIVE}
+            component={() => <Receive addresses={addresses} />}
           />
           <Route
             path={routes.HOME}

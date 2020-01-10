@@ -9,20 +9,24 @@ import {
 export default class RPC {
   fnSetTotalBalance: TotalBalance => void;
 
-  fnSetAddressesWithBalance: ([AddressBalance]) => void;
+  fnSetAddressesWithBalance: (AddressBalance[]) => void;
 
-  fnSetTransactionsList: ([Transaction]) => void;
+  fnSetTransactionsList: (Transaction[]) => void;
+
+  fnSetAllAddresses: (string[]) => void;
 
   timerID: TimerID;
 
   constructor(
     fnSetTotalBalance: TotalBalance => void,
-    fnSetAddressesWithBalance: ([AddressBalance]) => void,
-    fnSetTransactionsList: ([Transaction]) => void
+    fnSetAddressesWithBalance: (AddressBalance[]) => void,
+    fnSetTransactionsList: (Transaction[]) => void,
+    fnSetAllAddresses: (string[]) => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
+    this.fnSetAllAddresses = fnSetAllAddresses;
   }
 
   async configure() {
@@ -35,6 +39,7 @@ export default class RPC {
     this.fetchTotalBalance();
     this.fetchTandZAddressesWithBalances();
     this.fetchTandZTransactions();
+    this.fetchAllAddresses();
   }
 
   // This method will get the total balances
@@ -148,6 +153,17 @@ export default class RPC {
     });
 
     this.fnSetTransactionsList(alltxlist);
+  }
+
+  // Get all Addresses, including T and Z addresses
+  async fetchAllAddresses() {
+    const zaddrsPromise = RPC.doRPC('z_listaddresses', []);
+    const taddrsPromise = RPC.doRPC('getaddressesbyaccount', ['']);
+
+    const allZ = (await zaddrsPromise).result;
+    const allT = (await taddrsPromise).result;
+
+    this.fnSetAllAddresses(allZ.concat(allT));
   }
 
   static async doRPC(method: string, params: []) {
