@@ -41,7 +41,8 @@ export default class RPC {
   async fetchTotalBalance() {
     const response = await RPC.doRPC('z_gettotalbalance', [0]);
 
-    const balance = new TotalBalance(response.result.total);
+    const balance = new TotalBalance();
+    balance.total = response.result.total;
     balance.private = response.result.private;
     balance.transparent = response.result.transparent;
 
@@ -62,7 +63,7 @@ export default class RPC {
         (prev, obj) => prev + obj.amount,
         0
       );
-      return new AddressBalance(address, balance);
+      return new AddressBalance(address, Number(balance.toFixed(8)));
     });
 
     // Do the T addresses
@@ -73,7 +74,7 @@ export default class RPC {
         (prev, obj) => prev + obj.amount,
         0
       );
-      return new AddressBalance(address, balance);
+      return new AddressBalance(address, Number(balance.toFixed(8)));
     });
 
     const addresses = zaddresses.concat(taddresses);

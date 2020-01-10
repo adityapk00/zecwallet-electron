@@ -7,6 +7,7 @@ import styles from './Home.css';
 import cstyles from './Common.css';
 import AppState from './AppState';
 import Sidebar from './Sidebar';
+import Utils from '../utils/utils';
 
 function splitZecAmountIntoBigSmall(zecValue: number) {
   if (!zecValue) {
@@ -53,7 +54,9 @@ const BalanceBlockHighlight = ({ zecValue, usdValue }) => {
   return (
     <div style={{ float: 'left', padding: '1em' }}>
       <div className={[cstyles.highlight, cstyles.xlarge].join(' ')}>
-        <span>ZEC {bigPart}</span>
+        <span>
+          {Utils.CurrencyName()} {bigPart}
+        </span>
         <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
         </span>
@@ -75,7 +78,9 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
         {topLabel}
       </div>
       <div className={[cstyles.highlight, cstyles.large].join(' ')}>
-        <span>ZEC {bigPart}</span>
+        <span>
+          {Utils.CurrencyName()} {bigPart}
+        </span>
         <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
         </span>
@@ -121,7 +126,9 @@ const TxItemBlock = ({ transaction }) => {
         </div>
         <div className={[styles.txamount].join(' ')}>
           <div>
-            <span>ZEC {bigPart}</span>
+            <span>
+              {Utils.CurrencyName()} {bigPart}
+            </span>
             <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
               {smallPart}
             </span>

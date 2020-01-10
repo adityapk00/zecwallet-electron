@@ -4,35 +4,19 @@ import React, { Component } from 'react';
 import Select from 'react-select';
 import styles from './Send.css';
 import cstyles from './Common.css';
-import type State from './AppState';
+import { ToAddr, AddressBalance, SendPageState } from './AppState';
 import Sidebar from './Sidebar';
+import Utils from '../utils/utils';
 
-type Props = State;
-
-class ToAddr {
-  static idCounter: number = 0;
-
-  id: number;
-
-  to: string;
-
-  amount: number;
-
-  memo: string;
-
-  constructor() {
-    // eslint-disable-next-line no-plusplus
-    this.id = ToAddr.idCounter++;
-  }
-}
+type OptionType = {
+  value: string,
+  label: string
+};
 
 class SendState {
-  toaddrs: ToAddr[];
-
   height: number;
 
   constructor() {
-    this.toaddrs = [new ToAddr()];
     this.height = 0;
   }
 }
@@ -57,10 +41,19 @@ const ToAddrBox = () => {
   );
 };
 
+type Props = {
+  addressesWithBalance: AddressBalance[],
+
+  sendPageState: SendPageState,
+
+  setSendPageState: (sendPageState: SendPageState) => void
+};
+
 export default class Send extends Component<Props, SendState> {
   constructor(props: Props) {
     super(props);
 
+    console.log('Creating new Send');
     this.state = new SendState();
   }
 
@@ -74,14 +67,38 @@ export default class Send extends Component<Props, SendState> {
   }
 
   addToAddr = () => {
-    const { state } = this;
-    const newToAddrs = state.toaddrs.concat(new ToAddr());
+    const { sendPageState, setSendPageState } = this.props;
+    const newToAddrs = sendPageState.toaddrs.concat(new ToAddr());
 
-    this.setState({ toaddrs: newToAddrs });
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = sendPageState.fromaddr;
+    newState.toaddrs = newToAddrs;
+
+    setSendPageState(newState);
   };
 
   clearToAddrs = () => {
-    this.setState({ toaddrs: [new ToAddr()] });
+    const { sendPageState, setSendPageState } = this.props;
+    const newToAddrs = [new ToAddr()];
+
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = sendPageState.fromaddr;
+    newState.toaddrs = newToAddrs;
+
+    setSendPageState(newState);
+  };
+
+  changeFrom = (selectedOption: OptionType) => {
+    const { sendPageState, setSendPageState } = this.props;
+
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = selectedOption.value;
+    newState.toaddrs = sendPageState.toaddrs;
+
+    setSendPageState(newState);
   };
 
   updateDimensions() {
@@ -89,8 +106,23 @@ export default class Send extends Component<Props, SendState> {
     this.setState({ height: updateHeight });
   }
 
+  getLabelForFromAddress = (
+    addr: string,
+    addressesWithBalance: AddressBalance[]
+  ) => {
+    // Find the addr in addressesWithBalance
+    const addressBalance: AddressBalance = addressesWithBalance.find(
+      ab => ab.address === addr
+    );
+
+    return `[ ${Utils.CurrencyName()} ${addressBalance.balance.toString()} ]
+                  ${addr}`;
+  };
+
   render() {
+    console.log('Rendering send');
     const { height } = this.state;
+    const { sendPageState } = this.props;
 
     const customStyles = {
       option: (provided, state) => ({
@@ -118,11 +150,25 @@ export default class Send extends Component<Props, SendState> {
       }
     };
 
-    const options = [
-      { value: 'chocolate', label: 'Chocolate' },
-      { value: 'strawberry', label: 'Strawberry' },
-      { value: 'vanilla', label: 'Vanilla' }
-    ];
+    const { addressesWithBalance } = this.props;
+    const sendFromList = addressesWithBalance.map(ab => {
+      return {
+        value: ab.address,
+        label: this.getLabelForFromAddress(ab.address, addressesWithBalance)
+      };
+    });
+
+    // Find the fromaddress
+    let fromaddr = {};
+    if (sendPageState.fromaddr) {
+      fromaddr = {
+        value: sendPageState.fromaddr,
+        label: this.getLabelForFromAddress(
+          sendPageState.fromaddr,
+          addressesWithBalance
+        )
+      };
+    }
 
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -133,14 +179,19 @@ export default class Send extends Component<Props, SendState> {
           <div className={styles.sendcontainer}>
             <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
               <div className={[cstyles.sublight].join(' ')}>Send From</div>
-              <Select options={options} styles={customStyles} />
+              <Select
+                value={fromaddr}
+                options={sendFromList}
+                styles={customStyles}
+                // $FlowFixMe
+                onChange={this.changeFrom}
+              />
             </div>
 
             <Spacer />
 
             <div className={styles.toaddrcontainer} style={{ height }}>
-              {// eslint-disable-next-line react/destructuring-assignment
-              this.state.toaddrs.map(toaddr => {
+              {sendPageState.toaddrs.map(toaddr => {
                 return <ToAddrBox key={toaddr.id} />;
               })}
               <div style={{ textAlign: 'right' }}>

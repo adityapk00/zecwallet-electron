@@ -8,7 +8,8 @@ import Send from './components/Send';
 import AppState, {
   AddressBalance,
   TotalBalance,
-  Transaction
+  Transaction,
+  SendPageState
 } from './components/AppState';
 import RPC from './rpc';
 
@@ -21,10 +22,11 @@ export default class RouteApp extends React.Component<Props, AppState> {
     super(props);
 
     this.state = {
-      totalBalance: new TotalBalance(12),
+      totalBalance: new TotalBalance(),
       addressesWithBalance: [],
       addresses: [],
-      transactions: []
+      transactions: [],
+      sendPageState: new SendPageState()
     };
   }
 
@@ -46,6 +48,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
   };
 
   setAddressesWithBalances = (addressesWithBalance: [AddressBalance]) => {
+    console.log('addresses with balance updated');
     this.setState({ addressesWithBalance });
   };
 
@@ -53,19 +56,30 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.setState({ transactions });
   };
 
+  setSendPageState = (sendPageState: SendPageState) => {
+    this.setState({ sendPageState });
+  };
+
   render() {
+    const { addressesWithBalance, sendPageState } = this.state;
+
     return (
       <App>
         <Switch>
           <Route
             path={routes.SEND}
-            // eslint-disable-next-line
-            component={props => <Send {...this.state} />}
+            component={() => (
+              <Send
+                addressesWithBalance={addressesWithBalance}
+                sendPageState={sendPageState}
+                setSendPageState={this.setSendPageState}
+              />
+            )}
           />
           <Route
             path={routes.HOME}
-            // eslint-disable-next-line
-            component={props => <Home {...this.state} />}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            component={() => <Home {...this.state} />}
           />
         </Switch>
       </App>

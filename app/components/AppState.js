@@ -14,10 +14,6 @@ export class TotalBalance {
 
   // Total confirmed + spendable
   total: number;
-
-  constructor(total: number) {
-    this.total = total;
-  }
 }
 
 export class AddressBalance {
@@ -46,6 +42,34 @@ export class Transaction {
   time: number;
 }
 
+export class ToAddr {
+  static idCounter: number = 0;
+
+  id: number;
+
+  to: string;
+
+  amount: number;
+
+  memo: string;
+
+  constructor() {
+    // eslint-disable-next-line no-plusplus
+    this.id = ToAddr.idCounter++;
+  }
+}
+
+export class SendPageState {
+  fromaddr: string;
+
+  toaddrs: ToAddr[];
+
+  constructor() {
+    this.fromaddr = '';
+    this.toaddrs = [new ToAddr()];
+  }
+}
+
 // eslint-disable-next-line max-classes-per-file
 export default class AppState {
   // The total confirmed and unconfirmed balance in this wallet
@@ -61,4 +85,7 @@ export default class AppState {
 
   // List of all T and Z transactions
   transactions: [Transaction];
+
+  // The state of the send page, as the user constructs a transaction
+  sendPageState: SendPageState;
 }
