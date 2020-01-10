@@ -10,9 +10,11 @@ import AppState, {
   AddressBalance,
   TotalBalance,
   Transaction,
-  SendPageState
+  SendPageState,
+  ToAddr
 } from './components/AppState';
 import RPC from './rpc';
+import Utils from './utils/utils';
 
 type Props = {};
 
@@ -29,6 +31,10 @@ export default class RouteApp extends React.Component<Props, AppState> {
       transactions: [],
       sendPageState: new SendPageState()
     };
+
+    // Create the initial ToAddr box
+    // eslint-disable-next-line react/destructuring-assignment
+    this.state.sendPageState.toaddrs = [new ToAddr(Utils.getNextToAddrID())];
   }
 
   componentDidMount() {
@@ -47,34 +53,39 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setTotalBalance = (totalBalance: TotalBalance) => {
     this.setState({ totalBalance });
+    console.log('updated balances');
   };
 
   setAddressesWithBalances = (addressesWithBalance: AddressBalance[]) => {
     this.setState({ addressesWithBalance });
+    console.log('updated addressbalances');
   };
 
   setTransactionList = (transactions: Transaction[]) => {
     this.setState({ transactions });
+    console.log('updated transactions');
   };
 
   setAllAddresses = (addresses: string[]) => {
     this.setState({ addresses });
+    console.log('updated all addresses');
   };
 
   setSendPageState = (sendPageState: SendPageState) => {
     this.setState({ sendPageState });
+    console.log('updated sendpagestate');
   };
 
   render() {
     const { addressesWithBalance, addresses, sendPageState } = this.state;
-    console.log(`Route rendeing ${addresses.length} addresses`);
     return (
       <App>
         <Switch>
           <Route
             path={routes.SEND}
-            component={() => (
+            render={() => (
               <Send
+                key="send"
                 addressesWithBalance={addressesWithBalance}
                 sendPageState={sendPageState}
                 setSendPageState={this.setSendPageState}
@@ -83,12 +94,12 @@ export default class RouteApp extends React.Component<Props, AppState> {
           />
           <Route
             path={routes.RECEIVE}
-            component={() => <Receive addresses={addresses} />}
+            render={() => <Receive key="receive" addresses={addresses} />}
           />
           <Route
             path={routes.HOME}
             // eslint-disable-next-line react/jsx-props-no-spreading
-            component={() => <Home {...this.state} />}
+            render={() => <Home key="home" {...this.state} />}
           />
         </Switch>
       </App>

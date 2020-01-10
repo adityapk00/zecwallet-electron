@@ -1,4 +1,5 @@
-// eslint-disable-next-line max-classes-per-file
+/* eslint-disable max-classes-per-file */
+
 export class TotalBalance {
   // Total t address, confirmed
   transparent: number;
@@ -43,8 +44,6 @@ export class Transaction {
 }
 
 export class ToAddr {
-  static idCounter: number = 0;
-
   id: number;
 
   to: string;
@@ -53,9 +52,9 @@ export class ToAddr {
 
   memo: string;
 
-  constructor() {
+  constructor(id: number) {
     // eslint-disable-next-line no-plusplus
-    this.id = ToAddr.idCounter++;
+    this.id = id;
   }
 }
 
@@ -66,7 +65,7 @@ export class SendPageState {
 
   constructor() {
     this.fromaddr = '';
-    this.toaddrs = [new ToAddr()];
+    this.toaddrs = [];
   }
 }
 

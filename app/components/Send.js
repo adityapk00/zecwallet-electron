@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable max-classes-per-file */
 // @flow
 import React, { Component } from 'react';
@@ -67,7 +68,9 @@ export default class Send extends Component<Props, SendState> {
 
   addToAddr = () => {
     const { sendPageState, setSendPageState } = this.props;
-    const newToAddrs = sendPageState.toaddrs.concat(new ToAddr());
+    const newToAddrs = sendPageState.toaddrs.concat(
+      new ToAddr(Utils.getNextToAddrID())
+    );
 
     // Create the new state object
     const newState = new SendPageState();
