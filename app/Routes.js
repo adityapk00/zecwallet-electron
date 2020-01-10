@@ -85,7 +85,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
             path={routes.SEND}
             render={() => (
               <Send
-                key="send"
                 addressesWithBalance={addressesWithBalance}
                 sendPageState={sendPageState}
                 setSendPageState={this.setSendPageState}
@@ -94,12 +93,12 @@ export default class RouteApp extends React.Component<Props, AppState> {
           />
           <Route
             path={routes.RECEIVE}
-            render={() => <Receive key="receive" addresses={addresses} />}
+            render={() => <Receive addresses={addresses} />}
           />
           <Route
             path={routes.HOME}
             // eslint-disable-next-line react/jsx-props-no-spreading
-            render={() => <Home key="home" {...this.state} />}
+            render={() => <Home {...this.state} />}
           />
         </Switch>
       </App>
