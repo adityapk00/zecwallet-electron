@@ -2,6 +2,7 @@
 /* eslint-disable max-classes-per-file */
 // @flow
 import React, { Component } from 'react';
+import Modal from 'react-modal';
 import Select from 'react-select';
 import styles from './Send.css';
 import cstyles from './Common.css';
@@ -17,8 +18,11 @@ type OptionType = {
 class SendState {
   height: number;
 
+  modalIsOpen: boolean;
+
   constructor() {
     this.height = 0;
+    this.modalIsOpen = false;
   }
 }
 
@@ -108,6 +112,14 @@ export default class Send extends Component<Props, SendState> {
     this.setState({ height: updateHeight });
   }
 
+  openModal = () => {
+    this.setState({ modalIsOpen: true });
+  };
+
+  closeModal = () => {
+    this.setState({ modalIsOpen: false });
+  };
+
   getLabelForFromAddress = (
     addr: string,
     addressesWithBalance: AddressBalance[]
@@ -122,7 +134,7 @@ export default class Send extends Component<Props, SendState> {
   };
 
   render() {
-    const { height } = this.state;
+    const { height, modalIsOpen } = this.state;
     const { sendPageState } = this.props;
 
     const customStyles = {
@@ -203,7 +215,11 @@ export default class Send extends Component<Props, SendState> {
             </div>
 
             <div className={styles.buttoncontainer}>
-              <button type="button" className={cstyles.primarybutton}>
+              <button
+                type="button"
+                className={cstyles.primarybutton}
+                onClick={this.openModal}
+              >
                 Send
               </button>
               <button
@@ -214,6 +230,18 @@ export default class Send extends Component<Props, SendState> {
                 Cancel
               </button>
             </div>
+
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={this.closeModal}
+              className={styles.confirmModal}
+              overlayClassName={styles.confirmOverlay}
+            >
+              <span style={{ color: 'pink' }}>
+                This is a modalThis is a modalThis is a modalThis is a modalThis
+                is a modalThis is a modalThis is a modal
+              </span>
+            </Modal>
           </div>
         </div>
       </div>
