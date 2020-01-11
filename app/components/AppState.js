@@ -53,8 +53,11 @@ export class ToAddr {
   memo: string;
 
   constructor(id: number) {
-    // eslint-disable-next-line no-plusplus
     this.id = id;
+
+    this.to = '';
+    this.amount = 0;
+    this.memo = '';
   }
 }
 

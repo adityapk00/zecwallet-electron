@@ -30,15 +30,26 @@ const Spacer = () => {
   return <div style={{ marginTop: '24px' }} />;
 };
 
-const ToAddrBox = () => {
+// $FlowFixMe
+const ToAddrBox = ({ toaddr, updateToField }) => {
   return (
     <div>
       <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
         <div className={[cstyles.sublight].join(' ')}>To</div>
-        <input type="text" className={styles.inputbox} />
+        <input
+          type="text"
+          className={styles.inputbox}
+          value={toaddr.to}
+          onChange={e => updateToField(toaddr.id, e, null, null)}
+        />
         <Spacer />
         <div className={[cstyles.sublight].join(' ')}>Amount</div>
-        <input type="text" className={styles.inputbox} />
+        <input
+          type="text"
+          className={styles.inputbox}
+          value={toaddr.amount}
+          onChange={e => updateToField(toaddr.id, null, e, null)}
+        />
         <Spacer />
       </div>
       <Spacer />
@@ -103,6 +114,40 @@ export default class Send extends Component<Props, SendState> {
     const newState = new SendPageState();
     newState.fromaddr = selectedOption.value;
     newState.toaddrs = sendPageState.toaddrs;
+
+    setSendPageState(newState);
+  };
+
+  updateToField = (
+    id: number,
+    address: Event | null,
+    amount: Event | null,
+    memo: Event | null
+  ) => {
+    const { sendPageState, setSendPageState } = this.props;
+
+    const newToAddrs = sendPageState.toaddrs.slice(0);
+    // Find the correct toAddr
+    const toAddr = newToAddrs.find(a => a.id === id);
+    if (address) {
+      // $FlowFixMe
+      toAddr.to = address.target.value;
+    }
+
+    if (amount) {
+      // $FlowFixMe
+      toAddr.amount = amount.target.value;
+    }
+
+    if (memo) {
+      // $FlowFixMe
+      toAddr.memo = memo.target.value;
+    }
+
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = sendPageState.fromaddr;
+    newState.toaddrs = newToAddrs;
 
     setSendPageState(newState);
   };
@@ -205,7 +250,13 @@ export default class Send extends Component<Props, SendState> {
 
             <div className={styles.toaddrcontainer} style={{ height }}>
               {sendPageState.toaddrs.map(toaddr => {
-                return <ToAddrBox key={toaddr.id} />;
+                return (
+                  <ToAddrBox
+                    key={toaddr.id}
+                    toaddr={toaddr}
+                    updateToField={this.updateToField}
+                  />
+                );
               })}
               <div style={{ textAlign: 'right' }}>
                 <button type="button" onClick={this.addToAddr}>
