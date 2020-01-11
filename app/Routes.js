@@ -73,7 +73,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setSendPageState = (sendPageState: SendPageState) => {
     this.setState({ sendPageState });
-    console.log('updated sendpagestate');
   };
 
   render() {

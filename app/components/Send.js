@@ -289,8 +289,13 @@ export default class Send extends Component<Props, SendState> {
               overlayClassName={styles.confirmOverlay}
             >
               <span style={{ color: 'pink' }}>
-                This is a modalThis is a modalThis is a modalThis is a modalThis
-                is a modalThis is a modalThis is a modal
+                {sendPageState.fromaddr}
+                <br />
+                {sendPageState.toaddrs.map(t => (
+                  <div>
+                    {t.to} : {t.amount}
+                  </div>
+                ))}
               </span>
             </Modal>
           </div>
