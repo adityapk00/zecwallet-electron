@@ -97,7 +97,7 @@ export default class Send extends Component<Props, SendState> {
 
   clearToAddrs = () => {
     const { sendPageState, setSendPageState } = this.props;
-    const newToAddrs = [new ToAddr()];
+    const newToAddrs = [new ToAddr(Utils.getNextToAddrID())];
 
     // Create the new state object
     const newState = new SendPageState();
@@ -163,6 +163,21 @@ export default class Send extends Component<Props, SendState> {
 
   closeModal = () => {
     this.setState({ modalIsOpen: false });
+  };
+
+  // Create the z_sendmany structure
+  getSendManyJSON = () => {
+    const { sendPageState } = this.props;
+
+    const json = [];
+    json.push(sendPageState.fromaddr);
+    json.push(
+      sendPageState.toaddrs.map(to => {
+        return { address: to.to, amount: to.amount };
+      })
+    );
+
+    console.log(json);
   };
 
   getLabelForFromAddress = (
@@ -296,6 +311,12 @@ export default class Send extends Component<Props, SendState> {
                     {t.to} : {t.amount}
                   </div>
                 ))}
+                <button type="button" onClick={this.getSendManyJSON}>
+                  Confirm
+                </button>
+                <button type="button" onClick={this.closeModal}>
+                  Cancel
+                </button>
               </span>
             </Modal>
           </div>

@@ -5,7 +5,7 @@ import React, { Component } from 'react';
 import dateformat from 'dateformat';
 import styles from './Home.css';
 import cstyles from './Common.css';
-import AppState from './AppState';
+import { TotalBalance, Transaction } from './AppState';
 import Sidebar from './Sidebar';
 import Utils from '../utils/utils';
 
@@ -146,10 +146,13 @@ type HomeState = {
   height: number
 };
 
-export default class Home extends Component<AppState, HomeState> {
-  props: AppState;
+type Props = {
+  totalBalance: TotalBalance,
+  transactions: Transaction[]
+};
 
-  constructor(props: AppState) {
+export default class Home extends Component<Props, HomeState> {
+  constructor(props: Props) {
     super(props);
 
     this.state = { height: 0 };
