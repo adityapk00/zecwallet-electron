@@ -292,7 +292,7 @@ export default class Send extends Component<Props, SendState> {
                 {sendPageState.fromaddr}
                 <br />
                 {sendPageState.toaddrs.map(t => (
-                  <div>
+                  <div key={t.to}>
                     {t.to} : {t.amount}
                   </div>
                 ))}
