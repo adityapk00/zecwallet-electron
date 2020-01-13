@@ -4,6 +4,7 @@
 
 .txlistcontainer {
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .txbox {
@@ -26,12 +27,21 @@
   float: left;
 }
 
+.txaddressamount {
+  width: 85%;
+  float: left;
+}
+
 .txaddress {
-  width: 65%;
+  width: 75%;
   float: left;
 }
 
 .txamount {
   width: 20%;
   float: right;
+}
+
+.txmemo {
+  word-break: break-all;
 }

@@ -28,11 +28,19 @@ export class AddressBalance {
   }
 }
 
-// List of transactions. TODO: Handle memos, multiple addresses etc...
-export class Transaction {
+export class TxDetail {
   address: string;
 
+  amount: string;
+
+  memo: string | null;
+}
+
+// List of transactions. TODO: Handle memos, multiple addresses etc...
+export class Transaction {
   type: string;
+
+  address: string;
 
   amount: number;
 
@@ -41,6 +49,8 @@ export class Transaction {
   txid: string;
 
   time: number;
+
+  detailedTxns: TxDetail[];
 }
 
 export class ToAddr {

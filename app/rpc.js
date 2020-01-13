@@ -4,8 +4,27 @@ import {
   TotalBalance,
   AddressBalance,
   Transaction,
-  RPCConfig
+  RPCConfig,
+  TxDetail
 } from './components/AppState';
+
+const parseMemo = (memoHex: string): string | null => {
+  if (!memoHex || memoHex.length < 2) return null;
+
+  // First, check if this is a memo (first byte is less than 'f6' (246))
+  if (parseInt(memoHex.substr(0, 2), 16) >= 246) return null;
+
+  // Else, parse as Hex string
+  const memo = _.chunk(memoHex.split(''), 2)
+    .map(hexChunk => parseInt(hexChunk.join(''), 16))
+    .filter(c => c > 0)
+    .map(c => String.fromCharCode(c))
+    .join('');
+
+  if (memo === '') return null;
+
+  return memo;
+};
 
 export default class RPC {
   rpcConfig: RPCConfig;
@@ -40,6 +59,10 @@ export default class RPC {
     }
   }
 
+  setupNextFetch() {
+    this.timerID = setTimeout(() => this.refresh(), 20000);
+  }
+
   async doRPC(method: string, params: []) {
     const { url, username, password } = this.rpcConfig;
     const response = await axios(url, {
@@ -60,10 +83,19 @@ export default class RPC {
   }
 
   async refresh() {
-    this.fetchTotalBalance();
-    this.fetchTandZAddressesWithBalances();
-    this.fetchTandZTransactions();
-    this.fetchAllAddresses();
+    const balP = this.fetchTotalBalance();
+    const abP = this.fetchTandZAddressesWithBalances();
+    const txns = this.fetchTandZTransactions();
+    const addrs = this.fetchAllAddresses();
+
+    await balP;
+    await abP;
+    await txns;
+    await addrs;
+
+    // All done, set up next fetch
+    console.log('All done, setting up next fetch');
+    this.setupNextFetch();
   }
 
   // This method will get the total balances
@@ -123,11 +155,12 @@ export default class RPC {
       transaction.confirmations = tx.confirmations;
       transaction.txid = tx.txid;
       transaction.time = tx.time;
+      transaction.detailedTxns = [new TxDetail()];
+      transaction.detailedTxns[0].address = tx.address;
+      transaction.detailedTxns[0].amount = tx.amount;
 
       return transaction;
     });
-
-    this.fnSetTransactionsList(ttxlist);
 
     // Now get Z txns
     const zaddresses = await this.doRPC('z_listaddresses', []);
@@ -141,7 +174,7 @@ export default class RPC {
           return {
             address: zaddr,
             txid: incomingTx.txid,
-            memo: incomingTx.memo,
+            memo: parseMemo(incomingTx.memo),
             amount: incomingTx.amount
           };
         });
@@ -163,6 +196,10 @@ export default class RPC {
         transaction.confirmations = txresponse.result.confirmations;
         transaction.txid = tx.txid;
         transaction.time = txresponse.result.time;
+        transaction.detailedTxns = [new TxDetail()];
+        transaction.detailedTxns[0].address = tx.address;
+        transaction.detailedTxns[0].amount = tx.amount;
+        transaction.detailedTxns[0].memo = tx.memo;
 
         return transaction;
       })

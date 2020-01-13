@@ -93,18 +93,9 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
 };
 
 const TxItemBlock = ({ transaction }) => {
-  const { bigPart, smallPart } = splitZecAmountIntoBigSmall(
-    Math.abs(transaction.amount)
-  );
-
   const txDate = new Date(transaction.time * 1000);
   const datePart = dateformat(txDate, 'mmm dd, yyyy');
   const timePart = dateformat(txDate, 'hh:MM tt');
-
-  let { address } = transaction;
-  if (!address) {
-    address = '(Shielded)';
-  }
 
   return (
     <div>
@@ -116,27 +107,64 @@ const TxItemBlock = ({ transaction }) => {
       <div className={[cstyles.well, styles.txbox].join(' ')}>
         <div className={styles.txtype}>
           <div>{transaction.type}</div>
-          <div className={cstyles.sublight}>{timePart}</div>
-        </div>
-        <div className={styles.txaddress}>
-          <div className={cstyles.highlight}>&quot;Label&quot;</div>
-          <div className={cstyles.fixedfont}>
-            {splitStringIntoChunks(address, 6).join(' ')}
+          <div className={[cstyles.padtopsmall, cstyles.sublight].join(' ')}>
+            {timePart}
           </div>
         </div>
-        <div className={[styles.txamount].join(' ')}>
-          <div>
-            <span>
-              {Utils.CurrencyName()} {bigPart}
-            </span>
-            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
-              {smallPart}
-            </span>
-          </div>
-          <div className={[cstyles.sublight, cstyles.small].join(' ')}>
-            USD 12.12
-          </div>
-        </div>
+        {transaction.detailedTxns.map(txdetail => {
+          const { bigPart, smallPart } = splitZecAmountIntoBigSmall(
+            Math.abs(txdetail.amount)
+          );
+
+          let { address } = txdetail;
+          const { memo } = txdetail;
+
+          if (!address) {
+            address = '(Shielded)';
+          }
+
+          return (
+            <div key={address} className={styles.txaddressamount}>
+              <div className={styles.txaddress}>
+                <div className={cstyles.highlight}>&quot;Label&quot;</div>
+                <div className={cstyles.fixedfont}>
+                  {splitStringIntoChunks(address, 6).join(' ')}
+                </div>
+                <div
+                  className={[
+                    cstyles.small,
+                    cstyles.sublight,
+                    cstyles.padtopsmall,
+                    styles.txmemo
+                  ].join(' ')}
+                >
+                  {memo}
+                </div>
+              </div>
+              <div className={[styles.txamount].join(' ')}>
+                <div>
+                  <span>
+                    {Utils.CurrencyName()} {bigPart}
+                  </span>
+                  <span
+                    className={[cstyles.small, styles.zecsmallpart].join(' ')}
+                  >
+                    {smallPart}
+                  </span>
+                </div>
+                <div
+                  className={[
+                    cstyles.sublight,
+                    cstyles.small,
+                    cstyles.padtopsmall
+                  ].join(' ')}
+                >
+                  USD 12.12
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -203,7 +231,8 @@ export default class Home extends Component<Props, DashboardState> {
           </div>
           <div className={styles.txlistcontainer} style={{ height }}>
             {transactions.map(tx => {
-              return <TxItemBlock key={tx.txid} transaction={tx} />;
+              const key = tx.type + tx.txid + tx.address;
+              return <TxItemBlock key={key} transaction={tx} />;
             })}
           </div>
         </div>
