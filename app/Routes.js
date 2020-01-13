@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unused-state */
 import React from 'react';
 import { Switch, Route } from 'react-router';
 import routes from './constants/routes.json';
@@ -60,6 +61,35 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setAddressesWithBalances = (addressesWithBalance: AddressBalance[]) => {
     this.setState({ addressesWithBalance });
+
+    const { sendPageState } = this.state;
+
+    // If there is no 'from' address, we'll set a default one
+    if (!sendPageState.fromaddr) {
+      // Find a z-address with the highest balance
+      const defaultAB = addressesWithBalance
+        .filter(ab => Utils.isSapling(ab.address))
+        .reduce((prev, ab) => {
+          // We'll start with a sapling address
+          if (prev == null) {
+            return ab;
+          }
+          // Find the sapling address with the highest balance
+          if (prev.balance < ab.balance) {
+            return ab;
+          }
+
+          return prev;
+        }, null);
+
+      if (defaultAB) {
+        const newSendPageState = new SendPageState();
+        newSendPageState.fromaddr = defaultAB.address;
+        newSendPageState.toaddrs = sendPageState.toaddrs;
+
+        this.setState({ sendPageState: newSendPageState });
+      }
+    }
     console.log('updated addressbalances');
   };
 
@@ -75,7 +105,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setSendPageState = (sendPageState: SendPageState) => {
     this.setState({ sendPageState });
-    console.log('updated sendpagestate');
   };
 
   setRPCConfig = (rpcConfig: RPCConfig) => {
@@ -86,7 +115,13 @@ export default class RouteApp extends React.Component<Props, AppState> {
   };
 
   render() {
-    const { addressesWithBalance, addresses, sendPageState } = this.state;
+    const {
+      totalBalance,
+      transactions,
+      addressesWithBalance,
+      addresses,
+      sendPageState
+    } = this.state;
     return (
       <App>
         <Switch>
@@ -107,7 +142,12 @@ export default class RouteApp extends React.Component<Props, AppState> {
           <Route
             path={routes.DASHBOARD}
             // eslint-disable-next-line react/jsx-props-no-spreading
-            render={() => <Dashboard {...this.state} />}
+            render={() => (
+              <Dashboard
+                totalBalance={totalBalance}
+                transactions={transactions}
+              />
+            )}
           />
           <Route
             path={routes.LOADING}

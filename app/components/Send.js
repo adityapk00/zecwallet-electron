@@ -2,6 +2,7 @@
 /* eslint-disable max-classes-per-file */
 // @flow
 import React, { Component } from 'react';
+import Modal from 'react-modal';
 import Select from 'react-select';
 import styles from './Send.css';
 import cstyles from './Common.css';
@@ -17,8 +18,11 @@ type OptionType = {
 class SendState {
   height: number;
 
+  modalIsOpen: boolean;
+
   constructor() {
     this.height = 0;
+    this.modalIsOpen = false;
   }
 }
 
@@ -26,15 +30,26 @@ const Spacer = () => {
   return <div style={{ marginTop: '24px' }} />;
 };
 
-const ToAddrBox = () => {
+// $FlowFixMe
+const ToAddrBox = ({ toaddr, updateToField }) => {
   return (
     <div>
       <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
         <div className={[cstyles.sublight].join(' ')}>To</div>
-        <input type="text" className={styles.inputbox} />
+        <input
+          type="text"
+          className={styles.inputbox}
+          value={toaddr.to}
+          onChange={e => updateToField(toaddr.id, e, null, null)}
+        />
         <Spacer />
         <div className={[cstyles.sublight].join(' ')}>Amount</div>
-        <input type="text" className={styles.inputbox} />
+        <input
+          type="text"
+          className={styles.inputbox}
+          value={toaddr.amount}
+          onChange={e => updateToField(toaddr.id, null, e, null)}
+        />
         <Spacer />
       </div>
       <Spacer />
@@ -82,7 +97,7 @@ export default class Send extends Component<Props, SendState> {
 
   clearToAddrs = () => {
     const { sendPageState, setSendPageState } = this.props;
-    const newToAddrs = [new ToAddr()];
+    const newToAddrs = [new ToAddr(Utils.getNextToAddrID())];
 
     // Create the new state object
     const newState = new SendPageState();
@@ -103,10 +118,67 @@ export default class Send extends Component<Props, SendState> {
     setSendPageState(newState);
   };
 
+  updateToField = (
+    id: number,
+    address: Event | null,
+    amount: Event | null,
+    memo: Event | null
+  ) => {
+    const { sendPageState, setSendPageState } = this.props;
+
+    const newToAddrs = sendPageState.toaddrs.slice(0);
+    // Find the correct toAddr
+    const toAddr = newToAddrs.find(a => a.id === id);
+    if (address) {
+      // $FlowFixMe
+      toAddr.to = address.target.value;
+    }
+
+    if (amount) {
+      // $FlowFixMe
+      toAddr.amount = amount.target.value;
+    }
+
+    if (memo) {
+      // $FlowFixMe
+      toAddr.memo = memo.target.value;
+    }
+
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = sendPageState.fromaddr;
+    newState.toaddrs = newToAddrs;
+
+    setSendPageState(newState);
+  };
+
   updateDimensions() {
     const updateHeight = window.innerHeight - 200; // TODO: This should be the height of the balance box.
     this.setState({ height: updateHeight });
   }
+
+  openModal = () => {
+    this.setState({ modalIsOpen: true });
+  };
+
+  closeModal = () => {
+    this.setState({ modalIsOpen: false });
+  };
+
+  // Create the z_sendmany structure
+  getSendManyJSON = () => {
+    const { sendPageState } = this.props;
+
+    const json = [];
+    json.push(sendPageState.fromaddr);
+    json.push(
+      sendPageState.toaddrs.map(to => {
+        return { address: to.to, amount: to.amount };
+      })
+    );
+
+    console.log(json);
+  };
 
   getLabelForFromAddress = (
     addr: string,
@@ -122,7 +194,7 @@ export default class Send extends Component<Props, SendState> {
   };
 
   render() {
-    const { height } = this.state;
+    const { height, modalIsOpen } = this.state;
     const { sendPageState } = this.props;
 
     const customStyles = {
@@ -193,7 +265,13 @@ export default class Send extends Component<Props, SendState> {
 
             <div className={styles.toaddrcontainer} style={{ height }}>
               {sendPageState.toaddrs.map(toaddr => {
-                return <ToAddrBox key={toaddr.id} />;
+                return (
+                  <ToAddrBox
+                    key={toaddr.id}
+                    toaddr={toaddr}
+                    updateToField={this.updateToField}
+                  />
+                );
               })}
               <div style={{ textAlign: 'right' }}>
                 <button type="button" onClick={this.addToAddr}>
@@ -203,7 +281,11 @@ export default class Send extends Component<Props, SendState> {
             </div>
 
             <div className={styles.buttoncontainer}>
-              <button type="button" className={cstyles.primarybutton}>
+              <button
+                type="button"
+                className={cstyles.primarybutton}
+                onClick={this.openModal}
+              >
                 Send
               </button>
               <button
@@ -214,6 +296,29 @@ export default class Send extends Component<Props, SendState> {
                 Cancel
               </button>
             </div>
+
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={this.closeModal}
+              className={styles.confirmModal}
+              overlayClassName={styles.confirmOverlay}
+            >
+              <span style={{ color: 'pink' }}>
+                {sendPageState.fromaddr}
+                <br />
+                {sendPageState.toaddrs.map(t => (
+                  <div key={t.to}>
+                    {t.to} : {t.amount}
+                  </div>
+                ))}
+                <button type="button" onClick={this.getSendManyJSON}>
+                  Confirm
+                </button>
+                <button type="button" onClick={this.closeModal}>
+                  Cancel
+                </button>
+              </span>
+            </Modal>
           </div>
         </div>
       </div>

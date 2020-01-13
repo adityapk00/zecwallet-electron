@@ -21,7 +21,6 @@ const AddressBlock = ({ address }) => {
 export default class Receive extends Component<Props> {
   render() {
     const { addresses } = this.props;
-    console.log(`Rendering ${addresses.length} addresses`);
     return (
       <div style={{ overflow: 'hidden' }}>
         <div style={{ width: '30%', float: 'left' }}>
