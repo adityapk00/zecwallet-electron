@@ -3,10 +3,13 @@ import _ from 'underscore';
 import {
   TotalBalance,
   AddressBalance,
-  Transaction
+  Transaction,
+  RPCConfig
 } from './components/AppState';
 
 export default class RPC {
+  rpcConfig: RPCConfig;
+
   fnSetTotalBalance: TotalBalance => void;
 
   fnSetAddressesWithBalance: (AddressBalance[]) => void;
@@ -29,10 +32,31 @@ export default class RPC {
     this.fnSetAllAddresses = fnSetAllAddresses;
   }
 
-  async configure() {
+  async configure(rpcConfig: RPCConfig) {
+    this.rpcConfig = rpcConfig;
+
     if (!this.timerID) {
       this.timerID = setTimeout(() => this.refresh(), 1000);
     }
+  }
+
+  async doRPC(method: string, params: []) {
+    const { url, username, password } = this.rpcConfig;
+    const response = await axios(url, {
+      data: {
+        jsonrpc: '2.0',
+        id: 'curltest',
+        method,
+        params
+      },
+      method: 'POST',
+      auth: {
+        username,
+        password
+      }
+    });
+
+    return response.data;
   }
 
   async refresh() {
@@ -44,7 +68,7 @@ export default class RPC {
 
   // This method will get the total balances
   async fetchTotalBalance() {
-    const response = await RPC.doRPC('z_gettotalbalance', [0]);
+    const response = await this.doRPC('z_gettotalbalance', [0]);
 
     const balance = new TotalBalance();
     balance.total = response.result.total;
@@ -56,8 +80,8 @@ export default class RPC {
 
   // Fetch all addresses and their associated balances
   async fetchTandZAddressesWithBalances() {
-    const zresponse = RPC.doRPC('z_listunspent', []);
-    const tresponse = RPC.doRPC('listunspent', []);
+    const zresponse = this.doRPC('z_listunspent', []);
+    const tresponse = this.doRPC('listunspent', []);
 
     // Do the Z addresses
     // response.result has all the unspent notes.
@@ -89,7 +113,7 @@ export default class RPC {
 
   // Fetch all T and Z transactions
   async fetchTandZTransactions() {
-    const tresponse = await RPC.doRPC('listtransactions', []);
+    const tresponse = await this.doRPC('listtransactions', []);
 
     const ttxlist = tresponse.result.map(tx => {
       const transaction = new Transaction();
@@ -106,11 +130,11 @@ export default class RPC {
     this.fnSetTransactionsList(ttxlist);
 
     // Now get Z txns
-    const zaddresses = await RPC.doRPC('z_listaddresses', []);
+    const zaddresses = await this.doRPC('z_listaddresses', []);
 
     const alltxnsPromise = zaddresses.result.map(async zaddr => {
       // For each zaddr, get the list of incoming transactions
-      const incomingTxns = await RPC.doRPC('z_listreceivedbyaddress', [zaddr]);
+      const incomingTxns = await this.doRPC('z_listreceivedbyaddress', [zaddr]);
       const txns = incomingTxns.result
         .filter(itx => !itx.change)
         .map(incomingTx => {
@@ -130,7 +154,7 @@ export default class RPC {
     // Now, for each tx in the array, call gettransaction
     const ztxlist = await Promise.all(
       alltxns.map(async tx => {
-        const txresponse = await RPC.doRPC('gettransaction', [tx.txid]);
+        const txresponse = await this.doRPC('gettransaction', [tx.txid]);
 
         const transaction = new Transaction();
         transaction.address = tx.address;
@@ -157,30 +181,12 @@ export default class RPC {
 
   // Get all Addresses, including T and Z addresses
   async fetchAllAddresses() {
-    const zaddrsPromise = RPC.doRPC('z_listaddresses', []);
-    const taddrsPromise = RPC.doRPC('getaddressesbyaccount', ['']);
+    const zaddrsPromise = this.doRPC('z_listaddresses', []);
+    const taddrsPromise = this.doRPC('getaddressesbyaccount', ['']);
 
     const allZ = (await zaddrsPromise).result;
     const allT = (await taddrsPromise).result;
 
     this.fnSetAllAddresses(allZ.concat(allT));
-  }
-
-  static async doRPC(method: string, params: []) {
-    const response = await axios('http://127.0.0.1:8232/', {
-      data: {
-        jsonrpc: '2.0',
-        id: 'curltest',
-        method,
-        params
-      },
-      method: 'POST',
-      auth: {
-        username: 'zec-qt-wallet',
-        password: 'Zd2fcYO88l'
-      }
-    });
-
-    return response.data;
   }
 }

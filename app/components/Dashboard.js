@@ -3,7 +3,7 @@
 // @flow
 import React, { Component } from 'react';
 import dateformat from 'dateformat';
-import styles from './Home.css';
+import styles from './Dashboard.css';
 import cstyles from './Common.css';
 import AppState from './AppState';
 import Sidebar from './Sidebar';
@@ -142,11 +142,11 @@ const TxItemBlock = ({ transaction }) => {
   );
 };
 
-type HomeState = {
+type DashboardState = {
   height: number
 };
 
-export default class Home extends Component<AppState, HomeState> {
+export default class Dashboard extends Component<AppState, DashboardState> {
   props: AppState;
 
   constructor(props: AppState) {

@@ -69,6 +69,20 @@ export class SendPageState {
   }
 }
 
+export class RPCConfig {
+  url: string;
+
+  username: string;
+
+  password: string;
+
+  constructor() {
+    this.username = '';
+    this.password = '';
+    this.url = '';
+  }
+}
+
 // eslint-disable-next-line max-classes-per-file
 export default class AppState {
   // The total confirmed and unconfirmed balance in this wallet
@@ -87,4 +101,7 @@ export default class AppState {
 
   // The state of the send page, as the user constructs a transaction
   sendPageState: SendPageState;
+
+  // The Current configuration of the RPC params
+  rpcConfig: RPCConfig;
 }

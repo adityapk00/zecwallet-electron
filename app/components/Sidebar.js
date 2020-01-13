@@ -37,7 +37,7 @@ class Sidebar extends Component {
       <div className={styles.sidebar}>
         <SidebarMenuItem
           name="Dashboard"
-          routeName={routes.HOME}
+          routeName={routes.DASHBOARD}
           currentRoute={location.pathname}
         />
         <SidebarMenuItem
