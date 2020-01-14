@@ -53,3 +53,7 @@
 .padtopsmall {
   padding-top: 4px;
 }
+
+.padall {
+  padding: 16px;
+}

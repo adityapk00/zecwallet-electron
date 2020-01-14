@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable max-classes-per-file */
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import Modal from 'react-modal';
 import Select from 'react-select';
 import styles from './Send.css';
@@ -65,7 +65,7 @@ type Props = {
   info: Info
 };
 
-export default class Send extends Component<Props, SendState> {
+export default class Send extends PureComponent<Props, SendState> {
   constructor(props: Props) {
     super(props);
 

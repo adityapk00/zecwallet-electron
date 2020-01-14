@@ -1,7 +1,7 @@
 /* eslint-disable no-plusplus */
 /* eslint-disable react/prop-types */
 // @flow
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import dateformat from 'dateformat';
 import styles from './Dashboard.css';
 import cstyles from './Common.css';
@@ -73,7 +73,7 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel, currencyName }) => {
   const { bigPart, smallPart } = splitZecAmountIntoBigSmall(zecValue);
 
   return (
-    <div style={{ float: 'left', padding: '1em' }}>
+    <div className={cstyles.padall}>
       <div className={[styles.sublight, styles.small].join(' ')}>
         {topLabel}
       </div>
@@ -176,7 +176,7 @@ type Props = {
   info: Info
 };
 
-export default class Home extends Component<Props> {
+export default class Home extends PureComponent<Props> {
   render() {
     const { totalBalance, transactions, info } = this.props;
 

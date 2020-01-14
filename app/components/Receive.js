@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import {
   Accordion,
@@ -43,7 +43,7 @@ const AddressBlock = ({ addressBalance, currencyName }) => {
   );
 };
 
-export default class Receive extends Component<Props> {
+export default class Receive extends PureComponent<Props> {
   render() {
     const { addresses, addressesWithBalance, info } = this.props;
 
