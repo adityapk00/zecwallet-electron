@@ -137,7 +137,12 @@ export default class RouteApp extends React.Component<Props, AppState> {
           />
           <Route
             path={routes.RECEIVE}
-            render={() => <Receive addresses={addresses} />}
+            render={() => (
+              <Receive
+                addresses={addresses}
+                addressesWithBalance={addressesWithBalance}
+              />
+            )}
           />
           <Route
             path={routes.DASHBOARD}
