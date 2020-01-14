@@ -14,6 +14,7 @@ import styles from './Receive.css';
 import cstyles from './Common.css';
 import Utils from '../utils/utils';
 import { AddressBalance } from './AppState';
+import ScrollPane from './ScrollPane';
 
 type Props = {
   addresses: string[]
@@ -27,7 +28,9 @@ const AddressBlock = ({ addressBalance }) => {
       uuid={address}
     >
       <AccordionItemHeading>
-        <AccordionItemButton>{address}</AccordionItemButton>
+        <AccordionItemButton className={styles.accordionHeader}>
+          {address}
+        </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel className={[styles.receiveDetail].join(' ')}>
         {address}
@@ -53,11 +56,13 @@ export default class Receive extends Component<Props> {
       .filter(a => Utils.isSapling(a))
       .slice(0, 100)
       .map(a => new AddressBalance(a, addressMap[a]));
+    const defaultZaddr = zaddrs.length ? zaddrs[0].address : '';
 
     const taddrs = addresses
       .filter(a => Utils.isTransparent(a))
       .slice(0, 100)
       .map(a => new AddressBalance(a, addressMap[a]));
+    const defaultTaddr = taddrs.length ? taddrs[0].address : '';
 
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -73,19 +78,25 @@ export default class Receive extends Component<Props> {
               </TabList>
 
               <TabPanel>
-                <Accordion preExpanded={zaddrs.slice(0, 1)}>
-                  {zaddrs.map(a => (
-                    <AddressBlock key={a.address} addressBalance={a} />
-                  ))}
-                </Accordion>
+                {/* Change the hardcoded height */}
+                <ScrollPane offsetHeight={100}>
+                  <Accordion preExpanded={[defaultZaddr]}>
+                    {zaddrs.map(a => (
+                      <AddressBlock key={a.address} addressBalance={a} />
+                    ))}
+                  </Accordion>
+                </ScrollPane>
               </TabPanel>
 
               <TabPanel>
-                <Accordion preExpanded={taddrs.slice(0, 1)}>
-                  {taddrs.map(a => (
-                    <AddressBlock key={a.address} addressBalance={a} />
-                  ))}
-                </Accordion>
+                {/* Change the hardcoded height */}
+                <ScrollPane offsetHeight={100}>
+                  <Accordion preExpanded={[defaultTaddr]}>
+                    {taddrs.map(a => (
+                      <AddressBlock key={a.address} addressBalance={a} />
+                    ))}
+                  </Accordion>
+                </ScrollPane>
               </TabPanel>
             </Tabs>
           </div>

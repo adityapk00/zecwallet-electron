@@ -8,6 +8,7 @@ import cstyles from './Common.css';
 import { TotalBalance, Transaction } from './AppState';
 import Sidebar from './Sidebar';
 import Utils from '../utils/utils';
+import ScrollPane from './ScrollPane';
 
 function splitZecAmountIntoBigSmall(zecValue: number) {
   if (!zecValue) {
@@ -170,42 +171,14 @@ const TxItemBlock = ({ transaction }) => {
   );
 };
 
-type DashboardState = {
-  height: number
-};
-
 type Props = {
   totalBalance: TotalBalance,
   transactions: Transaction[]
 };
 
-export default class Home extends Component<Props, DashboardState> {
-  constructor(props: Props) {
-    super(props);
-
-    this.state = { height: 0 };
-  }
-
-  componentDidMount() {
-    this.updateDimensions();
-    window.addEventListener('resize', this.updateDimensions.bind(this));
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateDimensions.bind(this));
-  }
-
-  /**
-   * Calculate & Update state of height, needed for the scrolling
-   */
-  updateDimensions() {
-    const updateHeight = window.innerHeight - 200; // TODO: This should be the height of the balance box.
-    this.setState({ height: updateHeight });
-  }
-
+export default class Home extends Component<Props> {
   render() {
     const { totalBalance, transactions } = this.props;
-    const { height } = this.state;
 
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -229,12 +202,13 @@ export default class Home extends Component<Props, DashboardState> {
               usdValue="12.12"
             />
           </div>
-          <div className={styles.txlistcontainer} style={{ height }}>
+          {/* Change the hardcoded height */}
+          <ScrollPane offsetHeight={200}>
             {transactions.map(tx => {
               const key = tx.type + tx.txid + tx.address;
               return <TxItemBlock key={key} transaction={tx} />;
             })}
-          </div>
+          </ScrollPane>
         </div>
       </div>
     );

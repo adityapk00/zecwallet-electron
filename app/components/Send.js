@@ -9,6 +9,7 @@ import cstyles from './Common.css';
 import { ToAddr, AddressBalance, SendPageState } from './AppState';
 import Sidebar from './Sidebar';
 import Utils from '../utils/utils';
+import ScrollPane from './ScrollPane';
 
 type OptionType = {
   value: string,
@@ -16,12 +17,9 @@ type OptionType = {
 };
 
 class SendState {
-  height: number;
-
   modalIsOpen: boolean;
 
   constructor() {
-    this.height = 0;
     this.modalIsOpen = false;
   }
 }
@@ -70,15 +68,6 @@ export default class Send extends Component<Props, SendState> {
     super(props);
 
     this.state = new SendState();
-  }
-
-  componentDidMount() {
-    this.updateDimensions();
-    window.addEventListener('resize', this.updateDimensions.bind(this));
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.updateDimensions.bind(this));
   }
 
   addToAddr = () => {
@@ -152,11 +141,6 @@ export default class Send extends Component<Props, SendState> {
     setSendPageState(newState);
   };
 
-  updateDimensions() {
-    const updateHeight = window.innerHeight - 200; // TODO: This should be the height of the balance box.
-    this.setState({ height: updateHeight });
-  }
-
   openModal = () => {
     this.setState({ modalIsOpen: true });
   };
@@ -194,7 +178,7 @@ export default class Send extends Component<Props, SendState> {
   };
 
   render() {
-    const { height, modalIsOpen } = this.state;
+    const { modalIsOpen } = this.state;
     const { sendPageState } = this.props;
 
     const customStyles = {
@@ -263,7 +247,7 @@ export default class Send extends Component<Props, SendState> {
 
             <Spacer />
 
-            <div className={styles.toaddrcontainer} style={{ height }}>
+            <ScrollPane offsetHeight={200}>
               {sendPageState.toaddrs.map(toaddr => {
                 return (
                   <ToAddrBox
@@ -278,7 +262,7 @@ export default class Send extends Component<Props, SendState> {
                   +
                 </button>
               </div>
-            </div>
+            </ScrollPane>
 
             <div className={styles.buttoncontainer}>
               <button

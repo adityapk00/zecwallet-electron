@@ -2,11 +2,6 @@
   margin: 16px;
 }
 
-.txlistcontainer {
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
 .txbox {
   margin-left: 16px;
   margin-right: 16px;
