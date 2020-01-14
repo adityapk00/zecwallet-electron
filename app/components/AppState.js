@@ -96,6 +96,20 @@ export class RPCConfig {
   }
 }
 
+export class Info {
+  testnet: boolean;
+
+  latestBlock: number;
+
+  connections: number;
+
+  version: number;
+
+  verificationProgress: number;
+
+  currencyName: string;
+}
+
 // eslint-disable-next-line max-classes-per-file
 export default class AppState {
   // The total confirmed and unconfirmed balance in this wallet
@@ -117,4 +131,7 @@ export default class AppState {
 
   // The Current configuration of the RPC params
   rpcConfig: RPCConfig;
+
+  // getinfo and getblockchaininfo result
+  info: Info;
 }

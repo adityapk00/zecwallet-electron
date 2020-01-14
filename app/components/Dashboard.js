@@ -5,9 +5,8 @@ import React, { Component } from 'react';
 import dateformat from 'dateformat';
 import styles from './Dashboard.css';
 import cstyles from './Common.css';
-import { TotalBalance, Transaction } from './AppState';
+import { TotalBalance, Transaction, Info } from './AppState';
 import Sidebar from './Sidebar';
-import Utils from '../utils/utils';
 import ScrollPane from './ScrollPane';
 
 function splitZecAmountIntoBigSmall(zecValue: number) {
@@ -49,14 +48,14 @@ function splitStringIntoChunks(s: string, numChunks: number) {
 }
 
 // eslint-disable-next-line react/prop-types
-const BalanceBlockHighlight = ({ zecValue, usdValue }) => {
+const BalanceBlockHighlight = ({ zecValue, usdValue, currencyName }) => {
   const { bigPart, smallPart } = splitZecAmountIntoBigSmall(zecValue);
 
   return (
     <div style={{ float: 'left', padding: '1em' }}>
       <div className={[cstyles.highlight, cstyles.xlarge].join(' ')}>
         <span>
-          {Utils.CurrencyName()} {bigPart}
+          {currencyName} {bigPart}
         </span>
         <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
@@ -70,7 +69,7 @@ const BalanceBlockHighlight = ({ zecValue, usdValue }) => {
 };
 
 // eslint-disable-next-line react/prop-types
-const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
+const BalanceBlock = ({ zecValue, usdValue, topLabel, currencyName }) => {
   const { bigPart, smallPart } = splitZecAmountIntoBigSmall(zecValue);
 
   return (
@@ -80,7 +79,7 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
       </div>
       <div className={[cstyles.highlight, cstyles.large].join(' ')}>
         <span>
-          {Utils.CurrencyName()} {bigPart}
+          {currencyName} {bigPart}
         </span>
         <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
           {smallPart}
@@ -93,7 +92,7 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel }) => {
   );
 };
 
-const TxItemBlock = ({ transaction }) => {
+const TxItemBlock = ({ transaction, currencyName }) => {
   const txDate = new Date(transaction.time * 1000);
   const datePart = dateformat(txDate, 'mmm dd, yyyy');
   const timePart = dateformat(txDate, 'hh:MM tt');
@@ -145,7 +144,7 @@ const TxItemBlock = ({ transaction }) => {
               <div className={[styles.txamount].join(' ')}>
                 <div>
                   <span>
-                    {Utils.CurrencyName()} {bigPart}
+                    {currencyName} {bigPart}
                   </span>
                   <span
                     className={[cstyles.small, styles.zecsmallpart].join(' ')}
@@ -173,12 +172,13 @@ const TxItemBlock = ({ transaction }) => {
 
 type Props = {
   totalBalance: TotalBalance,
-  transactions: Transaction[]
+  transactions: Transaction[],
+  info: Info
 };
 
 export default class Home extends Component<Props> {
   render() {
-    const { totalBalance, transactions } = this.props;
+    const { totalBalance, transactions, info } = this.props;
 
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -190,23 +190,32 @@ export default class Home extends Component<Props> {
             <BalanceBlockHighlight
               zecValue={totalBalance.total}
               usdValue="12.12"
+              currencyName={info.currencyName}
             />
             <BalanceBlock
               topLabel="Shileded"
               zecValue={totalBalance.private}
               usdValue="12.12"
+              currencyName={info.currencyName}
             />
             <BalanceBlock
               topLabel="Transparent"
               zecValue={totalBalance.transparent}
               usdValue="12.12"
+              currencyName={info.currencyName}
             />
           </div>
           {/* Change the hardcoded height */}
           <ScrollPane offsetHeight={200}>
             {transactions.map(tx => {
               const key = tx.type + tx.txid + tx.address;
-              return <TxItemBlock key={key} transaction={tx} />;
+              return (
+                <TxItemBlock
+                  key={key}
+                  transaction={tx}
+                  currencyName={info.currencyName}
+                />
+              );
             })}
           </ScrollPane>
         </div>

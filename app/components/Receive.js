@@ -13,14 +13,16 @@ import Sidebar from './Sidebar';
 import styles from './Receive.css';
 import cstyles from './Common.css';
 import Utils from '../utils/utils';
-import { AddressBalance } from './AppState';
+import { AddressBalance, Info } from './AppState';
 import ScrollPane from './ScrollPane';
 
 type Props = {
-  addresses: string[]
+  addresses: string[],
+  addressesWithBalance: AddressBalance[],
+  info: Info
 };
 
-const AddressBlock = ({ addressBalance }) => {
+const AddressBlock = ({ addressBalance, currencyName }) => {
   const { address } = addressBalance;
   return (
     <AccordionItem
@@ -35,7 +37,7 @@ const AddressBlock = ({ addressBalance }) => {
       <AccordionItemPanel className={[styles.receiveDetail].join(' ')}>
         {address}
         <QRCode value={address} className={[styles.receiveQrcode].join(' ')} />
-        ZEC {addressBalance.balance || 0}
+        {currencyName} {addressBalance.balance || 0}
       </AccordionItemPanel>
     </AccordionItem>
   );
@@ -43,7 +45,7 @@ const AddressBlock = ({ addressBalance }) => {
 
 export default class Receive extends Component<Props> {
   render() {
-    const { addresses, addressesWithBalance } = this.props;
+    const { addresses, addressesWithBalance, info } = this.props;
 
     // Convert the addressBalances into a map.
     const addressMap = addressesWithBalance.reduce((map, a) => {
@@ -82,7 +84,11 @@ export default class Receive extends Component<Props> {
                 <ScrollPane offsetHeight={100}>
                   <Accordion preExpanded={[defaultZaddr]}>
                     {zaddrs.map(a => (
-                      <AddressBlock key={a.address} addressBalance={a} />
+                      <AddressBlock
+                        key={a.address}
+                        addressBalance={a}
+                        currencyName={info.currencyName}
+                      />
                     ))}
                   </Accordion>
                 </ScrollPane>
@@ -93,7 +99,11 @@ export default class Receive extends Component<Props> {
                 <ScrollPane offsetHeight={100}>
                   <Accordion preExpanded={[defaultTaddr]}>
                     {taddrs.map(a => (
-                      <AddressBlock key={a.address} addressBalance={a} />
+                      <AddressBlock
+                        key={a.address}
+                        addressBalance={a}
+                        currencyName={info.currencyName}
+                      />
                     ))}
                   </Accordion>
                 </ScrollPane>

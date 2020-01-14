@@ -63,8 +63,8 @@ export default class RPC {
     this.timerID = setTimeout(() => this.refresh(), 20000);
   }
 
-  async doRPC(method: string, params: []) {
-    const { url, username, password } = this.rpcConfig;
+  static async doRPC(method: string, params: [], rpcConfig: RPCConfig) {
+    const { url, username, password } = rpcConfig;
     const response = await axios(url, {
       data: {
         jsonrpc: '2.0',
@@ -100,7 +100,7 @@ export default class RPC {
 
   // This method will get the total balances
   async fetchTotalBalance() {
-    const response = await this.doRPC('z_gettotalbalance', [0]);
+    const response = await RPC.doRPC('z_gettotalbalance', [0], this.rpcConfig);
 
     const balance = new TotalBalance();
     balance.total = response.result.total;
@@ -112,8 +112,8 @@ export default class RPC {
 
   // Fetch all addresses and their associated balances
   async fetchTandZAddressesWithBalances() {
-    const zresponse = this.doRPC('z_listunspent', []);
-    const tresponse = this.doRPC('listunspent', []);
+    const zresponse = RPC.doRPC('z_listunspent', [], this.rpcConfig);
+    const tresponse = RPC.doRPC('listunspent', [], this.rpcConfig);
 
     // Do the Z addresses
     // response.result has all the unspent notes.
@@ -145,7 +145,7 @@ export default class RPC {
 
   // Fetch all T and Z transactions
   async fetchTandZTransactions() {
-    const tresponse = await this.doRPC('listtransactions', []);
+    const tresponse = await RPC.doRPC('listtransactions', [], this.rpcConfig);
 
     const ttxlist = tresponse.result.map(tx => {
       const transaction = new Transaction();
@@ -163,11 +163,15 @@ export default class RPC {
     });
 
     // Now get Z txns
-    const zaddresses = await this.doRPC('z_listaddresses', []);
+    const zaddresses = await RPC.doRPC('z_listaddresses', [], this.rpcConfig);
 
     const alltxnsPromise = zaddresses.result.map(async zaddr => {
       // For each zaddr, get the list of incoming transactions
-      const incomingTxns = await this.doRPC('z_listreceivedbyaddress', [zaddr]);
+      const incomingTxns = await RPC.doRPC(
+        'z_listreceivedbyaddress',
+        [zaddr],
+        this.rpcConfig
+      );
       const txns = incomingTxns.result
         .filter(itx => !itx.change)
         .map(incomingTx => {
@@ -187,7 +191,11 @@ export default class RPC {
     // Now, for each tx in the array, call gettransaction
     const ztxlist = await Promise.all(
       alltxns.map(async tx => {
-        const txresponse = await this.doRPC('gettransaction', [tx.txid]);
+        const txresponse = await RPC.doRPC(
+          'gettransaction',
+          [tx.txid],
+          this.rpcConfig
+        );
 
         const transaction = new Transaction();
         transaction.address = tx.address;
@@ -218,8 +226,12 @@ export default class RPC {
 
   // Get all Addresses, including T and Z addresses
   async fetchAllAddresses() {
-    const zaddrsPromise = this.doRPC('z_listaddresses', []);
-    const taddrsPromise = this.doRPC('getaddressesbyaccount', ['']);
+    const zaddrsPromise = RPC.doRPC('z_listaddresses', [], this.rpcConfig);
+    const taddrsPromise = RPC.doRPC(
+      'getaddressesbyaccount',
+      [''],
+      this.rpcConfig
+    );
 
     const allZ = (await zaddrsPromise).result;
     const allT = (await taddrsPromise).result;

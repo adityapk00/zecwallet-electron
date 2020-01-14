@@ -7,7 +7,8 @@ import os from 'os';
 import path from 'path';
 import { remote } from 'electron';
 import routes from '../constants/routes.json';
-import { RPCConfig } from './AppState';
+import { RPCConfig, Info } from './AppState';
+import RPC from '../rpc';
 
 const locateZcashConf = () => {
   if (os.platform() === 'darwin') {
@@ -22,7 +23,8 @@ const locateZcashConf = () => {
 };
 
 type Props = {
-  setRPCConfig: (rpcConfig: RPCConfig) => void
+  setRPCConfig: (rpcConfig: RPCConfig) => void,
+  setInfo: (info: Info) => void
 };
 
 class LoadingScreenState {
@@ -48,10 +50,29 @@ export default class LoadingScreen extends Component<Props> {
       const rpcConfig = new RPCConfig();
       rpcConfig.username = confValues.rpcuser;
       rpcConfig.password = confValues.rpcpassword;
-      rpcConfig.url = 'http://127.0.0.1:8232';
 
-      const { setRPCConfig } = this.props;
+      const isTestnet =
+        (confValues.testnet && confValues.testnet === 1) || false;
+      const server = confValues.rpcbind || '127.0.0.1';
+      const port = confValues.rpcport || (isTestnet ? '18232' : '8232');
+      rpcConfig.url = `http://${server}:${port}`;
+
+      // Try getting the info. TODO: Handle failure
+      const infoResult = await RPC.doRPC('getinfo', [], rpcConfig);
+      const info = new Info();
+      info.testnet = infoResult.result.testnet;
+      info.latestBlock = infoResult.result.blocks;
+      info.connections = infoResult.result.connections;
+      info.version = infoResult.result.version;
+      info.currencyName = info.testnet ? 'TAZ' : 'ZEC';
+      info.verificationProgress = 1; // TODO
+
+      console.log(info);
+
+      const { setRPCConfig, setInfo } = this.props;
+
       setRPCConfig(rpcConfig);
+      setInfo(info);
     })();
   }
 

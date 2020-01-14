@@ -6,7 +6,7 @@ import Modal from 'react-modal';
 import Select from 'react-select';
 import styles from './Send.css';
 import cstyles from './Common.css';
-import { ToAddr, AddressBalance, SendPageState } from './AppState';
+import { ToAddr, AddressBalance, SendPageState, Info } from './AppState';
 import Sidebar from './Sidebar';
 import Utils from '../utils/utils';
 import ScrollPane from './ScrollPane';
@@ -60,7 +60,9 @@ type Props = {
 
   sendPageState: SendPageState,
 
-  setSendPageState: (sendPageState: SendPageState) => void
+  setSendPageState: (sendPageState: SendPageState) => void,
+
+  info: Info
 };
 
 export default class Send extends Component<Props, SendState> {
@@ -166,20 +168,21 @@ export default class Send extends Component<Props, SendState> {
 
   getLabelForFromAddress = (
     addr: string,
-    addressesWithBalance: AddressBalance[]
+    addressesWithBalance: AddressBalance[],
+    currencyName: string
   ) => {
     // Find the addr in addressesWithBalance
     const addressBalance: AddressBalance = addressesWithBalance.find(
       ab => ab.address === addr
     );
 
-    return `[ ${Utils.CurrencyName()} ${addressBalance.balance.toString()} ]
+    return `[ ${currencyName} ${addressBalance.balance.toString()} ]
                   ${addr}`;
   };
 
   render() {
     const { modalIsOpen } = this.state;
-    const { sendPageState } = this.props;
+    const { sendPageState, info } = this.props;
 
     const customStyles = {
       option: (provided, state) => ({
@@ -211,7 +214,11 @@ export default class Send extends Component<Props, SendState> {
     const sendFromList = addressesWithBalance.map(ab => {
       return {
         value: ab.address,
-        label: this.getLabelForFromAddress(ab.address, addressesWithBalance)
+        label: this.getLabelForFromAddress(
+          ab.address,
+          addressesWithBalance,
+          info.currencyName
+        )
       };
     });
 
@@ -222,7 +229,8 @@ export default class Send extends Component<Props, SendState> {
         value: sendPageState.fromaddr,
         label: this.getLabelForFromAddress(
           sendPageState.fromaddr,
-          addressesWithBalance
+          addressesWithBalance,
+          info.currencyName
         )
       };
     }

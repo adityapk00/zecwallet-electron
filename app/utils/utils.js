@@ -1,10 +1,6 @@
 export default class Utils {
-  static CurrencyName(): string {
-    return 'ZEC';
-  }
-
   static isSapling(addr: string): boolean {
-    return addr.startsWith('zs');
+    return addr.startsWith('zs') || addr.startsWith('ztestsapling');
   }
 
   static isTransparent(addr: string): boolean {

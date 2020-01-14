@@ -14,7 +14,8 @@ import AppState, {
   Transaction,
   SendPageState,
   ToAddr,
-  RPCConfig
+  RPCConfig,
+  Info
 } from './components/AppState';
 import RPC from './rpc';
 import Utils from './utils/utils';
@@ -33,7 +34,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addresses: [],
       transactions: [],
       sendPageState: new SendPageState(),
-      rpcConfig: new RPCConfig()
+      rpcConfig: new RPCConfig(),
+      info: new Info()
     };
 
     // Create the initial ToAddr box
@@ -109,9 +111,13 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setRPCConfig = (rpcConfig: RPCConfig) => {
     this.setState({ rpcConfig });
-    console.log(`updated RPC config:`);
     console.log(rpcConfig);
     this.rpc.configure(rpcConfig);
+  };
+
+  setInfo = (info: Info) => {
+    this.setState({ info });
+    console.log('updated info');
   };
 
   render() {
@@ -120,7 +126,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
       transactions,
       addressesWithBalance,
       addresses,
-      sendPageState
+      sendPageState,
+      info
     } = this.state;
     return (
       <App>
@@ -132,6 +139,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
                 addressesWithBalance={addressesWithBalance}
                 sendPageState={sendPageState}
                 setSendPageState={this.setSendPageState}
+                info={info}
               />
             )}
           />
@@ -141,6 +149,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
               <Receive
                 addresses={addresses}
                 addressesWithBalance={addressesWithBalance}
+                info={info}
               />
             )}
           />
@@ -151,12 +160,18 @@ export default class RouteApp extends React.Component<Props, AppState> {
               <Dashboard
                 totalBalance={totalBalance}
                 transactions={transactions}
+                info={info}
               />
             )}
           />
           <Route
             path={routes.LOADING}
-            render={() => <LoadingScreen setRPCConfig={this.setRPCConfig} />}
+            render={() => (
+              <LoadingScreen
+                setRPCConfig={this.setRPCConfig}
+                setInfo={this.setInfo}
+              />
+            )}
           />
         </Switch>
       </App>
