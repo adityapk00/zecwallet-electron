@@ -40,7 +40,6 @@ const ToAddrBox = ({
   totalAmountAvailable
 }) => {
   const isMemoDisabled = !Utils.isZaddr(toaddr.to);
-  console.log(`Is memo disabled ${isMemoDisabled}`);
 
   return (
     <div>
@@ -191,12 +190,9 @@ export default class Send extends PureComponent<Props, SendState> {
     let totalOtherAmount: number = newToAddrs
       .filter(a => a.id !== id)
       .reduce((s, a) => parseFloat(s) + parseFloat(a.amount), 0);
-    console.log(totalOtherAmount);
 
     // Add Fee
     totalOtherAmount += 0.0001;
-
-    console.log(`${totalOtherAmount} of ${total}`);
 
     // Find the correct toAddr
     const toAddr = newToAddrs.find(a => a.id === id);
