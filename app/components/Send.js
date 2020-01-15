@@ -1,3 +1,6 @@
+/* eslint-disable radix */
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /* eslint-disable react/prop-types */
 /* eslint-disable max-classes-per-file */
 // @flow
@@ -10,6 +13,7 @@ import { ToAddr, AddressBalance, SendPageState, Info } from './AppState';
 import Sidebar from './Sidebar';
 import Utils from '../utils/utils';
 import ScrollPane from './ScrollPane';
+import ArrowUpLight from '../assets/img/arrow_up_dark.png';
 
 type OptionType = {
   value: string,
@@ -29,11 +33,22 @@ const Spacer = () => {
 };
 
 // $FlowFixMe
-const ToAddrBox = ({ toaddr, updateToField }) => {
+const ToAddrBox = ({
+  toaddr,
+  updateToField,
+  setMaxAmount,
+  totalAmountAvailable
+}) => {
+  const isMemoDisabled = !Utils.isZaddr(toaddr.to);
+  console.log(`Is memo disabled ${isMemoDisabled}`);
+
   return (
     <div>
       <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
-        <div className={[cstyles.sublight].join(' ')}>To</div>
+        <div className={[cstyles.flexspacebetween].join(' ')}>
+          <div className={cstyles.sublight}>To</div>
+          <div className={cstyles.validationerror}>Address Validation</div>
+        </div>
         <input
           type="text"
           className={styles.inputbox}
@@ -41,12 +56,37 @@ const ToAddrBox = ({ toaddr, updateToField }) => {
           onChange={e => updateToField(toaddr.id, e, null, null)}
         />
         <Spacer />
-        <div className={[cstyles.sublight].join(' ')}>Amount</div>
+        <div className={[cstyles.flexspacebetween].join(' ')}>
+          <div className={cstyles.sublight}>Amount</div>
+          <div className={cstyles.validationerror}>Amount Validation</div>
+        </div>
+        <div className={[cstyles.flexspacebetween].join(' ')}>
+          <input
+            type="text"
+            className={styles.inputbox}
+            value={toaddr.amount}
+            onChange={e => updateToField(toaddr.id, null, e, null)}
+          />
+          <img
+            className={styles.toaddrbutton}
+            src={ArrowUpLight}
+            alt="Max"
+            onClick={() => setMaxAmount(toaddr.id, totalAmountAvailable)}
+          />
+        </div>
+        <Spacer />
+        <div className={[cstyles.flexspacebetween].join(' ')}>
+          <div className={cstyles.sublight}>Memo</div>
+          <div className={cstyles.validationerror}>
+            {toaddr.memo.length} / 512
+          </div>
+        </div>
         <input
           type="text"
           className={styles.inputbox}
-          value={toaddr.amount}
-          onChange={e => updateToField(toaddr.id, null, e, null)}
+          value={isMemoDisabled ? '<Memos only for z-addresses>' : toaddr.memo}
+          disabled={isMemoDisabled}
+          onChange={e => updateToField(toaddr.id, null, null, e)}
         />
         <Spacer />
       </div>
@@ -143,6 +183,34 @@ export default class Send extends PureComponent<Props, SendState> {
     setSendPageState(newState);
   };
 
+  setMaxAmount = (id: number, total: number) => {
+    const { sendPageState, setSendPageState } = this.props;
+
+    const newToAddrs = sendPageState.toaddrs.slice(0);
+
+    let totalOtherAmount: number = newToAddrs
+      .filter(a => a.id !== id)
+      .reduce((s, a) => parseFloat(s) + parseFloat(a.amount), 0);
+    console.log(totalOtherAmount);
+
+    // Add Fee
+    totalOtherAmount += 0.0001;
+
+    console.log(`${totalOtherAmount} of ${total}`);
+
+    // Find the correct toAddr
+    const toAddr = newToAddrs.find(a => a.id === id);
+    toAddr.amount = total - totalOtherAmount;
+    if (toAddr.amount < 0) toAddr.amount = 0;
+
+    // Create the new state object
+    const newState = new SendPageState();
+    newState.fromaddr = sendPageState.fromaddr;
+    newState.toaddrs = newToAddrs;
+
+    setSendPageState(newState);
+  };
+
   openModal = () => {
     this.setState({ modalIsOpen: true });
   };
@@ -166,18 +234,31 @@ export default class Send extends PureComponent<Props, SendState> {
     console.log(json);
   };
 
+  getBalanceForAddress = (
+    addr: string,
+    addressesWithBalance: AddressBalance[]
+  ): number => {
+    // Find the addr in addressesWithBalance
+    const addressBalance: AddressBalance = addressesWithBalance.find(
+      ab => ab.address === addr
+    );
+
+    if (!addressBalance) {
+      return 0;
+    }
+
+    return addressBalance.balance;
+  };
+
   getLabelForFromAddress = (
     addr: string,
     addressesWithBalance: AddressBalance[],
     currencyName: string
   ) => {
     // Find the addr in addressesWithBalance
-    const addressBalance: AddressBalance = addressesWithBalance.find(
-      ab => ab.address === addr
-    );
+    const balance = this.getBalanceForAddress(addr, addressesWithBalance);
 
-    return `[ ${currencyName} ${addressBalance.balance.toString()} ]
-                  ${addr}`;
+    return `[ ${currencyName} ${balance.toString()} ] ${addr}`;
   };
 
   render() {
@@ -235,6 +316,11 @@ export default class Send extends PureComponent<Props, SendState> {
       };
     }
 
+    const totalAmountAvailable = this.getBalanceForAddress(
+      fromaddr.value,
+      addressesWithBalance
+    );
+
     return (
       <div style={{ overflow: 'hidden' }}>
         <div style={{ width: '30%', float: 'left' }}>
@@ -262,6 +348,8 @@ export default class Send extends PureComponent<Props, SendState> {
                     key={toaddr.id}
                     toaddr={toaddr}
                     updateToField={this.updateToField}
+                    setMaxAmount={this.setMaxAmount}
+                    totalAmountAvailable={totalAmountAvailable}
                   />
                 );
               })}

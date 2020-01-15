@@ -8,6 +8,11 @@
   flex-direction: column;
 }
 
+.flexspacebetween {
+  display: flex;
+  justify-content: space-between;
+}
+
 .highlight {
   color: #c3921f;
 }

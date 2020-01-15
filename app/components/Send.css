@@ -22,6 +22,16 @@
   text-align: center;
 }
 
+.toaddrbutton {
+  height: 36px;
+  border: white 1px solid;
+  margin-top: 3px;
+}
+
+.toaddrbutton:hover {
+  cursor: pointer;
+}
+
 .confirmModal {
   top: 25%;
   left: 25%;
