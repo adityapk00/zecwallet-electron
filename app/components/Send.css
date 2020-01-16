@@ -20,6 +20,7 @@
 
 .buttoncontainer {
   text-align: center;
+  padding-top: 24px;
 }
 
 .toaddrbutton {
@@ -38,11 +39,16 @@
   right: auto;
   bottom: auto;
   opacity: 1;
-  margin-right: -25%;
   transform: translate(-12.5%, -12.5%);
-  background: #000;
+  background: #212124;
   position: absolute;
   padding: 16px;
+  min-width: 700px;
+}
+
+.confirmModalAddress {
+  width: 60%;
+  padding-bottom: 8px;
 }
 
 .confirmOverlay {

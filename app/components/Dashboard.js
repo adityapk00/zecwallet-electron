@@ -8,48 +8,11 @@ import cstyles from './Common.css';
 import { TotalBalance, Transaction, Info } from './AppState';
 import Sidebar from './Sidebar';
 import ScrollPane from './ScrollPane';
-
-function splitZecAmountIntoBigSmall(zecValue: number) {
-  if (!zecValue) {
-    return { bigPart: zecValue, smallPart: '' };
-  }
-  let bigPart = zecValue.toString();
-  let smallPart = '';
-
-  if (bigPart.indexOf('.') >= 0) {
-    const decimalPart = bigPart.substr(bigPart.indexOf('.') + 1);
-    if (decimalPart.length > 4) {
-      smallPart = decimalPart.substr(4);
-      bigPart = bigPart.substr(0, bigPart.length - smallPart.length);
-
-      // Pad the small part with trailing 0s
-      while (smallPart.length < 4) {
-        smallPart += '0';
-      }
-    }
-  }
-
-  return { bigPart, smallPart };
-}
-
-function splitStringIntoChunks(s: string, numChunks: number) {
-  if (numChunks > s.length) return [s];
-  if (s.length < 16) return [s];
-
-  const chunkSize = Math.round(s.length / numChunks);
-  const chunks = [];
-  for (let i = 0; i < numChunks - 1; i++) {
-    chunks.push(s.substr(i * chunkSize, chunkSize));
-  }
-  // Last chunk might contain un-even length
-  chunks.push(s.substr((numChunks - 1) * chunkSize));
-
-  return chunks;
-}
+import Utils from '../utils/utils';
 
 // eslint-disable-next-line react/prop-types
 const BalanceBlockHighlight = ({ zecValue, usdValue, currencyName }) => {
-  const { bigPart, smallPart } = splitZecAmountIntoBigSmall(zecValue);
+  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(zecValue);
 
   return (
     <div style={{ float: 'left', padding: '1em' }}>
@@ -70,7 +33,7 @@ const BalanceBlockHighlight = ({ zecValue, usdValue, currencyName }) => {
 
 // eslint-disable-next-line react/prop-types
 const BalanceBlock = ({ zecValue, usdValue, topLabel, currencyName }) => {
-  const { bigPart, smallPart } = splitZecAmountIntoBigSmall(zecValue);
+  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(zecValue);
 
   return (
     <div className={cstyles.padall}>
@@ -112,7 +75,7 @@ const TxItemBlock = ({ transaction, currencyName }) => {
           </div>
         </div>
         {transaction.detailedTxns.map(txdetail => {
-          const { bigPart, smallPart } = splitZecAmountIntoBigSmall(
+          const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(
             Math.abs(txdetail.amount)
           );
 
@@ -128,7 +91,7 @@ const TxItemBlock = ({ transaction, currencyName }) => {
               <div className={styles.txaddress}>
                 <div className={cstyles.highlight}>&quot;Label&quot;</div>
                 <div className={cstyles.fixedfont}>
-                  {splitStringIntoChunks(address, 6).join(' ')}
+                  {Utils.splitStringIntoChunks(address, 6).join(' ')}
                 </div>
                 <div
                   className={[

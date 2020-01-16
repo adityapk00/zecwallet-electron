@@ -1,5 +1,4 @@
 .well {
-  display: flex;
   background-color: #000;
   padding: 16px;
 }
@@ -57,6 +56,14 @@
 
 .padtopsmall {
   padding-top: 4px;
+}
+
+.margintoplarge {
+  margin-top: 24px;
+}
+
+.marginbottomlarge {
+  margin-bottom: 24px;
 }
 
 .padall {

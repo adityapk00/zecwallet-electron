@@ -94,6 +94,130 @@ const ToAddrBox = ({
   );
 };
 
+function getSendManyJSON(sendPageState: SendPageState) {
+  const json = [];
+  json.push(sendPageState.fromaddr);
+  json.push(
+    sendPageState.toaddrs.map(to => {
+      return { address: to.to, amount: to.amount };
+    })
+  );
+
+  console.log(json);
+}
+
+const ConfirmModalToAddr = ({ toaddr, info }) => {
+  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(
+    toaddr.amount
+  );
+
+  return (
+    <div className={cstyles.well}>
+      <div
+        className={[cstyles.flexspacebetween, cstyles.margintoplarge].join(' ')}
+      >
+        <div
+          className={[
+            cstyles.small,
+            cstyles.fixedfont,
+            styles.confirmModalAddress
+          ].join(' ')}
+        >
+          {Utils.splitStringIntoChunks(toaddr.to, 6).join(' ')}
+        </div>
+        <div className={cstyles.large}>
+          <div>
+            <span>
+              {info.currencyName} {bigPart}
+            </span>
+            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
+              {smallPart}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className={cstyles.sublight}>{toaddr.memo}</div>
+    </div>
+  );
+};
+
+const ConfirmModal = ({ sendPageState, info, closeModal, modalIsOpen }) => {
+  const sendingTotal =
+    sendPageState.toaddrs.reduce(
+      (s, t) => parseFloat(s) + parseFloat(t.amount),
+      0.0
+    ) + 0.0001;
+  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(sendingTotal);
+
+  return (
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      className={styles.confirmModal}
+      overlayClassName={styles.confirmOverlay}
+    >
+      <div className={[cstyles.verticalflex].join(' ')}>
+        <div
+          className={cstyles.marginbottomlarge}
+          style={{ textAlign: 'center' }}
+        >
+          Confirm Transaction
+        </div>
+        <div className={cstyles.flex}>
+          <div
+            className={[
+              cstyles.highlight,
+              cstyles.xlarge,
+              cstyles.flexspacebetween,
+              cstyles.well
+            ].join(' ')}
+          >
+            <div>Total</div>
+            <div>
+              <span>
+                {info.currencyName} {bigPart}
+              </span>
+              <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
+                {smallPart}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div
+          className={[cstyles.verticalflex, cstyles.margintoplarge].join(' ')}
+        >
+          {sendPageState.toaddrs.map(t => (
+            <ConfirmModalToAddr key={t.to} toaddr={t} info={info} />
+          ))}
+        </div>
+
+        <ConfirmModalToAddr
+          toaddr={{ to: 'Fee', amount: 0.0001, memo: null }}
+          info={info}
+        />
+
+        <div className={styles.buttoncontainer}>
+          <button
+            type="button"
+            className={cstyles.primarybutton}
+            onClick={() => getSendManyJSON(sendPageState)}
+          >
+            Send
+          </button>
+          <button
+            type="button"
+            className={cstyles.primarybutton}
+            onClick={closeModal}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </Modal>
+  );
+};
+
 type Props = {
   addressesWithBalance: AddressBalance[],
 
@@ -213,21 +337,6 @@ export default class Send extends PureComponent<Props, SendState> {
 
   closeModal = () => {
     this.setState({ modalIsOpen: false });
-  };
-
-  // Create the z_sendmany structure
-  getSendManyJSON = () => {
-    const { sendPageState } = this.props;
-
-    const json = [];
-    json.push(sendPageState.fromaddr);
-    json.push(
-      sendPageState.toaddrs.map(to => {
-        return { address: to.to, amount: to.amount };
-      })
-    );
-
-    console.log(json);
   };
 
   getBalanceForAddress = (
@@ -373,28 +482,12 @@ export default class Send extends PureComponent<Props, SendState> {
               </button>
             </div>
 
-            <Modal
-              isOpen={modalIsOpen}
-              onRequestClose={this.closeModal}
-              className={styles.confirmModal}
-              overlayClassName={styles.confirmOverlay}
-            >
-              <span style={{ color: 'pink' }}>
-                {sendPageState.fromaddr}
-                <br />
-                {sendPageState.toaddrs.map(t => (
-                  <div key={t.to}>
-                    {t.to} : {t.amount}
-                  </div>
-                ))}
-                <button type="button" onClick={this.getSendManyJSON}>
-                  Confirm
-                </button>
-                <button type="button" onClick={this.closeModal}>
-                  Cancel
-                </button>
-              </span>
-            </Modal>
+            <ConfirmModal
+              sendPageState={sendPageState}
+              info={info}
+              closeModal={this.closeModal}
+              modalIsOpen={modalIsOpen}
+            />
           </div>
         </div>
       </div>
