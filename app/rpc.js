@@ -7,6 +7,7 @@ import {
   RPCConfig,
   TxDetail
 } from './components/AppState';
+import Utils from './utils/utils';
 
 const parseMemo = (memoHex: string): string | null => {
   if (!memoHex || memoHex.length < 2) return null;
@@ -37,18 +38,22 @@ export default class RPC {
 
   fnSetAllAddresses: (string[]) => void;
 
+  fnSetSinglePrivateKey: (string, string) => void;
+
   timerID: TimerID;
 
   constructor(
     fnSetTotalBalance: TotalBalance => void,
     fnSetAddressesWithBalance: (AddressBalance[]) => void,
     fnSetTransactionsList: (Transaction[]) => void,
-    fnSetAllAddresses: (string[]) => void
+    fnSetAllAddresses: (string[]) => void,
+    fnSetSinglePrivateKey: (string, string) => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
+    this.fnSetSinglePrivateKey = fnSetSinglePrivateKey;
   }
 
   async configure(rpcConfig: RPCConfig) {
@@ -108,6 +113,20 @@ export default class RPC {
     balance.transparent = response.result.transparent;
 
     this.fnSetTotalBalance(balance);
+  }
+
+  // Fetch a private key for either a t or a z address
+  async fetchPrivateKey(address: string) {
+    let method = '';
+    if (Utils.isZaddr(address)) {
+      method = 'z_exportkey';
+    } else if (Utils.isTransparent(address)) {
+      method = 'dumpprivkey';
+    }
+
+    const response = await RPC.doRPC(method, [address], this.rpcConfig);
+
+    this.fnSetSinglePrivateKey(address, response.result);
   }
 
   // Fetch all addresses and their associated balances

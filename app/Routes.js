@@ -31,6 +31,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.state = {
       totalBalance: new TotalBalance(),
       addressesWithBalance: [],
+      addressPrivateKeys: {},
       addresses: [],
       transactions: [],
       sendPageState: new SendPageState(),
@@ -49,7 +50,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setTotalBalance,
         this.setAddressesWithBalances,
         this.setTransactionList,
-        this.setAllAddresses
+        this.setAllAddresses,
+        this.setSinglePrivateKey
       );
     }
   }
@@ -120,11 +122,24 @@ export default class RouteApp extends React.Component<Props, AppState> {
     console.log('updated info');
   };
 
+  setSinglePrivateKey = (address: string, key: string) => {
+    const addressPrivateKeys = {};
+    addressPrivateKeys[address] = key;
+    this.setState({ addressPrivateKeys });
+    console.log(`Added private key for ${address}`);
+  };
+
+  // Getter methods, which are called by the components to update the state
+  getSinglePrivateKey = (address: string) => {
+    this.rpc.fetchPrivateKey(address);
+  };
+
   render() {
     const {
       totalBalance,
       transactions,
       addressesWithBalance,
+      addressPrivateKeys,
       addresses,
       sendPageState,
       info
@@ -149,7 +164,9 @@ export default class RouteApp extends React.Component<Props, AppState> {
               <Receive
                 addresses={addresses}
                 addressesWithBalance={addressesWithBalance}
+                addressPrivateKeys={addressPrivateKeys}
                 info={info}
+                getSinglePrivateKey={this.getSinglePrivateKey}
               />
             )}
           />

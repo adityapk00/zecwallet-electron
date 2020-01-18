@@ -19,11 +19,18 @@ import ScrollPane from './ScrollPane';
 type Props = {
   addresses: string[],
   addressesWithBalance: AddressBalance[],
-  info: Info
+  info: Info,
+  getSinglePrivateKey: string => void
 };
 
-const AddressBlock = ({ addressBalance, currencyName }) => {
+const AddressBlock = ({
+  addressBalance,
+  currencyName,
+  privateKey,
+  getSinglePrivateKey
+}) => {
   const { address } = addressBalance;
+
   return (
     <AccordionItem
       className={[cstyles.well, styles.receiveblock].join(' ')}
@@ -38,6 +45,16 @@ const AddressBlock = ({ addressBalance, currencyName }) => {
         {address}
         <QRCode value={address} className={[styles.receiveQrcode].join(' ')} />
         {currencyName} {addressBalance.balance || 0}
+        {privateKey && (
+          <div style={{ overflowWrap: 'break-word' }}>
+            Private Key: {privateKey}
+          </div>
+        )}
+        {!privateKey && (
+          <button type="button" onClick={() => getSinglePrivateKey(address)}>
+            Export Private Key
+          </button>
+        )}
       </AccordionItemPanel>
     </AccordionItem>
   );
@@ -45,7 +62,13 @@ const AddressBlock = ({ addressBalance, currencyName }) => {
 
 export default class Receive extends PureComponent<Props> {
   render() {
-    const { addresses, addressesWithBalance, info } = this.props;
+    const {
+      addresses,
+      addressesWithBalance,
+      addressPrivateKeys,
+      info,
+      getSinglePrivateKey
+    } = this.props;
 
     // Convert the addressBalances into a map.
     const addressMap = addressesWithBalance.reduce((map, a) => {
@@ -88,6 +111,8 @@ export default class Receive extends PureComponent<Props> {
                         key={a.address}
                         addressBalance={a}
                         currencyName={info.currencyName}
+                        privateKey={addressPrivateKeys[a.address]}
+                        getSinglePrivateKey={getSinglePrivateKey}
                       />
                     ))}
                   </Accordion>
@@ -103,6 +128,8 @@ export default class Receive extends PureComponent<Props> {
                         key={a.address}
                         addressBalance={a}
                         currencyName={info.currencyName}
+                        privateKey={addressPrivateKeys[a.address]}
+                        getSinglePrivateKey={getSinglePrivateKey}
                       />
                     ))}
                   </Accordion>
