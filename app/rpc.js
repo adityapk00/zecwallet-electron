@@ -8,6 +8,7 @@ import {
   TxDetail
 } from './components/AppState';
 import Utils from './utils/utils';
+import SentTxStore from './utils/SentTxStore';
 
 const parseMemo = (memoHex: string): string | null => {
   if (!memoHex || memoHex.length < 2) return null;
@@ -165,6 +166,8 @@ export default class RPC {
   // Fetch all T and Z transactions
   async fetchTandZTransactions() {
     const tresponse = await RPC.doRPC('listtransactions', [], this.rpcConfig);
+    const zaddressesPromise = RPC.doRPC('z_listaddresses', [], this.rpcConfig);
+    const senttxstorePromise = SentTxStore.loadSentTxns();
 
     const ttxlist = tresponse.result.map(tx => {
       const transaction = new Transaction();
@@ -182,7 +185,7 @@ export default class RPC {
     });
 
     // Now get Z txns
-    const zaddresses = await RPC.doRPC('z_listaddresses', [], this.rpcConfig);
+    const zaddresses = await zaddressesPromise;
 
     const alltxnsPromise = zaddresses.result.map(async zaddr => {
       // For each zaddr, get the list of incoming transactions
@@ -232,13 +235,23 @@ export default class RPC {
       })
     );
 
+    // Get transactions from the sent tx store
+    const sentTxns = await senttxstorePromise;
+
     // Now concat the t and z transactions, and call the update function again
-    const alltxlist = ttxlist.concat(ztxlist).sort((tx1, tx2) => {
-      if (tx1.confirmations === tx2.confirmations) {
-        return tx1.time - tx2.time;
-      }
-      return tx1.confirmations - tx2.confirmations;
-    });
+    const alltxlist = ttxlist
+      .concat(ztxlist)
+      .concat(sentTxns)
+      .sort((tx1, tx2) => {
+        if (
+          !tx1.confirmations ||
+          !tx2.confirmations ||
+          tx1.confirmations === tx2.confirmations
+        ) {
+          return tx1.time - tx2.time;
+        }
+        return tx1.confirmations - tx2.confirmations;
+      });
 
     this.fnSetTransactionsList(alltxlist);
   }
