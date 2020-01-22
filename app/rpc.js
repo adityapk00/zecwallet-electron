@@ -85,21 +85,29 @@ export default class RPC {
 
   static async doRPC(method: string, params: [], rpcConfig: RPCConfig) {
     const { url, username, password } = rpcConfig;
-    const response = await axios(url, {
-      data: {
-        jsonrpc: '2.0',
-        id: 'curltest',
-        method,
-        params
-      },
-      method: 'POST',
-      auth: {
-        username,
-        password
-      }
+
+    const response = await new Promise((resolve, reject) => {
+      axios(url, {
+        data: {
+          jsonrpc: '2.0',
+          id: 'curltest',
+          method,
+          params
+        },
+        method: 'POST',
+        auth: {
+          username,
+          password
+        }
+      })
+        .then(r => resolve(r.data))
+        .catch(err => {
+          const e = { ...err };
+          reject(e.response.data.error.message);
+        });
     });
 
-    return response.data;
+    return response;
   }
 
   async refresh() {
@@ -287,13 +295,19 @@ export default class RPC {
 
   // Send a transaction using the already constructed sendJson structure
   async sendTransaction(sendJson: []): boolean {
-    const opid = (await RPC.doRPC('z_sendmany', sendJson, this.rpcConfig))
-      .result;
-    this.fnsetStatusMessage(`Computing ${opid}`);
+    try {
+      const opid = (await RPC.doRPC('z_sendmany', sendJson, this.rpcConfig))
+        .result;
+      this.fnsetStatusMessage(`Computing ${opid}`);
 
-    this.addOpidToMonitor(opid);
+      this.addOpidToMonitor(opid);
 
-    return true;
+      return true;
+    } catch (err) {
+      // TODO Show a modal with the error
+      console.log(`Error sending Tx: ${err}`);
+      return false;
+    }
   }
 
   // Start monitoring the given opid
@@ -314,21 +328,29 @@ export default class RPC {
     if (this.opids.size > 0) {
       // Get all the operation statuses.
       [...this.opids].map(async id => {
-        console.log(id);
-        const resultJson = (
-          await RPC.doRPC('z_getoperationstatus', [[id]], this.rpcConfig)
-        ).result[0];
-
-        console.log(resultJson);
-
-        if (resultJson.status === 'success') {
-          this.opids.delete(id);
-          this.fnsetStatusMessage(
-            `Opid ${id} completed successfully. Txid = ${resultJson.result.txid}`
+        try {
+          const resultJson = await RPC.doRPC(
+            'z_getoperationstatus',
+            [[id]],
+            this.rpcConfig
           );
-        } else if (resultJson.status === 'error') {
+
+          const result = resultJson.result[0];
+
+          if (result.status === 'success') {
+            this.opids.delete(id);
+            this.fnsetStatusMessage(
+              `Opid ${id} completed successfully. Txid = ${result.result.txid}`
+            );
+          } else if (result.status === 'failed') {
+            this.opids.delete(id);
+            this.fnsetStatusMessage(
+              `Opid ${id} Failed. ${result.error.message}`
+            );
+          }
+        } catch (err) {
+          // If we can't get a response for this OPID, then just forget it and move on
           this.opids.delete(id);
-          this.fnsetStatusMessage(`Opid ${id} Failed. ${resultJson.result}`);
         }
       });
     }
