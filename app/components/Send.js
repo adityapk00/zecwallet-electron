@@ -94,7 +94,7 @@ const ToAddrBox = ({
   );
 };
 
-function getSendManyJSON(sendPageState: SendPageState) {
+function getSendManyJSON(sendPageState: SendPageState): [] {
   const json = [];
   json.push(sendPageState.fromaddr);
   json.push(
@@ -103,7 +103,7 @@ function getSendManyJSON(sendPageState: SendPageState) {
     })
   );
 
-  console.log(json);
+  return json;
 }
 
 const ConfirmModalToAddr = ({ toaddr, info }) => {
@@ -141,13 +141,33 @@ const ConfirmModalToAddr = ({ toaddr, info }) => {
   );
 };
 
-const ConfirmModal = ({ sendPageState, info, closeModal, modalIsOpen }) => {
+const ConfirmModal = ({
+  sendPageState,
+  info,
+  sendTransaction,
+  clearToAddrs,
+  closeModal,
+  modalIsOpen
+}) => {
   const sendingTotal =
     sendPageState.toaddrs.reduce(
       (s, t) => parseFloat(s) + parseFloat(t.amount),
       0.0
     ) + 0.0001;
   const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(sendingTotal);
+
+  const sendButton = () => {
+    (async () => {
+      const sendJson = getSendManyJSON(sendPageState);
+      const success = await sendTransaction(sendJson);
+
+      if (success) {
+        clearToAddrs();
+      }
+
+      closeModal();
+    })();
+  };
 
   return (
     <Modal
@@ -201,7 +221,7 @@ const ConfirmModal = ({ sendPageState, info, closeModal, modalIsOpen }) => {
           <button
             type="button"
             className={cstyles.primarybutton}
-            onClick={() => getSendManyJSON(sendPageState)}
+            onClick={() => sendButton()}
           >
             Send
           </button>
@@ -223,7 +243,11 @@ type Props = {
 
   sendPageState: SendPageState,
 
+  sendTransaction: (sendJson: []) => void,
+
   setSendPageState: (sendPageState: SendPageState) => void,
+
+  statusMessage: string | null,
 
   info: Info
 };
@@ -396,7 +420,7 @@ export default class Send extends PureComponent<Props, SendState> {
       }
     };
 
-    const { addressesWithBalance } = this.props;
+    const { addressesWithBalance, statusMessage, sendTransaction } = this.props;
     const sendFromList = addressesWithBalance.map(ab => {
       return {
         value: ab.address,
@@ -429,7 +453,7 @@ export default class Send extends PureComponent<Props, SendState> {
     return (
       <div style={{ overflow: 'hidden' }}>
         <div style={{ width: '30%', float: 'left' }}>
-          <Sidebar />
+          <Sidebar statusMessage={statusMessage} />
         </div>
         <div style={{ width: '70%', float: 'right' }}>
           <div className={styles.sendcontainer}>
@@ -485,8 +509,10 @@ export default class Send extends PureComponent<Props, SendState> {
             <ConfirmModal
               sendPageState={sendPageState}
               info={info}
+              sendTransaction={sendTransaction}
               closeModal={this.closeModal}
               modalIsOpen={modalIsOpen}
+              clearToAddrs={this.clearToAddrs}
             />
           </div>
         </div>

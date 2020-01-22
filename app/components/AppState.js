@@ -133,6 +133,9 @@ export default class AppState {
   // The state of the send page, as the user constructs a transaction
   sendPageState: SendPageState;
 
+  // Any status message to display
+  statusMessage: string;
+
   // The Current configuration of the RPC params
   rpcConfig: RPCConfig;
 

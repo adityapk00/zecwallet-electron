@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import styles from './Sidebar.css';
@@ -29,9 +29,9 @@ const SidebarMenuItem = ({ name, routeName, currentRoute }) => {
   );
 };
 
-class Sidebar extends Component {
+class Sidebar extends PureComponent {
   render() {
-    const { location } = this.props;
+    const { location, statusMessage } = this.props;
 
     return (
       <div className={styles.sidebar}>
@@ -65,6 +65,11 @@ class Sidebar extends Component {
           routeName={routes.ZCASHD}
           currentRoute={location.pathname}
         />
+        {statusMessage && (
+          <div>
+            <span>{statusMessage}</span>
+          </div>
+        )}
       </div>
     );
   }

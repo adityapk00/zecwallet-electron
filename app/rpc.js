@@ -41,32 +41,46 @@ export default class RPC {
 
   fnSetSinglePrivateKey: (string, string) => void;
 
-  timerID: TimerID;
+  fnsetStatusMessage: (string | null) => void;
+
+  opids: Set<string>;
+
+  refreshTimerID: TimerID;
+
+  opTimerID: TimerID;
 
   constructor(
     fnSetTotalBalance: TotalBalance => void,
     fnSetAddressesWithBalance: (AddressBalance[]) => void,
     fnSetTransactionsList: (Transaction[]) => void,
     fnSetAllAddresses: (string[]) => void,
-    fnSetSinglePrivateKey: (string, string) => void
+    fnSetSinglePrivateKey: (string, string) => void,
+    setStatusMessage: (string | null) => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetSinglePrivateKey = fnSetSinglePrivateKey;
+    this.fnsetStatusMessage = setStatusMessage;
+
+    this.opids = new Set();
   }
 
   async configure(rpcConfig: RPCConfig) {
     this.rpcConfig = rpcConfig;
 
-    if (!this.timerID) {
-      this.timerID = setTimeout(() => this.refresh(), 1000);
+    if (!this.refreshTimerID) {
+      this.refreshTimerID = setTimeout(() => this.refresh(), 1000);
+    }
+
+    if (!this.opTimerID) {
+      this.opTimerID = setTimeout(() => this.refreshOpStatus(), 1000);
     }
   }
 
   setupNextFetch() {
-    this.timerID = setTimeout(() => this.refresh(), 20000);
+    this.refreshTimerID = setTimeout(() => this.refresh(), 20000);
   }
 
   static async doRPC(method: string, params: [], rpcConfig: RPCConfig) {
@@ -269,5 +283,56 @@ export default class RPC {
     const allT = (await taddrsPromise).result;
 
     this.fnSetAllAddresses(allZ.concat(allT));
+  }
+
+  // Send a transaction using the already constructed sendJson structure
+  async sendTransaction(sendJson: []): boolean {
+    const opid = (await RPC.doRPC('z_sendmany', sendJson, this.rpcConfig))
+      .result;
+    this.fnsetStatusMessage(`Computing ${opid}`);
+
+    this.addOpidToMonitor(opid);
+
+    return true;
+  }
+
+  // Start monitoring the given opid
+  async addOpidToMonitor(opid: string) {
+    this.opids.add(opid);
+    this.refreshOpStatus();
+  }
+
+  setupNextOpidSatusFetch() {
+    if (this.opids.size > 0) {
+      this.opTimerID = setTimeout(() => this.refreshOpStatus(), 2000); // 2 sec
+    } else {
+      this.opTimerID = null;
+    }
+  }
+
+  async refreshOpStatus() {
+    if (this.opids.size > 0) {
+      // Get all the operation statuses.
+      [...this.opids].map(async id => {
+        console.log(id);
+        const resultJson = (
+          await RPC.doRPC('z_getoperationstatus', [[id]], this.rpcConfig)
+        ).result[0];
+
+        console.log(resultJson);
+
+        if (resultJson.status === 'success') {
+          this.opids.delete(id);
+          this.fnsetStatusMessage(
+            `Opid ${id} completed successfully. Txid = ${resultJson.result.txid}`
+          );
+        } else if (resultJson.status === 'error') {
+          this.opids.delete(id);
+          this.fnsetStatusMessage(`Opid ${id} Failed. ${resultJson.result}`);
+        }
+      });
+    }
+
+    this.setupNextOpidSatusFetch();
   }
 }

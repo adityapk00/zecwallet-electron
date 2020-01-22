@@ -35,6 +35,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addresses: [],
       transactions: [],
       sendPageState: new SendPageState(),
+      statusMessage: null,
       rpcConfig: new RPCConfig(),
       info: new Info()
     };
@@ -51,7 +52,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setAddressesWithBalances,
         this.setTransactionList,
         this.setAllAddresses,
-        this.setSinglePrivateKey
+        this.setSinglePrivateKey,
+        this.setStatusMessage
       );
     }
   }
@@ -111,6 +113,11 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.setState({ sendPageState });
   };
 
+  setStatusMessage = (statusMessage: string | null) => {
+    console.log(`Setting status message: ${statusMessage}`);
+    this.setState({ statusMessage });
+  };
+
   setRPCConfig = (rpcConfig: RPCConfig) => {
     this.setState({ rpcConfig });
     console.log(rpcConfig);
@@ -129,6 +136,11 @@ export default class RouteApp extends React.Component<Props, AppState> {
     console.log(`Added private key for ${address}`);
   };
 
+  sendTransaction = async (sendJson: []) => {
+    const success = await this.rpc.sendTransaction(sendJson);
+    return success;
+  };
+
   // Getter methods, which are called by the components to update the state
   getSinglePrivateKey = (address: string) => {
     this.rpc.fetchPrivateKey(address);
@@ -141,6 +153,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addressesWithBalance,
       addressPrivateKeys,
       addresses,
+      statusMessage,
       sendPageState,
       info
     } = this.state;
@@ -152,8 +165,10 @@ export default class RouteApp extends React.Component<Props, AppState> {
             render={() => (
               <Send
                 addressesWithBalance={addressesWithBalance}
+                sendTransaction={this.sendTransaction}
                 sendPageState={sendPageState}
                 setSendPageState={this.setSendPageState}
+                statusMessage={statusMessage}
                 info={info}
               />
             )}
