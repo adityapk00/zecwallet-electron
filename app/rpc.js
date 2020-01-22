@@ -306,7 +306,7 @@ export default class RPC {
     } catch (err) {
       // TODO Show a modal with the error
       console.log(`Error sending Tx: ${err}`);
-      return false;
+      throw err;
     }
   }
 

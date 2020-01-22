@@ -23,8 +23,17 @@ type OptionType = {
 class SendState {
   modalIsOpen: boolean;
 
+  errorModalIsOpen: boolean;
+
+  errorModalTitle: string;
+
+  errorModalBody: string;
+
   constructor() {
     this.modalIsOpen = false;
+    this.errorModalIsOpen = false;
+    this.errorModalBody = '';
+    this.errorModalTitle = '';
   }
 }
 
@@ -141,13 +150,48 @@ const ConfirmModalToAddr = ({ toaddr, info }) => {
   );
 };
 
+const ErrorModal = ({ title, body, modalIsOpen, closeModal }) => {
+  return (
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      className={styles.confirmModal}
+      overlayClassName={styles.confirmOverlay}
+    >
+      <div className={[cstyles.verticalflex].join(' ')}>
+        <div
+          className={cstyles.marginbottomlarge}
+          style={{ textAlign: 'center' }}
+        >
+          {title}
+        </div>
+
+        <div className={cstyles.well} style={{ textAlign: 'center' }}>
+          {body}
+        </div>
+      </div>
+
+      <div className={styles.buttoncontainer}>
+        <button
+          type="button"
+          className={cstyles.primarybutton}
+          onClick={closeModal}
+        >
+          Close
+        </button>
+      </div>
+    </Modal>
+  );
+};
+
 const ConfirmModal = ({
   sendPageState,
   info,
   sendTransaction,
   clearToAddrs,
   closeModal,
-  modalIsOpen
+  modalIsOpen,
+  openErrorModal
 }) => {
   const sendingTotal =
     sendPageState.toaddrs.reduce(
@@ -159,7 +203,14 @@ const ConfirmModal = ({
   const sendButton = () => {
     (async () => {
       const sendJson = getSendManyJSON(sendPageState);
-      const success = await sendTransaction(sendJson);
+      let success = false;
+
+      try {
+        success = await sendTransaction(sendJson);
+      } catch (err) {
+        // If there was an error, show the error modal
+        openErrorModal('Error Sending Transaction', err);
+      }
 
       if (success) {
         clearToAddrs();
@@ -363,6 +414,16 @@ export default class Send extends PureComponent<Props, SendState> {
     this.setState({ modalIsOpen: false });
   };
 
+  openErrorModal = (title: string, body: string) => {
+    this.setState({ errorModalIsOpen: true });
+    this.setState({ errorModalTitle: title });
+    this.setState({ errorModalBody: body });
+  };
+
+  closeErrorModal = () => {
+    this.setState({ errorModalIsOpen: false });
+  };
+
   getBalanceForAddress = (
     addr: string,
     addressesWithBalance: AddressBalance[]
@@ -391,7 +452,12 @@ export default class Send extends PureComponent<Props, SendState> {
   };
 
   render() {
-    const { modalIsOpen } = this.state;
+    const {
+      modalIsOpen,
+      errorModalIsOpen,
+      errorModalTitle,
+      errorModalBody
+    } = this.state;
     const { sendPageState, info } = this.props;
 
     const customStyles = {
@@ -510,9 +576,17 @@ export default class Send extends PureComponent<Props, SendState> {
               sendPageState={sendPageState}
               info={info}
               sendTransaction={sendTransaction}
+              openErrorModal={this.openErrorModal}
               closeModal={this.closeModal}
               modalIsOpen={modalIsOpen}
               clearToAddrs={this.clearToAddrs}
+            />
+
+            <ErrorModal
+              title={errorModalTitle}
+              body={errorModalBody}
+              modalIsOpen={errorModalIsOpen}
+              closeModal={this.closeErrorModal}
             />
           </div>
         </div>
