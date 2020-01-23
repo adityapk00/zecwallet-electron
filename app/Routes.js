@@ -136,8 +136,14 @@ export default class RouteApp extends React.Component<Props, AppState> {
     console.log(`Added private key for ${address}`);
   };
 
-  sendTransaction = async (sendJson: []) => {
-    const success = await this.rpc.sendTransaction(sendJson);
+  sendTransaction = async (
+    sendJson: [],
+    fnOpenSendErrorModal: (string, string) => void
+  ) => {
+    const success = await this.rpc.sendTransaction(
+      sendJson,
+      fnOpenSendErrorModal
+    );
     return success;
   };
 

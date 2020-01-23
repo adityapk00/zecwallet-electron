@@ -43,6 +43,9 @@ export default class RPC {
 
   fnsetStatusMessage: (string | null) => void;
 
+  // This function is not set via a constructor, but via the sendTransaction method
+  fnOpenSendErrorModal: (string, string) => void;
+
   opids: Set<string>;
 
   refreshTimerID: TimerID;
@@ -294,7 +297,12 @@ export default class RPC {
   }
 
   // Send a transaction using the already constructed sendJson structure
-  async sendTransaction(sendJson: []): boolean {
+  async sendTransaction(
+    sendJson: [],
+    fnOpenSendErrorModal: (string, string) => void
+  ): boolean {
+    this.fnOpenSendErrorModal = fnOpenSendErrorModal;
+
     try {
       const opid = (await RPC.doRPC('z_sendmany', sendJson, this.rpcConfig))
         .result;
@@ -344,7 +352,10 @@ export default class RPC {
             );
           } else if (result.status === 'failed') {
             this.opids.delete(id);
-            this.fnsetStatusMessage(
+
+            this.fnsetStatusMessage('');
+            this.fnOpenSendErrorModal(
+              'Error Sending Transaction',
               `Opid ${id} Failed. ${result.error.message}`
             );
           }

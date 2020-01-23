@@ -206,7 +206,7 @@ const ConfirmModal = ({
       let success = false;
 
       try {
-        success = await sendTransaction(sendJson);
+        success = await sendTransaction(sendJson, openErrorModal);
       } catch (err) {
         // If there was an error, show the error modal
         openErrorModal('Error Sending Transaction', err);
@@ -294,7 +294,7 @@ type Props = {
 
   sendPageState: SendPageState,
 
-  sendTransaction: (sendJson: []) => void,
+  sendTransaction: (sendJson: [], (string, string) => void) => void,
 
   setSendPageState: (sendPageState: SendPageState) => void,
 
