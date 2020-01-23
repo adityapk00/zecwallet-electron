@@ -36,6 +36,10 @@
   color: #6a6a6a;
 }
 
+.center {
+  text-align: center;
+}
+
 .primarybutton {
   background-color: #c3921f;
   color: #fff;

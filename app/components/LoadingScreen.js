@@ -9,6 +9,8 @@ import { remote } from 'electron';
 import routes from '../constants/routes.json';
 import { RPCConfig, Info } from './AppState';
 import RPC from '../rpc';
+import cstyles from './Common.css';
+import Logo from '../assets/img/logobig.gif';
 
 const locateZcashConf = () => {
   if (os.platform() === 'darwin') {
@@ -29,6 +31,16 @@ type Props = {
 
 class LoadingScreenState {
   currentStatus: string;
+
+  loadingDone: boolean;
+
+  rpcConfig: RPCConfig | null;
+
+  constructor() {
+    this.currentStatus = 'Loading';
+    this.loadingDone = false;
+    this.rpcConfig = null;
+  }
 }
 
 export default class LoadingScreen extends Component<Props> {
@@ -57,7 +69,22 @@ export default class LoadingScreen extends Component<Props> {
       const port = confValues.rpcport || (isTestnet ? '18232' : '8232');
       rpcConfig.url = `http://${server}:${port}`;
 
-      // Try getting the info. TODO: Handle failure
+      this.setState({ rpcConfig });
+
+      // And setup the next getinfo
+      this.setupNextGetInfo();
+    })();
+  }
+
+  setupNextGetInfo() {
+    setTimeout(() => this.getInfo(), 1000);
+  }
+
+  async getInfo() {
+    const { rpcConfig } = this.state;
+
+    // Try getting the info.
+    try {
       const infoResult = await RPC.doRPC('getinfo', [], rpcConfig);
       const info = new Info();
       info.testnet = infoResult.result.testnet;
@@ -73,10 +100,31 @@ export default class LoadingScreen extends Component<Props> {
 
       setRPCConfig(rpcConfig);
       setInfo(info);
-    })();
+
+      // This will cause a redirect to the dashboard
+      this.setState({ loadingDone: true });
+    } catch (err) {
+      // Not yet finished loading. So update the state, and setup the next refresh
+      this.setState({ currentStatus: err });
+      this.setupNextGetInfo();
+    }
   }
 
   render() {
+    const { loadingDone, currentStatus } = this.state;
+
+    // If still loading, show the status
+    if (!loadingDone) {
+      return (
+        <div className={[cstyles.verticalflex, cstyles.center].join(' ')}>
+          <div style={{ marginTop: '100px' }}>
+            <img src={Logo} width="200px;" alt="Logo" />
+          </div>
+          <div>{currentStatus}</div>
+        </div>
+      );
+    }
+
     return <Redirect to={routes.DASHBOARD} />;
   }
 }
