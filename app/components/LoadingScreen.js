@@ -6,6 +6,7 @@ import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import { remote } from 'electron';
+import { spawn } from 'child_process';
 import routes from '../constants/routes.json';
 import { RPCConfig, Info } from './AppState';
 import RPC from '../rpc';
@@ -37,9 +38,15 @@ class LoadingScreenState {
 
   rpcConfig: RPCConfig | null;
 
+  zcashdSpawned: number;
+
+  getinfoRetryCount: number;
+
   constructor() {
     this.currentStatus = 'Loading...';
     this.loadingDone = false;
+    this.zcashdSpawned = 0;
+    this.getinfoRetryCount = 0;
     this.rpcConfig = null;
   }
 }
@@ -77,12 +84,46 @@ export default class LoadingScreen extends Component<Props> {
     })();
   }
 
+  async startZcashd() {
+    const { zcashdSpawned } = this.state;
+
+    if (zcashdSpawned) {
+      this.setState({ currentStatus: 'zcashd start failed' });
+      return;
+    }
+
+    const program = path.join(remote.app.getAppPath(), 'zcashd');
+    console.log(program);
+
+    const zcashd = spawn(program);
+
+    this.setState({ zcashdSpawned: 1 });
+    this.setState({ currentStatus: 'zcashd starting...' });
+
+    zcashd.on('close', (code: number) => {
+      console.log(`child process exited with code ${code}`);
+    });
+
+    zcashd.on('error', err => {
+      console.log(`zcashd start error, giving up. Error: ${err}`);
+      // Set that we tried to start zcashd, and failed
+      this.setState({ zcashdSpawned: 1 });
+      // No point retrying.
+      this.setState({ getinfoRetryCount: 10 });
+    });
+
+    // Set up to kill zcashd when we exit.
+    remote.getCurrentWindow().on('close', () => {
+      zcashd.kill();
+    });
+  }
+
   setupNextGetInfo() {
     setTimeout(() => this.getInfo(), 1000);
   }
 
   async getInfo() {
-    const { rpcConfig } = this.state;
+    const { rpcConfig, zcashdSpawned, getinfoRetryCount } = this.state;
 
     // Try getting the info.
     try {
@@ -107,6 +148,24 @@ export default class LoadingScreen extends Component<Props> {
     } catch (err) {
       // Not yet finished loading. So update the state, and setup the next refresh
       this.setState({ currentStatus: err });
+
+      if (err === NO_CONNECTION && !zcashdSpawned) {
+        // Try to start zcashd
+        this.startZcashd();
+        this.setupNextGetInfo();
+      }
+
+      if (err === NO_CONNECTION && zcashdSpawned && getinfoRetryCount < 10) {
+        this.setState({ currentStatus: 'Waiting for zcashd to start...' });
+        const inc = getinfoRetryCount + 1;
+        this.setState({ getinfoRetryCount: inc });
+        this.setupNextGetInfo();
+      }
+
+      if (err === NO_CONNECTION && zcashdSpawned && getinfoRetryCount >= 10) {
+        // Give up
+        this.setState({ currentStatus: 'Failed to start zcashd. Giving up!' });
+      }
 
       if (err !== NO_CONNECTION) {
         this.setupNextGetInfo();
