@@ -95,6 +95,14 @@ export default class Receive extends PureComponent<Props> {
           <Sidebar />
         </div>
         <div style={{ width: '70%', float: 'right' }}>
+          <div
+            className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
+              ' '
+            )}
+          >
+            Receive
+          </div>
+
           <div className={styles.receivecontainer}>
             <Tabs>
               <TabList>

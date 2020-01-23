@@ -1,6 +1,6 @@
 .sidebar {
-  background-color: #000000;
-  height: 100vh;
+  background-color: #000;
+  height: calc(100vh - 100px);
 }
 
 .sidebarmenuitem {
@@ -11,4 +11,13 @@
 
 .sidebarmenuitemactive {
   color: #c3921f;
+}
+
+.sidebarlogobg {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 184, 0, 1) 0%,
+    rgb(206, 209, 113) 100%
+  );
+  margin-bottom: 8px;
 }

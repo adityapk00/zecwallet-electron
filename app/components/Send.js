@@ -522,9 +522,21 @@ export default class Send extends PureComponent<Props, SendState> {
           <Sidebar statusMessage={statusMessage} />
         </div>
         <div style={{ width: '70%', float: 'right' }}>
+          <div
+            className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
+              ' '
+            )}
+          >
+            Send
+          </div>
+
           <div className={styles.sendcontainer}>
             <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
-              <div className={[cstyles.sublight].join(' ')}>Send From</div>
+              <div
+                className={[cstyles.sublight, cstyles.padbottomsmall].join(' ')}
+              >
+                Send From
+              </div>
               <Select
                 value={fromaddr}
                 options={sendFromList}

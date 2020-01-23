@@ -83,9 +83,8 @@ input[disabled] {
 }
 
 .react-tabs__tab--selected {
-  background: grey;
-  border-color: #aaa;
-  color: white;
+  background: white;
+  color: black;
   border-radius: 5px 5px 0 0;
 }
 

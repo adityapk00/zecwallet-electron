@@ -149,6 +149,13 @@ export default class Home extends PureComponent<Props> {
           <Sidebar />
         </div>
         <div style={{ width: '70%', float: 'right' }}>
+          <div
+            className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
+              ' '
+            )}
+          >
+            Dashboard
+          </div>
           <div className={[cstyles.well, styles.balancebox].join(' ')}>
             <BalanceBlockHighlight
               zecValue={totalBalance.total}
