@@ -1,4 +1,6 @@
 /* eslint-disable no-plusplus */
+export const NO_CONNECTION: string = 'Could not connect to zcashd';
+
 export default class Utils {
   static isSapling(addr: string): boolean {
     return addr.startsWith('zs') || addr.startsWith('ztestsapling');

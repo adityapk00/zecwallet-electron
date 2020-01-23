@@ -10,6 +10,7 @@ import routes from '../constants/routes.json';
 import { RPCConfig, Info } from './AppState';
 import RPC from '../rpc';
 import cstyles from './Common.css';
+import { NO_CONNECTION } from '../utils/utils';
 import Logo from '../assets/img/logobig.gif';
 
 const locateZcashConf = () => {
@@ -37,7 +38,7 @@ class LoadingScreenState {
   rpcConfig: RPCConfig | null;
 
   constructor() {
-    this.currentStatus = 'Loading';
+    this.currentStatus = 'Loading...';
     this.loadingDone = false;
     this.rpcConfig = null;
   }
@@ -106,7 +107,10 @@ export default class LoadingScreen extends Component<Props> {
     } catch (err) {
       // Not yet finished loading. So update the state, and setup the next refresh
       this.setState({ currentStatus: err });
-      this.setupNextGetInfo();
+
+      if (err !== NO_CONNECTION) {
+        this.setupNextGetInfo();
+      }
     }
   }
 

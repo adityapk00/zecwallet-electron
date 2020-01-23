@@ -7,7 +7,7 @@ import {
   RPCConfig,
   TxDetail
 } from './components/AppState';
-import Utils from './utils/utils';
+import Utils, { NO_CONNECTION } from './utils/utils';
 import SentTxStore from './utils/SentTxStore';
 
 const parseMemo = (memoHex: string): string | null => {
@@ -106,7 +106,12 @@ export default class RPC {
         .then(r => resolve(r.data))
         .catch(err => {
           const e = { ...err };
-          reject(e.response.data.error.message);
+          if (e.response && e.response.data) {
+            reject(e.response.data.error.message);
+          } else {
+            // eslint-disable-next-line prefer-promise-reject-errors
+            reject(NO_CONNECTION);
+          }
         });
     });
 
@@ -268,13 +273,10 @@ export default class RPC {
       .concat(ztxlist)
       .concat(sentTxns)
       .sort((tx1, tx2) => {
-        if (
-          !tx1.confirmations ||
-          !tx2.confirmations ||
-          tx1.confirmations === tx2.confirmations
-        ) {
-          return tx1.time - tx2.time;
+        if (tx1.time && tx2.time) {
+          return tx2.time - tx1.time;
         }
+
         return tx1.confirmations - tx2.confirmations;
       });
 
