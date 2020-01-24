@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import {
   Accordion,
@@ -9,6 +9,7 @@ import {
   AccordionItemPanel
 } from 'react-accessible-accordion';
 import QRCode from 'qrcode.react';
+import { clipboard } from 'electron';
 import Sidebar from './Sidebar';
 import styles from './Receive.css';
 import cstyles from './Common.css';
@@ -42,25 +43,77 @@ const AddressBlock = ({
         </AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel className={[styles.receiveDetail].join(' ')}>
-        {address}
-        <QRCode value={address} className={[styles.receiveQrcode].join(' ')} />
-        {currencyName} {addressBalance.balance || 0}
-        {privateKey && (
-          <div style={{ overflowWrap: 'break-word' }}>
-            Private Key: {privateKey}
+        <div className={[cstyles.flex].join(' ')}>
+          <div>
+            <QRCode
+              value={address}
+              className={[styles.receiveQrcode].join(' ')}
+            />
           </div>
-        )}
-        {!privateKey && (
-          <button type="button" onClick={() => getSinglePrivateKey(address)}>
-            Export Private Key
-          </button>
-        )}
+          <div className={[cstyles.verticalflex, cstyles.marginleft].join(' ')}>
+            <div className={[cstyles.sublight].join(' ')}>Address</div>
+            <div className={[cstyles.padtopsmall, cstyles.fixedfont].join(' ')}>
+              {Utils.splitStringIntoChunks(address, 6).join(' ')}
+            </div>
+            <div>
+              <button
+                className={[cstyles.primarybutton, cstyles.margintoplarge].join(
+                  ' '
+                )}
+                type="button"
+                onClick={() => {
+                  clipboard.writeText(address);
+                }}
+              >
+                Copy Address
+              </button>
+              {!privateKey && (
+                <button
+                  className={[cstyles.primarybutton].join(' ')}
+                  type="button"
+                  onClick={() => getSinglePrivateKey(address)}
+                >
+                  Export Private Key
+                </button>
+              )}
+            </div>
+            <div
+              className={[cstyles.sublight, cstyles.margintoplarge].join(' ')}
+            >
+              Funds
+            </div>
+            <div className={[cstyles.padtopsmall].join(' ')}>
+              {currencyName} {addressBalance.balance || 0}
+            </div>
+            <div
+              className={[cstyles.margintoplarge, cstyles.breakword].join(' ')}
+            >
+              {privateKey && (
+                <div>
+                  <div className={[cstyles.sublight].join(' ')}>
+                    Private Key
+                  </div>
+                  <div
+                    className={[
+                      cstyles.breakword,
+                      cstyles.padtopsmall,
+                      cstyles.fixedfont
+                    ].join(' ')}
+                    style={{ maxWidth: '600px' }}
+                  >
+                    {privateKey}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       </AccordionItemPanel>
     </AccordionItem>
   );
 };
 
-export default class Receive extends PureComponent<Props> {
+export default class Receive extends Component<Props> {
   render() {
     const {
       addresses,

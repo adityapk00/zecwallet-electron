@@ -7,6 +7,10 @@
   flex-direction: column;
 }
 
+.flex {
+  display: flex;
+}
+
 .flexspacebetween {
   display: flex;
   justify-content: space-between;
@@ -40,9 +44,13 @@
   text-align: center;
 }
 
+.breakword {
+  overflow-wrap: break-word;
+}
+
 .primarybutton {
   background-color: #c3921f;
-  color: #fff;
+  color: #000;
   font-size: 16px;
   padding-top: 8px;
   padding-bottom: 8px;
@@ -68,6 +76,10 @@
 
 .margintoplarge {
   margin-top: 24px;
+}
+
+.marginleft {
+  margin-left: 16px;
 }
 
 .marginbottomlarge {

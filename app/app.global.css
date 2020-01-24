@@ -13,7 +13,7 @@ body {
   color: white;
   height: 100vh;
   background-color: #212124;
-  font-family: Arial, Helvetica, Helvetica Neue, serif;
+  font-family: Roboto, Arial, Helvetica, Helvetica Neue, serif;
 }
 
 ::-webkit-scrollbar {
@@ -83,7 +83,7 @@ input[disabled] {
 }
 
 .react-tabs__tab--selected {
-  background: white;
+  background: #c3921f;
   color: black;
   border-radius: 5px 5px 0 0;
 }
