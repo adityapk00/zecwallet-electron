@@ -150,9 +150,6 @@ export default class AppState {
   // Any state for the receive page
   receivePageState: ReceivePageState;
 
-  // Any status message to display
-  statusMessage: string;
-
   // The Current configuration of the RPC params
   rpcConfig: RPCConfig;
 

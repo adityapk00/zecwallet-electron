@@ -41,8 +41,6 @@ export default class RPC {
 
   fnSetSinglePrivateKey: (string, string) => void;
 
-  fnsetStatusMessage: (string | null) => void;
-
   // This function is not set via a constructor, but via the sendTransaction method
   fnOpenSendErrorModal: (string, string) => void;
 
@@ -57,15 +55,13 @@ export default class RPC {
     fnSetAddressesWithBalance: (AddressBalance[]) => void,
     fnSetTransactionsList: (Transaction[]) => void,
     fnSetAllAddresses: (string[]) => void,
-    fnSetSinglePrivateKey: (string, string) => void,
-    setStatusMessage: (string | null) => void
+    fnSetSinglePrivateKey: (string, string) => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetSinglePrivateKey = fnSetSinglePrivateKey;
-    this.fnsetStatusMessage = setStatusMessage;
 
     this.opids = new Set();
   }
@@ -325,7 +321,6 @@ export default class RPC {
     try {
       const opid = (await RPC.doRPC('z_sendmany', sendJson, this.rpcConfig))
         .result;
-      this.fnsetStatusMessage(`Computing ${opid}`);
 
       this.addOpidToMonitor(opid);
 
@@ -366,13 +361,9 @@ export default class RPC {
 
           if (result.status === 'success') {
             this.opids.delete(id);
-            this.fnsetStatusMessage(
-              `Opid ${id} completed successfully. Txid = ${result.result.txid}`
-            );
           } else if (result.status === 'failed') {
             this.opids.delete(id);
 
-            this.fnsetStatusMessage('');
             this.fnOpenSendErrorModal(
               'Error Sending Transaction',
               `Opid ${id} Failed. ${result.error.message}`

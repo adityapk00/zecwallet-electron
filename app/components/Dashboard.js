@@ -3,6 +3,7 @@
 // @flow
 import React, { PureComponent } from 'react';
 import dateformat from 'dateformat';
+import escape from 'escape-html';
 import styles from './Dashboard.css';
 import cstyles from './Common.css';
 import { TotalBalance, Transaction, Info } from './AppState';
@@ -80,7 +81,10 @@ const TxItemBlock = ({ transaction, currencyName }) => {
           );
 
           let { address } = txdetail;
-          const { memo } = txdetail;
+          let { memo } = txdetail;
+          if (memo) {
+            memo = escape(memo);
+          }
 
           if (!address) {
             address = '(Shielded)';
@@ -145,10 +149,10 @@ export default class Home extends PureComponent<Props> {
 
     return (
       <div style={{ overflow: 'hidden' }}>
-        <div style={{ width: '30%', float: 'left' }}>
-          <Sidebar />
+        <div className={cstyles.sidebarcontainer}>
+          <Sidebar info={info} />
         </div>
-        <div style={{ width: '70%', float: 'right' }}>
+        <div className={cstyles.contentcontainer}>
           <div
             className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
               ' '
@@ -176,7 +180,7 @@ export default class Home extends PureComponent<Props> {
             />
           </div>
           {/* Change the hardcoded height */}
-          <ScrollPane offsetHeight={200}>
+          <ScrollPane offsetHeight={250}>
             {transactions.map(tx => {
               const key = tx.type + tx.txid + tx.address;
               return (

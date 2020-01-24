@@ -175,10 +175,10 @@ export default class Receive extends Component<Props> {
 
     return (
       <div style={{ overflow: 'hidden' }}>
-        <div style={{ width: '30%', float: 'left' }}>
-          <Sidebar />
+        <div className={cstyles.sidebarcontainer}>
+          <Sidebar info={info} />
         </div>
-        <div style={{ width: '70%', float: 'right' }}>
+        <div className={cstyles.contentcontainer}>
           <div
             className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
               ' '

@@ -7,6 +7,7 @@
 import React, { PureComponent } from 'react';
 import Modal from 'react-modal';
 import Select from 'react-select';
+import escape from 'escape-html';
 import styles from './Send.css';
 import cstyles from './Common.css';
 import { ToAddr, AddressBalance, SendPageState, Info } from './AppState';
@@ -115,41 +116,6 @@ function getSendManyJSON(sendPageState: SendPageState): [] {
   return json;
 }
 
-const ConfirmModalToAddr = ({ toaddr, info }) => {
-  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(
-    toaddr.amount
-  );
-
-  return (
-    <div className={cstyles.well}>
-      <div
-        className={[cstyles.flexspacebetween, cstyles.margintoplarge].join(' ')}
-      >
-        <div
-          className={[
-            cstyles.small,
-            cstyles.fixedfont,
-            styles.confirmModalAddress
-          ].join(' ')}
-        >
-          {Utils.splitStringIntoChunks(toaddr.to, 6).join(' ')}
-        </div>
-        <div className={cstyles.large}>
-          <div>
-            <span>
-              {info.currencyName} {bigPart}
-            </span>
-            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
-              {smallPart}
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className={cstyles.sublight}>{toaddr.memo}</div>
-    </div>
-  );
-};
-
 const ErrorModal = ({ title, body, modalIsOpen, closeModal }) => {
   return (
     <Modal
@@ -181,6 +147,43 @@ const ErrorModal = ({ title, body, modalIsOpen, closeModal }) => {
         </button>
       </div>
     </Modal>
+  );
+};
+
+const ConfirmModalToAddr = ({ toaddr, info }) => {
+  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(
+    toaddr.amount
+  );
+
+  const memo: string = toaddr.memo ? escape(toaddr.memo) : '';
+
+  return (
+    <div className={cstyles.well}>
+      <div
+        className={[cstyles.flexspacebetween, cstyles.margintoplarge].join(' ')}
+      >
+        <div
+          className={[
+            cstyles.small,
+            cstyles.fixedfont,
+            styles.confirmModalAddress
+          ].join(' ')}
+        >
+          {Utils.splitStringIntoChunks(toaddr.to, 6).join(' ')}
+        </div>
+        <div className={cstyles.large}>
+          <div>
+            <span>
+              {info.currencyName} {bigPart}
+            </span>
+            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
+              {smallPart}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className={cstyles.sublight}>{memo}</div>
+    </div>
   );
 };
 
@@ -240,7 +243,8 @@ const ConfirmModal = ({
               cstyles.highlight,
               cstyles.xlarge,
               cstyles.flexspacebetween,
-              cstyles.well
+              cstyles.well,
+              cstyles.maxwidth
             ].join(' ')}
           >
             <div>Total</div>
@@ -297,8 +301,6 @@ type Props = {
   sendTransaction: (sendJson: [], (string, string) => void) => void,
 
   setSendPageState: (sendPageState: SendPageState) => void,
-
-  statusMessage: string | null,
 
   info: Info
 };
@@ -397,6 +399,7 @@ export default class Send extends PureComponent<Props, SendState> {
     const toAddr = newToAddrs.find(a => a.id === id);
     toAddr.amount = total - totalOtherAmount;
     if (toAddr.amount < 0) toAddr.amount = 0;
+    toAddr.amount = Utils.maxPrecision(toAddr.amount);
 
     // Create the new state object
     const newState = new SendPageState();
@@ -486,7 +489,7 @@ export default class Send extends PureComponent<Props, SendState> {
       }
     };
 
-    const { addressesWithBalance, statusMessage, sendTransaction } = this.props;
+    const { addressesWithBalance, sendTransaction } = this.props;
     const sendFromList = addressesWithBalance.map(ab => {
       return {
         value: ab.address,
@@ -518,10 +521,10 @@ export default class Send extends PureComponent<Props, SendState> {
 
     return (
       <div style={{ overflow: 'hidden' }}>
-        <div style={{ width: '30%', float: 'left' }}>
-          <Sidebar statusMessage={statusMessage} />
+        <div className={cstyles.sidebarcontainer}>
+          <Sidebar info={info} />
         </div>
-        <div style={{ width: '70%', float: 'right' }}>
+        <div className={cstyles.contentcontainer}>
           <div
             className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
               ' '
@@ -548,7 +551,7 @@ export default class Send extends PureComponent<Props, SendState> {
 
             <Spacer />
 
-            <ScrollPane offsetHeight={200}>
+            <ScrollPane offsetHeight={300}>
               {sendPageState.toaddrs.map(toaddr => {
                 return (
                   <ToAddrBox
@@ -562,7 +565,7 @@ export default class Send extends PureComponent<Props, SendState> {
               })}
               <div style={{ textAlign: 'right' }}>
                 <button type="button" onClick={this.addToAddr}>
-                  +
+                  <i className={['fas', 'fa-plus'].join(' ')} />
                 </button>
               </div>
             </ScrollPane>

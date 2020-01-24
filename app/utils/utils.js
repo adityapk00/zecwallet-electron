@@ -22,11 +22,24 @@ export default class Utils {
     return addr.startsWith('t');
   }
 
+  // Convert to max 8 decimal places, and remove trailing zeros
+  static maxPrecision(v: number): number {
+    if (!v) return v;
+
+    if (typeof v === 'string' || v instanceof String) {
+      // eslint-disable-next-line no-param-reassign
+      v = parseFloat(v);
+    }
+
+    return parseFloat(v.toFixed(8));
+  }
+
   static splitZecAmountIntoBigSmall(zecValue: number) {
     if (!zecValue) {
       return { bigPart: zecValue, smallPart: '' };
     }
-    let bigPart = zecValue.toString();
+
+    let bigPart = Utils.maxPrecision(zecValue).toString();
     let smallPart = '';
 
     if (bigPart.indexOf('.') >= 0) {

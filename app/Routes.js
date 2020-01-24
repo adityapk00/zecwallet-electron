@@ -37,7 +37,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
       transactions: [],
       sendPageState: new SendPageState(),
       receivePageState: new ReceivePageState(),
-      statusMessage: null,
       rpcConfig: new RPCConfig(),
       info: new Info()
     };
@@ -54,8 +53,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setAddressesWithBalances,
         this.setTransactionList,
         this.setAllAddresses,
-        this.setSinglePrivateKey,
-        this.setStatusMessage
+        this.setSinglePrivateKey
       );
     }
   }
@@ -113,11 +111,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setSendPageState = (sendPageState: SendPageState) => {
     this.setState({ sendPageState });
-  };
-
-  setStatusMessage = (statusMessage: string | null) => {
-    console.log(`Setting status message: ${statusMessage}`);
-    this.setState({ statusMessage });
   };
 
   setRPCConfig = (rpcConfig: RPCConfig) => {
@@ -179,7 +172,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addressesWithBalance,
       addressPrivateKeys,
       addresses,
-      statusMessage,
       sendPageState,
       receivePageState,
       info
@@ -195,7 +187,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
                 sendTransaction={this.sendTransaction}
                 sendPageState={sendPageState}
                 setSendPageState={this.setSendPageState}
-                statusMessage={statusMessage}
                 info={info}
               />
             )}
