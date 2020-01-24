@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import {
   Accordion,
@@ -25,8 +25,11 @@ const AddressBlock = ({
 }) => {
   const { address } = addressBalance;
 
+  const [copied, setCopied] = useState(false);
+
   return (
     <AccordionItem
+      key={copied}
       className={[cstyles.well, styles.receiveblock].join(' ')}
       uuid={address}
     >
@@ -56,9 +59,11 @@ const AddressBlock = ({
                 type="button"
                 onClick={() => {
                   clipboard.writeText(address);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 5000);
                 }}
               >
-                Copy Address
+                {copied ? <span>Copied!</span> : <span>Copy Address</span>}
               </button>
               {!privateKey && (
                 <button
@@ -144,6 +149,12 @@ export default class Receive extends Component<Props> {
     let defaultZaddr = zaddrs.length ? zaddrs[0].address : '';
     if (receivePageState && Utils.isSapling(receivePageState.newAddress)) {
       defaultZaddr = receivePageState.newAddress;
+
+      // move this address to the front, since the scrollbar will reset when we re-render
+      zaddrs.sort((x, y) => {
+        // eslint-disable-next-line prettier/prettier, no-nested-ternary
+        return x.address === defaultZaddr ? -1 : y.address === defaultZaddr ? 1 : 0
+      });
     }
 
     const taddrs = addresses
@@ -154,6 +165,12 @@ export default class Receive extends Component<Props> {
     let defaultTaddr = taddrs.length ? taddrs[0].address : '';
     if (receivePageState && Utils.isTransparent(receivePageState.newAddress)) {
       defaultTaddr = receivePageState.newAddress;
+
+      // move this address to the front, since the scrollbar will reset when we re-render
+      taddrs.sort((x, y) => {
+        // eslint-disable-next-line prettier/prettier, no-nested-ternary
+        return x.address === defaultTaddr ? -1 : y.address === defaultTaddr ? 1 : 0
+      });
     }
 
     return (
@@ -196,7 +213,8 @@ export default class Receive extends Component<Props> {
                   <button
                     className={[
                       cstyles.primarybutton,
-                      cstyles.margintoplarge
+                      cstyles.margintoplarge,
+                      cstyles.marginbottomlarge
                     ].join(' ')}
                     onClick={() => createNewAddress(true)}
                     type="button"
@@ -225,7 +243,8 @@ export default class Receive extends Component<Props> {
                   <button
                     className={[
                       cstyles.primarybutton,
-                      cstyles.margintoplarge
+                      cstyles.margintoplarge,
+                      cstyles.marginbottomlarge
                     ].join(' ')}
                     type="button"
                     onClick={() => createNewAddress(false)}

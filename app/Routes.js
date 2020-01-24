@@ -170,15 +170,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
     newReceivePageState.rerenderKey = newRerenderKey;
 
     this.setState({ receivePageState: newReceivePageState });
-
-    // And clear the new address after 5 seconds
-    setTimeout(() => {
-      const clearReceivePageState = new ReceivePageState();
-      clearReceivePageState.newAddress = '';
-      clearReceivePageState.rerenderKey = newRerenderKey;
-
-      this.setState({ receivePageState: clearReceivePageState });
-    }, 5000);
   };
 
   render() {
