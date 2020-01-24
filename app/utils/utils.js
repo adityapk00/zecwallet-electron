@@ -3,18 +3,22 @@ export const NO_CONNECTION: string = 'Could not connect to zcashd';
 
 export default class Utils {
   static isSapling(addr: string): boolean {
+    if (!addr) return false;
     return addr.startsWith('zs') || addr.startsWith('ztestsapling');
   }
 
   static isSprout(addr: string): boolean {
+    if (!addr) return false;
     return addr.startsWith('zc');
   }
 
   static isZaddr(addr: string): boolean {
+    if (!addr) return false;
     return Utils.isSapling(addr) || Utils.isSprout(addr);
   }
 
   static isTransparent(addr: string): boolean {
+    if (!addr) return false;
     return addr.startsWith('t');
   }
 

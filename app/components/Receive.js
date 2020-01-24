@@ -14,15 +14,8 @@ import Sidebar from './Sidebar';
 import styles from './Receive.css';
 import cstyles from './Common.css';
 import Utils from '../utils/utils';
-import { AddressBalance, Info } from './AppState';
+import { AddressBalance, Info, ReceivePageState } from './AppState';
 import ScrollPane from './ScrollPane';
-
-type Props = {
-  addresses: string[],
-  addressesWithBalance: AddressBalance[],
-  info: Info,
-  getSinglePrivateKey: string => void
-};
 
 const AddressBlock = ({
   addressBalance,
@@ -113,6 +106,16 @@ const AddressBlock = ({
   );
 };
 
+type Props = {
+  addresses: string[],
+  addressesWithBalance: AddressBalance[],
+  info: Info,
+  receivePageState: ReceivePageState,
+  getSinglePrivateKey: string => void,
+  createNewAddress: boolean => void,
+  rerenderKey: number
+};
+
 export default class Receive extends Component<Props> {
   render() {
     const {
@@ -120,7 +123,10 @@ export default class Receive extends Component<Props> {
       addressesWithBalance,
       addressPrivateKeys,
       info,
-      getSinglePrivateKey
+      receivePageState,
+      getSinglePrivateKey,
+      createNewAddress,
+      rerenderKey
     } = this.props;
 
     // Convert the addressBalances into a map.
@@ -134,13 +140,21 @@ export default class Receive extends Component<Props> {
       .filter(a => Utils.isSapling(a))
       .slice(0, 100)
       .map(a => new AddressBalance(a, addressMap[a]));
-    const defaultZaddr = zaddrs.length ? zaddrs[0].address : '';
+
+    let defaultZaddr = zaddrs.length ? zaddrs[0].address : '';
+    if (receivePageState && Utils.isSapling(receivePageState.newAddress)) {
+      defaultZaddr = receivePageState.newAddress;
+    }
 
     const taddrs = addresses
       .filter(a => Utils.isTransparent(a))
       .slice(0, 100)
       .map(a => new AddressBalance(a, addressMap[a]));
-    const defaultTaddr = taddrs.length ? taddrs[0].address : '';
+
+    let defaultTaddr = taddrs.length ? taddrs[0].address : '';
+    if (receivePageState && Utils.isTransparent(receivePageState.newAddress)) {
+      defaultTaddr = receivePageState.newAddress;
+    }
 
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -163,9 +177,9 @@ export default class Receive extends Component<Props> {
                 <Tab>Transparent</Tab>
               </TabList>
 
-              <TabPanel>
+              <TabPanel key={`z${rerenderKey}`}>
                 {/* Change the hardcoded height */}
-                <ScrollPane offsetHeight={100}>
+                <ScrollPane offsetHeight={150}>
                   <Accordion preExpanded={[defaultZaddr]}>
                     {zaddrs.map(a => (
                       <AddressBlock
@@ -174,15 +188,27 @@ export default class Receive extends Component<Props> {
                         currencyName={info.currencyName}
                         privateKey={addressPrivateKeys[a.address]}
                         getSinglePrivateKey={getSinglePrivateKey}
+                        rerender={this.rerender}
                       />
                     ))}
                   </Accordion>
+
+                  <button
+                    className={[
+                      cstyles.primarybutton,
+                      cstyles.margintoplarge
+                    ].join(' ')}
+                    onClick={() => createNewAddress(true)}
+                    type="button"
+                  >
+                    New Shielded Address
+                  </button>
                 </ScrollPane>
               </TabPanel>
 
-              <TabPanel>
+              <TabPanel key={`t${rerenderKey}`}>
                 {/* Change the hardcoded height */}
-                <ScrollPane offsetHeight={100}>
+                <ScrollPane offsetHeight={150}>
                   <Accordion preExpanded={[defaultTaddr]}>
                     {taddrs.map(a => (
                       <AddressBlock
@@ -191,9 +217,21 @@ export default class Receive extends Component<Props> {
                         currencyName={info.currencyName}
                         privateKey={addressPrivateKeys[a.address]}
                         getSinglePrivateKey={getSinglePrivateKey}
+                        rerender={this.rerender}
                       />
                     ))}
                   </Accordion>
+
+                  <button
+                    className={[
+                      cstyles.primarybutton,
+                      cstyles.margintoplarge
+                    ].join(' ')}
+                    type="button"
+                    onClick={() => createNewAddress(false)}
+                  >
+                    New Transparent Address
+                  </button>
                 </ScrollPane>
               </TabPanel>
             </Tabs>

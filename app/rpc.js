@@ -146,6 +146,23 @@ export default class RPC {
     this.fnSetTotalBalance(balance);
   }
 
+  async createNewAddress(zaddress: boolean) {
+    if (zaddress) {
+      const newaddress = await RPC.doRPC(
+        'z_getnewaddress',
+        ['sapling'],
+        this.rpcConfig
+      );
+
+      return newaddress.result;
+      // eslint-disable-next-line no-else-return
+    } else {
+      const newaddress = await RPC.doRPC('getnewaddress', [''], this.rpcConfig);
+
+      return newaddress.result;
+    }
+  }
+
   // Fetch a private key for either a t or a z address
   async fetchPrivateKey(address: string) {
     let method = '';

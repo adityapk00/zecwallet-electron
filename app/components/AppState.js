@@ -82,6 +82,20 @@ export class SendPageState {
   }
 }
 
+export class ReceivePageState {
+  // A newly created address to show by default
+  newAddress: string;
+
+  // The key used for the recieve page component.
+  // Increment to force re-render
+  rerenderKey: number;
+
+  constructor() {
+    this.newAddress = '';
+    this.rerenderKey = 0;
+  }
+}
+
 export class RPCConfig {
   url: string;
 
@@ -132,6 +146,9 @@ export default class AppState {
 
   // The state of the send page, as the user constructs a transaction
   sendPageState: SendPageState;
+
+  // Any state for the receive page
+  receivePageState: ReceivePageState;
 
   // Any status message to display
   statusMessage: string;

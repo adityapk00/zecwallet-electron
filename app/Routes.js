@@ -15,7 +15,8 @@ import AppState, {
   SendPageState,
   ToAddr,
   RPCConfig,
-  Info
+  Info,
+  ReceivePageState
 } from './components/AppState';
 import RPC from './rpc';
 import Utils from './utils/utils';
@@ -35,6 +36,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addresses: [],
       transactions: [],
       sendPageState: new SendPageState(),
+      receivePageState: new ReceivePageState(),
       statusMessage: null,
       rpcConfig: new RPCConfig(),
       info: new Info()
@@ -152,6 +154,33 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.rpc.fetchPrivateKey(address);
   };
 
+  createNewAddress = async (zaddress: boolean) => {
+    // Create a new address
+    const newaddress = await this.rpc.createNewAddress(zaddress);
+    console.log(`Created new Address ${newaddress}`);
+
+    // And then fetch the list of addresses again to refresh
+    this.rpc.fetchAllAddresses();
+
+    const { receivePageState } = this.state;
+    const newRerenderKey = receivePageState.rerenderKey + 1;
+
+    const newReceivePageState = new ReceivePageState();
+    newReceivePageState.newAddress = newaddress;
+    newReceivePageState.rerenderKey = newRerenderKey;
+
+    this.setState({ receivePageState: newReceivePageState });
+
+    // And clear the new address after 5 seconds
+    setTimeout(() => {
+      const clearReceivePageState = new ReceivePageState();
+      clearReceivePageState.newAddress = '';
+      clearReceivePageState.rerenderKey = newRerenderKey;
+
+      this.setState({ receivePageState: clearReceivePageState });
+    }, 5000);
+  };
+
   render() {
     const {
       totalBalance,
@@ -161,6 +190,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addresses,
       statusMessage,
       sendPageState,
+      receivePageState,
       info
     } = this.state;
     return (
@@ -183,11 +213,14 @@ export default class RouteApp extends React.Component<Props, AppState> {
             path={routes.RECEIVE}
             render={() => (
               <Receive
+                rerenderKey={receivePageState.rerenderKey}
                 addresses={addresses}
                 addressesWithBalance={addressesWithBalance}
                 addressPrivateKeys={addressPrivateKeys}
+                receivePageState={receivePageState}
                 info={info}
                 getSinglePrivateKey={this.getSinglePrivateKey}
+                createNewAddress={this.createNewAddress}
               />
             )}
           />
