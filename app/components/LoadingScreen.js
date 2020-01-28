@@ -51,7 +51,10 @@ class LoadingScreenState {
   }
 }
 
-export default class LoadingScreen extends Component<Props> {
+export default class LoadingScreen extends Component<
+  Props,
+  LoadingScreenState
+> {
   constructor(props: Props) {
     super(props);
 

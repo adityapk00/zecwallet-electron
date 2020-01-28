@@ -269,6 +269,16 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
             </div>
           );
         })}
+
+        <div className={cstyles.center}>
+          <button
+            type="button"
+            className={cstyles.primarybutton}
+            onClick={closeModal}
+          >
+            Close
+          </button>
+        </div>
       </div>
     </Modal>
   );

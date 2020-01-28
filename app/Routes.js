@@ -20,6 +20,7 @@ import AppState, {
 } from './components/AppState';
 import RPC from './rpc';
 import Utils from './utils/utils';
+import Zcashd from './components/Zcashd';
 
 type Props = {};
 
@@ -217,6 +218,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
               />
             )}
           />
+          <Route path={routes.ZCASHD} render={() => <Zcashd info={info} />} />
           <Route
             path={routes.LOADING}
             render={() => (

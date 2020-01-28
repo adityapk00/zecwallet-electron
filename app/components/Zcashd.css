@@ -1,0 +1,31 @@
+.container {
+  overflow: hidden;
+  margin-top: 100px;
+}
+
+.imgcontainer {
+  float: left;
+  width: 60%;
+}
+
+.imgcontainer img {
+  margin: 24px;
+}
+
+.detailcontainer {
+  float: right;
+  width: 40%;
+  flex-direction: column;
+  margin-top: 100px;
+}
+
+.detaillines {
+  border: 1px solid white;
+  padding: 16px;
+}
+
+.detailline {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
