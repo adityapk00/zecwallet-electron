@@ -17,34 +17,20 @@ import Utils from '../utils/utils';
 import { AddressBalance, Info, ReceivePageState } from './AppState';
 import ScrollPane from './ScrollPane';
 
-const AddressBlock = ({
-  addressBalance,
-  currencyName,
-  privateKey,
-  getSinglePrivateKey
-}) => {
+const AddressBlock = ({ addressBalance, currencyName, privateKey, getSinglePrivateKey }) => {
   const { address } = addressBalance;
 
   const [copied, setCopied] = useState(false);
 
   return (
-    <AccordionItem
-      key={copied}
-      className={[cstyles.well, styles.receiveblock].join(' ')}
-      uuid={address}
-    >
+    <AccordionItem key={copied} className={[cstyles.well, styles.receiveblock].join(' ')} uuid={address}>
       <AccordionItemHeading>
-        <AccordionItemButton className={styles.accordionHeader}>
-          {address}
-        </AccordionItemButton>
+        <AccordionItemButton className={styles.accordionHeader}>{address}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel className={[styles.receiveDetail].join(' ')}>
         <div className={[cstyles.flex].join(' ')}>
           <div>
-            <QRCode
-              value={address}
-              className={[styles.receiveQrcode].join(' ')}
-            />
+            <QRCode value={address} className={[styles.receiveQrcode].join(' ')} />
           </div>
           <div className={[cstyles.verticalflex, cstyles.marginleft].join(' ')}>
             <div className={[cstyles.sublight].join(' ')}>Address</div>
@@ -53,9 +39,7 @@ const AddressBlock = ({
             </div>
             <div>
               <button
-                className={[cstyles.primarybutton, cstyles.margintoplarge].join(
-                  ' '
-                )}
+                className={[cstyles.primarybutton, cstyles.margintoplarge].join(' ')}
                 type="button"
                 onClick={() => {
                   clipboard.writeText(address);
@@ -75,28 +59,16 @@ const AddressBlock = ({
                 </button>
               )}
             </div>
-            <div
-              className={[cstyles.sublight, cstyles.margintoplarge].join(' ')}
-            >
-              Funds
-            </div>
+            <div className={[cstyles.sublight, cstyles.margintoplarge].join(' ')}>Funds</div>
             <div className={[cstyles.padtopsmall].join(' ')}>
               {currencyName} {addressBalance.balance || 0}
             </div>
-            <div
-              className={[cstyles.margintoplarge, cstyles.breakword].join(' ')}
-            >
+            <div className={[cstyles.margintoplarge, cstyles.breakword].join(' ')}>
               {privateKey && (
                 <div>
-                  <div className={[cstyles.sublight].join(' ')}>
-                    Private Key
-                  </div>
+                  <div className={[cstyles.sublight].join(' ')}>Private Key</div>
                   <div
-                    className={[
-                      cstyles.breakword,
-                      cstyles.padtopsmall,
-                      cstyles.fixedfont
-                    ].join(' ')}
+                    className={[cstyles.breakword, cstyles.padtopsmall, cstyles.fixedfont].join(' ')}
                     style={{ maxWidth: '600px' }}
                   >
                     {privateKey}
@@ -179,13 +151,7 @@ export default class Receive extends Component<Props> {
           <Sidebar info={info} />
         </div>
         <div className={cstyles.contentcontainer}>
-          <div
-            className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
-              ' '
-            )}
-          >
-            Receive
-          </div>
+          <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Receive</div>
 
           <div className={styles.receivecontainer}>
             <Tabs>
@@ -211,11 +177,7 @@ export default class Receive extends Component<Props> {
                   </Accordion>
 
                   <button
-                    className={[
-                      cstyles.primarybutton,
-                      cstyles.margintoplarge,
-                      cstyles.marginbottomlarge
-                    ].join(' ')}
+                    className={[cstyles.primarybutton, cstyles.margintoplarge, cstyles.marginbottomlarge].join(' ')}
                     onClick={() => createNewAddress(true)}
                     type="button"
                   >
@@ -241,11 +203,7 @@ export default class Receive extends Component<Props> {
                   </Accordion>
 
                   <button
-                    className={[
-                      cstyles.primarybutton,
-                      cstyles.margintoplarge,
-                      cstyles.marginbottomlarge
-                    ].join(' ')}
+                    className={[cstyles.primarybutton, cstyles.margintoplarge, cstyles.marginbottomlarge].join(' ')}
                     type="button"
                     onClick={() => createNewAddress(false)}
                   >

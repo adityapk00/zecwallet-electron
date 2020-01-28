@@ -32,10 +32,7 @@ export default class Zcashd extends Component<Props> {
           <div className={cstyles.contentcontainer}>
             <div className={[cstyles.verticalflex, cstyles.center].join(' ')}>
               <div style={{ marginTop: '100px' }}>
-                <i
-                  className={['fas', 'fa-times-circle'].join(' ')}
-                  style={{ fontSize: '96px', color: 'red' }}
-                />
+                <i className={['fas', 'fa-times-circle'].join(' ')} style={{ fontSize: '96px', color: 'red' }} />
               </div>
               <div className={cstyles.margintoplarge}>Not Connected</div>
             </div>
@@ -52,17 +49,15 @@ export default class Zcashd extends Component<Props> {
           <div className={cstyles.contentcontainer}>
             <div className={styles.container}>
               <div className={styles.imgcontainer}>
-                <img src={Heart} width="80%" alt="heart" />
+                <img src={Heart} alt="heart" />
               </div>
 
               <div className={styles.detailcontainer}>
                 <div className={styles.detaillines}>
-                  <DetailLine
-                    label="Network"
-                    value={info.testnet ? 'Testnet' : 'Mainnet'}
-                  />
+                  <DetailLine label="Network" value={info.testnet ? 'Testnet' : 'Mainnet'} />
                   <DetailLine label="Block Height" value={info.latestBlock} />
                   <DetailLine label="Connections" value={info.connections} />
+                  <DetailLine label="Network Solution Rate" value={`${info.solps} Sol/s`} />
                 </div>
               </div>
             </div>

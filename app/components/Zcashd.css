@@ -1,26 +1,28 @@
 .container {
   overflow: hidden;
-  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
 }
 
 .imgcontainer {
-  float: left;
-  width: 60%;
+  width: 100%;
+  text-align: center;
+  margin-top: 10%;
 }
 
 .imgcontainer img {
-  margin: 24px;
+  max-width: 500px;
 }
 
 .detailcontainer {
-  float: right;
-  width: 40%;
+  width: 50%;
   flex-direction: column;
-  margin-top: 100px;
+  margin-left: 25%;
+  margin-top: 5%;
 }
 
 .detaillines {
-  border: 1px solid white;
+  border: 1px solid grey;
   padding: 16px;
 }
 

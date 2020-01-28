@@ -26,12 +26,7 @@ const Spacer = () => {
 };
 
 // $FlowFixMe
-const ToAddrBox = ({
-  toaddr,
-  updateToField,
-  setMaxAmount,
-  totalAmountAvailable
-}) => {
+const ToAddrBox = ({ toaddr, updateToField, setMaxAmount, totalAmountAvailable }) => {
   const isMemoDisabled = !Utils.isZaddr(toaddr.to);
 
   return (
@@ -69,9 +64,7 @@ const ToAddrBox = ({
         <Spacer />
         <div className={[cstyles.flexspacebetween].join(' ')}>
           <div className={cstyles.sublight}>Memo</div>
-          <div className={cstyles.validationerror}>
-            {toaddr.memo.length} / 512
-          </div>
+          <div className={cstyles.validationerror}>{toaddr.memo.length} / 512</div>
         </div>
         <input
           type="text"
@@ -108,10 +101,7 @@ const ErrorModal = ({ title, body, modalIsOpen, closeModal }) => {
       overlayClassName={styles.confirmOverlay}
     >
       <div className={[cstyles.verticalflex].join(' ')}>
-        <div
-          className={cstyles.marginbottomlarge}
-          style={{ textAlign: 'center' }}
-        >
+        <div className={cstyles.marginbottomlarge} style={{ textAlign: 'center' }}>
           {title}
         </div>
 
@@ -121,11 +111,7 @@ const ErrorModal = ({ title, body, modalIsOpen, closeModal }) => {
       </div>
 
       <div className={styles.buttoncontainer}>
-        <button
-          type="button"
-          className={cstyles.primarybutton}
-          onClick={closeModal}
-        >
+        <button type="button" className={cstyles.primarybutton} onClick={closeModal}>
           Close
         </button>
       </div>
@@ -134,24 +120,14 @@ const ErrorModal = ({ title, body, modalIsOpen, closeModal }) => {
 };
 
 const ConfirmModalToAddr = ({ toaddr, info }) => {
-  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(
-    toaddr.amount
-  );
+  const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(toaddr.amount);
 
   const memo: string = toaddr.memo ? escape(toaddr.memo) : '';
 
   return (
     <div className={cstyles.well}>
-      <div
-        className={[cstyles.flexspacebetween, cstyles.margintoplarge].join(' ')}
-      >
-        <div
-          className={[
-            cstyles.small,
-            cstyles.fixedfont,
-            styles.confirmModalAddress
-          ].join(' ')}
-        >
+      <div className={[cstyles.flexspacebetween, cstyles.margintoplarge].join(' ')}>
+        <div className={[cstyles.small, cstyles.fixedfont, styles.confirmModalAddress].join(' ')}>
           {Utils.splitStringIntoChunks(toaddr.to, 6).join(' ')}
         </div>
         <div className={cstyles.large}>
@@ -159,9 +135,7 @@ const ConfirmModalToAddr = ({ toaddr, info }) => {
             <span>
               {info.currencyName} {bigPart}
             </span>
-            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
-              {smallPart}
-            </span>
+            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
           </div>
         </div>
       </div>
@@ -179,11 +153,7 @@ const ConfirmModal = ({
   modalIsOpen,
   openErrorModal
 }) => {
-  const sendingTotal =
-    sendPageState.toaddrs.reduce(
-      (s, t) => parseFloat(s) + parseFloat(t.amount),
-      0.0
-    ) + 0.0001;
+  const sendingTotal = sendPageState.toaddrs.reduce((s, t) => parseFloat(s) + parseFloat(t.amount), 0.0) + 0.0001;
   const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(sendingTotal);
 
   const sendButton = () => {
@@ -214,9 +184,7 @@ const ConfirmModal = ({
       overlayClassName={styles.confirmOverlay}
     >
       <div className={[cstyles.verticalflex].join(' ')}>
-        <div className={[cstyles.marginbottomlarge, cstyles.center].join(' ')}>
-          Confirm Transaction
-        </div>
+        <div className={[cstyles.marginbottomlarge, cstyles.center].join(' ')}>Confirm Transaction</div>
         <div className={cstyles.flex}>
           <div
             className={[
@@ -232,39 +200,24 @@ const ConfirmModal = ({
               <span>
                 {info.currencyName} {bigPart}
               </span>
-              <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
-                {smallPart}
-              </span>
+              <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
             </div>
           </div>
         </div>
 
-        <div
-          className={[cstyles.verticalflex, cstyles.margintoplarge].join(' ')}
-        >
+        <div className={[cstyles.verticalflex, cstyles.margintoplarge].join(' ')}>
           {sendPageState.toaddrs.map(t => (
             <ConfirmModalToAddr key={t.to} toaddr={t} info={info} />
           ))}
         </div>
 
-        <ConfirmModalToAddr
-          toaddr={{ to: 'Fee', amount: 0.0001, memo: null }}
-          info={info}
-        />
+        <ConfirmModalToAddr toaddr={{ to: 'Fee', amount: 0.0001, memo: null }} info={info} />
 
         <div className={styles.buttoncontainer}>
-          <button
-            type="button"
-            className={cstyles.primarybutton}
-            onClick={() => sendButton()}
-          >
+          <button type="button" className={cstyles.primarybutton} onClick={() => sendButton()}>
             Send
           </button>
-          <button
-            type="button"
-            className={cstyles.primarybutton}
-            onClick={closeModal}
-          >
+          <button type="button" className={cstyles.primarybutton} onClick={closeModal}>
             Cancel
           </button>
         </div>
@@ -311,9 +264,7 @@ export default class Send extends PureComponent<Props, SendState> {
 
   addToAddr = () => {
     const { sendPageState, setSendPageState } = this.props;
-    const newToAddrs = sendPageState.toaddrs.concat(
-      new ToAddr(Utils.getNextToAddrID())
-    );
+    const newToAddrs = sendPageState.toaddrs.concat(new ToAddr(Utils.getNextToAddrID()));
 
     // Create the new state object
     const newState = new SendPageState();
@@ -346,12 +297,7 @@ export default class Send extends PureComponent<Props, SendState> {
     setSendPageState(newState);
   };
 
-  updateToField = (
-    id: number,
-    address: Event | null,
-    amount: Event | null,
-    memo: Event | null
-  ) => {
+  updateToField = (id: number, address: Event | null, amount: Event | null, memo: Event | null) => {
     const { sendPageState, setSendPageState } = this.props;
 
     const newToAddrs = sendPageState.toaddrs.slice(0);
@@ -424,14 +370,9 @@ export default class Send extends PureComponent<Props, SendState> {
     this.setState({ errorModalIsOpen: false });
   };
 
-  getBalanceForAddress = (
-    addr: string,
-    addressesWithBalance: AddressBalance[]
-  ): number => {
+  getBalanceForAddress = (addr: string, addressesWithBalance: AddressBalance[]): number => {
     // Find the addr in addressesWithBalance
-    const addressBalance: AddressBalance = addressesWithBalance.find(
-      ab => ab.address === addr
-    );
+    const addressBalance: AddressBalance = addressesWithBalance.find(ab => ab.address === addr);
 
     if (!addressBalance) {
       return 0;
@@ -440,11 +381,7 @@ export default class Send extends PureComponent<Props, SendState> {
     return addressBalance.balance;
   };
 
-  getLabelForFromAddress = (
-    addr: string,
-    addressesWithBalance: AddressBalance[],
-    currencyName: string
-  ) => {
+  getLabelForFromAddress = (addr: string, addressesWithBalance: AddressBalance[], currencyName: string) => {
     // Find the addr in addressesWithBalance
     const balance = this.getBalanceForAddress(addr, addressesWithBalance);
 
@@ -452,12 +389,7 @@ export default class Send extends PureComponent<Props, SendState> {
   };
 
   render() {
-    const {
-      modalIsOpen,
-      errorModalIsOpen,
-      errorModalTitle,
-      errorModalBody
-    } = this.state;
+    const { modalIsOpen, errorModalIsOpen, errorModalTitle, errorModalBody } = this.state;
     const { sendPageState, info } = this.props;
 
     const customStyles = {
@@ -490,11 +422,7 @@ export default class Send extends PureComponent<Props, SendState> {
     const sendFromList = addressesWithBalance.map(ab => {
       return {
         value: ab.address,
-        label: this.getLabelForFromAddress(
-          ab.address,
-          addressesWithBalance,
-          info.currencyName
-        )
+        label: this.getLabelForFromAddress(ab.address, addressesWithBalance, info.currencyName)
       };
     });
 
@@ -503,18 +431,11 @@ export default class Send extends PureComponent<Props, SendState> {
     if (sendPageState.fromaddr) {
       fromaddr = {
         value: sendPageState.fromaddr,
-        label: this.getLabelForFromAddress(
-          sendPageState.fromaddr,
-          addressesWithBalance,
-          info.currencyName
-        )
+        label: this.getLabelForFromAddress(sendPageState.fromaddr, addressesWithBalance, info.currencyName)
       };
     }
 
-    const totalAmountAvailable = this.getBalanceForAddress(
-      fromaddr.value,
-      addressesWithBalance
-    );
+    const totalAmountAvailable = this.getBalanceForAddress(fromaddr.value, addressesWithBalance);
 
     return (
       <div style={{ overflow: 'hidden' }}>
@@ -522,21 +443,11 @@ export default class Send extends PureComponent<Props, SendState> {
           <Sidebar info={info} />
         </div>
         <div className={cstyles.contentcontainer}>
-          <div
-            className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
-              ' '
-            )}
-          >
-            Send
-          </div>
+          <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Send</div>
 
           <div className={styles.sendcontainer}>
             <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
-              <div
-                className={[cstyles.sublight, cstyles.padbottomsmall].join(' ')}
-              >
-                Send From
-              </div>
+              <div className={[cstyles.sublight, cstyles.padbottomsmall].join(' ')}>Send From</div>
               <Select
                 value={fromaddr}
                 options={sendFromList}
@@ -568,18 +479,10 @@ export default class Send extends PureComponent<Props, SendState> {
             </ScrollPane>
 
             <div className={styles.buttoncontainer}>
-              <button
-                type="button"
-                className={cstyles.primarybutton}
-                onClick={this.openModal}
-              >
+              <button type="button" className={cstyles.primarybutton} onClick={this.openModal}>
                 Send
               </button>
-              <button
-                type="button"
-                className={cstyles.primarybutton}
-                onClick={this.clearToAddrs}
-              >
+              <button type="button" className={cstyles.primarybutton} onClick={this.clearToAddrs}>
                 Cancel
               </button>
             </div>

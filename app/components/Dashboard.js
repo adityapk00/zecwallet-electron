@@ -24,13 +24,9 @@ const BalanceBlockHighlight = ({ zecValue, usdValue, currencyName }) => {
         <span>
           {currencyName} {bigPart}
         </span>
-        <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
-          {smallPart}
-        </span>
+        <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
       </div>
-      <div className={[cstyles.sublight, cstyles.small].join(' ')}>
-        USD {usdValue}
-      </div>
+      <div className={[cstyles.sublight, cstyles.small].join(' ')}>USD {usdValue}</div>
     </div>
   );
 };
@@ -41,20 +37,14 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel, currencyName }) => {
 
   return (
     <div className={cstyles.padall}>
-      <div className={[styles.sublight, styles.small].join(' ')}>
-        {topLabel}
-      </div>
+      <div className={[styles.sublight, styles.small].join(' ')}>{topLabel}</div>
       <div className={[cstyles.highlight, cstyles.large].join(' ')}>
         <span>
           {currencyName} {bigPart}
         </span>
-        <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>
-          {smallPart}
-        </span>
+        <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
       </div>
-      <div className={[cstyles.sublight, cstyles.small].join(' ')}>
-        USD {usdValue}
-      </div>
+      <div className={[cstyles.sublight, cstyles.small].join(' ')}>USD {usdValue}</div>
     </div>
   );
 };
@@ -66,11 +56,7 @@ const TxItemBlock = ({ transaction, currencyName, txClicked }) => {
 
   return (
     <div>
-      <div
-        className={[cstyles.small, cstyles.sublight, styles.txdate].join(' ')}
-      >
-        {datePart}
-      </div>
+      <div className={[cstyles.small, cstyles.sublight, styles.txdate].join(' ')}>{datePart}</div>
       <div
         className={[cstyles.well, styles.txbox].join(' ')}
         onClick={() => {
@@ -79,14 +65,10 @@ const TxItemBlock = ({ transaction, currencyName, txClicked }) => {
       >
         <div className={styles.txtype}>
           <div>{transaction.type}</div>
-          <div className={[cstyles.padtopsmall, cstyles.sublight].join(' ')}>
-            {timePart}
-          </div>
+          <div className={[cstyles.padtopsmall, cstyles.sublight].join(' ')}>{timePart}</div>
         </div>
         {transaction.detailedTxns.map(txdetail => {
-          const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(
-            Math.abs(txdetail.amount)
-          );
+          const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(Math.abs(txdetail.amount));
 
           let { address } = txdetail;
           let { memo } = txdetail;
@@ -102,17 +84,8 @@ const TxItemBlock = ({ transaction, currencyName, txClicked }) => {
             <div key={address} className={styles.txaddressamount}>
               <div className={styles.txaddress}>
                 <div className={cstyles.highlight}>&quot;Label&quot;</div>
-                <div className={cstyles.fixedfont}>
-                  {Utils.splitStringIntoChunks(address, 6).join(' ')}
-                </div>
-                <div
-                  className={[
-                    cstyles.small,
-                    cstyles.sublight,
-                    cstyles.padtopsmall,
-                    styles.txmemo
-                  ].join(' ')}
-                >
+                <div className={cstyles.fixedfont}>{Utils.splitStringIntoChunks(address, 6).join(' ')}</div>
+                <div className={[cstyles.small, cstyles.sublight, cstyles.padtopsmall, styles.txmemo].join(' ')}>
                   {memo}
                 </div>
               </div>
@@ -121,21 +94,9 @@ const TxItemBlock = ({ transaction, currencyName, txClicked }) => {
                   <span>
                     {currencyName} {bigPart}
                   </span>
-                  <span
-                    className={[cstyles.small, styles.zecsmallpart].join(' ')}
-                  >
-                    {smallPart}
-                  </span>
+                  <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
                 </div>
-                <div
-                  className={[
-                    cstyles.sublight,
-                    cstyles.small,
-                    cstyles.padtopsmall
-                  ].join(' ')}
-                >
-                  USD 12.12
-                </div>
+                <div className={[cstyles.sublight, cstyles.small, cstyles.padtopsmall].join(' ')}>USD 12.12</div>
               </div>
             </div>
           );
@@ -183,24 +144,15 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
       overlayClassName={styles.txmodalOverlay}
     >
       <div className={[cstyles.verticalflex].join(' ')}>
-        <div className={[cstyles.marginbottomlarge, cstyles.center].join(' ')}>
-          Transaction Status
-        </div>
+        <div className={[cstyles.marginbottomlarge, cstyles.center].join(' ')}>Transaction Status</div>
 
         <div className={[cstyles.center].join(' ')}>
-          <i
-            className={['fas', typeIcon].join(' ')}
-            style={{ fontSize: '96px', color: typeColor }}
-          />
+          <i className={['fas', typeIcon].join(' ')} style={{ fontSize: '96px', color: typeColor }} />
         </div>
 
         <div className={[cstyles.center].join(' ')}>
           {type}
-          <BalanceBlockHighlight
-            zecValue={amount}
-            usdValue={12.12}
-            currencyName={currencyName}
-          />
+          <BalanceBlockHighlight zecValue={amount} usdValue={12.12} currencyName={currencyName} />
         </div>
 
         <div className={[cstyles.flexspacebetween].join(' ')}>
@@ -224,9 +176,7 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
         <div className={cstyles.margintoplarge} />
 
         {detailedTxns.map(txdetail => {
-          const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(
-            Math.abs(txdetail.amount)
-          );
+          const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(Math.abs(txdetail.amount));
 
           let { address, memo } = txdetail;
           if (memo) {
@@ -240,9 +190,7 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
           return (
             <div key={address} className={cstyles.verticalflex}>
               <div className={[cstyles.sublight].join(' ')}>Address</div>
-              <div className={cstyles.fixedfont}>
-                {Utils.splitStringIntoChunks(address, 6).join(' ')}
-              </div>
+              <div className={cstyles.fixedfont}>{Utils.splitStringIntoChunks(address, 6).join(' ')}</div>
 
               <div className={cstyles.margintoplarge} />
 
@@ -251,11 +199,7 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
                 <span>
                   {currencyName} {bigPart}
                 </span>
-                <span
-                  className={[cstyles.small, styles.zecsmallpart].join(' ')}
-                >
-                  {smallPart}
-                </span>
+                <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
               </div>
 
               <div className={cstyles.margintoplarge} />
@@ -271,11 +215,7 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
         })}
 
         <div className={cstyles.center}>
-          <button
-            type="button"
-            className={cstyles.primarybutton}
-            onClick={closeModal}
-          >
+          <button type="button" className={cstyles.primarybutton} onClick={closeModal}>
             Close
           </button>
         </div>
@@ -324,19 +264,9 @@ export default class Home extends Component<Props, State> {
           <Sidebar info={info} />
         </div>
         <div className={cstyles.contentcontainer}>
-          <div
-            className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(
-              ' '
-            )}
-          >
-            Dashboard
-          </div>
+          <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Dashboard</div>
           <div className={[cstyles.well, styles.balancebox].join(' ')}>
-            <BalanceBlockHighlight
-              zecValue={totalBalance.total}
-              usdValue="12.12"
-              currencyName={info.currencyName}
-            />
+            <BalanceBlockHighlight zecValue={totalBalance.total} usdValue="12.12" currencyName={info.currencyName} />
             <BalanceBlock
               topLabel="Shileded"
               zecValue={totalBalance.private}
@@ -354,21 +284,12 @@ export default class Home extends Component<Props, State> {
           <ScrollPane offsetHeight={250}>
             {/* If no transactions, show the "loading..." text */
             transactions.length === 0 && (
-              <div
-                className={[cstyles.center, cstyles.margintoplarge].join(' ')}
-              >
-                Loading...
-              </div>
+              <div className={[cstyles.center, cstyles.margintoplarge].join(' ')}>Loading...</div>
             )}
             {transactions.map(t => {
               const key = t.type + t.txid + t.address;
               return (
-                <TxItemBlock
-                  key={key}
-                  transaction={t}
-                  currencyName={info.currencyName}
-                  txClicked={this.txClicked}
-                />
+                <TxItemBlock key={key} transaction={t} currencyName={info.currencyName} txClicked={this.txClicked} />
               );
             })}
           </ScrollPane>

@@ -54,12 +54,18 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setAddressesWithBalances,
         this.setTransactionList,
         this.setAllAddresses,
-        this.setSinglePrivateKey
+        this.setSinglePrivateKey,
+        this.setInfo
       );
     }
   }
 
   componentWillUnmount() {}
+
+  setInfo = (info: Info) => {
+    this.setState({ info });
+    console.log('set info');
+  };
 
   setTotalBalance = (totalBalance: TotalBalance) => {
     this.setState({ totalBalance });
@@ -132,14 +138,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
     console.log(`Added private key for ${address}`);
   };
 
-  sendTransaction = async (
-    sendJson: [],
-    fnOpenSendErrorModal: (string, string) => void
-  ) => {
-    const success = await this.rpc.sendTransaction(
-      sendJson,
-      fnOpenSendErrorModal
-    );
+  sendTransaction = async (sendJson: [], fnOpenSendErrorModal: (string, string) => void) => {
+    const success = await this.rpc.sendTransaction(sendJson, fnOpenSendErrorModal);
     return success;
   };
 
@@ -210,23 +210,12 @@ export default class RouteApp extends React.Component<Props, AppState> {
           <Route
             path={routes.DASHBOARD}
             // eslint-disable-next-line react/jsx-props-no-spreading
-            render={() => (
-              <Dashboard
-                totalBalance={totalBalance}
-                transactions={transactions}
-                info={info}
-              />
-            )}
+            render={() => <Dashboard totalBalance={totalBalance} transactions={transactions} info={info} />}
           />
           <Route path={routes.ZCASHD} render={() => <Zcashd info={info} />} />
           <Route
             path={routes.LOADING}
-            render={() => (
-              <LoadingScreen
-                setRPCConfig={this.setRPCConfig}
-                setInfo={this.setInfo}
-              />
-            )}
+            render={() => <LoadingScreen setRPCConfig={this.setRPCConfig} setInfo={this.setInfo} />}
           />
         </Switch>
       </App>

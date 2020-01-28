@@ -122,6 +122,8 @@ export class Info {
   verificationProgress: number;
 
   currencyName: string;
+
+  solps: number;
 }
 
 // eslint-disable-next-line max-classes-per-file

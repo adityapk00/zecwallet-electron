@@ -10,10 +10,7 @@ import Logo from '../assets/img/logobig.gif';
 const SidebarMenuItem = ({ name, routeName, currentRoute, iconname }) => {
   let isActive = false;
 
-  if (
-    (currentRoute.endsWith('app.html') && routeName === routes.HOME) ||
-    currentRoute === routeName
-  ) {
+  if ((currentRoute.endsWith('app.html') && routeName === routes.HOME) || currentRoute === routeName) {
     isActive = true;
   }
 
@@ -86,13 +83,7 @@ class Sidebar extends PureComponent {
 
         <div className={cstyles.center}>
           {info && info.version && (
-            <div
-              className={[
-                cstyles.padsmallall,
-                cstyles.margintopsmall,
-                cstyles.blackbg
-              ].join(' ')}
-            >
+            <div className={[cstyles.padsmallall, cstyles.margintopsmall, cstyles.blackbg].join(' ')}>
               <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
               &nbsp; Connected
             </div>

@@ -1,12 +1,6 @@
 import axios from 'axios';
 import _ from 'underscore';
-import {
-  TotalBalance,
-  AddressBalance,
-  Transaction,
-  RPCConfig,
-  TxDetail
-} from './components/AppState';
+import { TotalBalance, AddressBalance, Transaction, RPCConfig, TxDetail, Info } from './components/AppState';
 import Utils, { NO_CONNECTION } from './utils/utils';
 import SentTxStore from './utils/SentTxStore';
 
@@ -30,6 +24,8 @@ const parseMemo = (memoHex: string): string | null => {
 
 export default class RPC {
   rpcConfig: RPCConfig;
+
+  fnSetInfo: Info => void;
 
   fnSetTotalBalance: TotalBalance => void;
 
@@ -55,13 +51,15 @@ export default class RPC {
     fnSetAddressesWithBalance: (AddressBalance[]) => void,
     fnSetTransactionsList: (Transaction[]) => void,
     fnSetAllAddresses: (string[]) => void,
-    fnSetSinglePrivateKey: (string, string) => void
+    fnSetSinglePrivateKey: (string, string) => void,
+    fnSetInfo: Info => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetSinglePrivateKey = fnSetSinglePrivateKey;
+    this.fnSetInfo = fnSetInfo;
 
     this.opids = new Set();
   }
@@ -119,15 +117,43 @@ export default class RPC {
     const abP = this.fetchTandZAddressesWithBalances();
     const txns = this.fetchTandZTransactions();
     const addrs = this.fetchAllAddresses();
+    const info = this.fetchInfo();
 
     await balP;
     await abP;
     await txns;
     await addrs;
+    await info;
 
     // All done, set up next fetch
     console.log('All done, setting up next fetch');
     this.setupNextFetch();
+  }
+
+  // Special method to ge the Info object. This is used both internally and by the Loading screen
+  static async getInfoObject(rpcConfig: RPCConfig) {
+    const infoResult = await RPC.doRPC('getinfo', [], rpcConfig);
+
+    const info = new Info();
+    info.testnet = infoResult.result.testnet;
+    info.latestBlock = infoResult.result.blocks;
+    info.connections = infoResult.result.connections;
+    info.version = infoResult.result.version;
+    info.currencyName = info.testnet ? 'TAZ' : 'ZEC';
+
+    const blkInfoResult = await RPC.doRPC('getblockchaininfo', [], rpcConfig);
+    info.verificationProgress = blkInfoResult.verificationProgress;
+
+    const solps = await RPC.doRPC('getnetworksolps', [], rpcConfig);
+    info.solps = solps.result;
+
+    return info;
+  }
+
+  async fetchInfo() {
+    const info = await RPC.getInfoObject(this.rpcConfig);
+
+    this.fnSetInfo(info);
   }
 
   // This method will get the total balances
@@ -144,11 +170,7 @@ export default class RPC {
 
   async createNewAddress(zaddress: boolean) {
     if (zaddress) {
-      const newaddress = await RPC.doRPC(
-        'z_getnewaddress',
-        ['sapling'],
-        this.rpcConfig
-      );
+      const newaddress = await RPC.doRPC('z_getnewaddress', ['sapling'], this.rpcConfig);
 
       return newaddress.result;
       // eslint-disable-next-line no-else-return
@@ -183,10 +205,7 @@ export default class RPC {
     const unspentNotes = (await zresponse).result;
     const zgroups = _.groupBy(unspentNotes, 'address');
     const zaddresses = Object.keys(zgroups).map(address => {
-      const balance = zgroups[address].reduce(
-        (prev, obj) => prev + obj.amount,
-        0
-      );
+      const balance = zgroups[address].reduce((prev, obj) => prev + obj.amount, 0);
       return new AddressBalance(address, Number(balance.toFixed(8)));
     });
 
@@ -194,10 +213,7 @@ export default class RPC {
     const unspentTXOs = (await tresponse).result;
     const tgroups = _.groupBy(unspentTXOs, 'address');
     const taddresses = Object.keys(tgroups).map(address => {
-      const balance = tgroups[address].reduce(
-        (prev, obj) => prev + obj.amount,
-        0
-      );
+      const balance = tgroups[address].reduce((prev, obj) => prev + obj.amount, 0);
       return new AddressBalance(address, Number(balance.toFixed(8)));
     });
 
@@ -232,11 +248,7 @@ export default class RPC {
 
     const alltxnsPromise = zaddresses.result.map(async zaddr => {
       // For each zaddr, get the list of incoming transactions
-      const incomingTxns = await RPC.doRPC(
-        'z_listreceivedbyaddress',
-        [zaddr],
-        this.rpcConfig
-      );
+      const incomingTxns = await RPC.doRPC('z_listreceivedbyaddress', [zaddr], this.rpcConfig);
       const txns = incomingTxns.result
         .filter(itx => !itx.change)
         .map(incomingTx => {
@@ -256,11 +268,7 @@ export default class RPC {
     // Now, for each tx in the array, call gettransaction
     const ztxlist = await Promise.all(
       alltxns.map(async tx => {
-        const txresponse = await RPC.doRPC(
-          'gettransaction',
-          [tx.txid],
-          this.rpcConfig
-        );
+        const txresponse = await RPC.doRPC('gettransaction', [tx.txid], this.rpcConfig);
 
         const transaction = new Transaction();
         transaction.address = tx.address;
@@ -299,11 +307,7 @@ export default class RPC {
   // Get all Addresses, including T and Z addresses
   async fetchAllAddresses() {
     const zaddrsPromise = RPC.doRPC('z_listaddresses', [], this.rpcConfig);
-    const taddrsPromise = RPC.doRPC(
-      'getaddressesbyaccount',
-      [''],
-      this.rpcConfig
-    );
+    const taddrsPromise = RPC.doRPC('getaddressesbyaccount', [''], this.rpcConfig);
 
     const allZ = (await zaddrsPromise).result;
     const allT = (await taddrsPromise).result;
@@ -312,15 +316,11 @@ export default class RPC {
   }
 
   // Send a transaction using the already constructed sendJson structure
-  async sendTransaction(
-    sendJson: [],
-    fnOpenSendErrorModal: (string, string) => void
-  ): boolean {
+  async sendTransaction(sendJson: [], fnOpenSendErrorModal: (string, string) => void): boolean {
     this.fnOpenSendErrorModal = fnOpenSendErrorModal;
 
     try {
-      const opid = (await RPC.doRPC('z_sendmany', sendJson, this.rpcConfig))
-        .result;
+      const opid = (await RPC.doRPC('z_sendmany', sendJson, this.rpcConfig)).result;
 
       this.addOpidToMonitor(opid);
 
@@ -351,11 +351,7 @@ export default class RPC {
       // Get all the operation statuses.
       [...this.opids].map(async id => {
         try {
-          const resultJson = await RPC.doRPC(
-            'z_getoperationstatus',
-            [[id]],
-            this.rpcConfig
-          );
+          const resultJson = await RPC.doRPC('z_getoperationstatus', [[id]], this.rpcConfig);
 
           const result = resultJson.result[0];
 
@@ -364,10 +360,7 @@ export default class RPC {
           } else if (result.status === 'failed') {
             this.opids.delete(id);
 
-            this.fnOpenSendErrorModal(
-              'Error Sending Transaction',
-              `Opid ${id} Failed. ${result.error.message}`
-            );
+            this.fnOpenSendErrorModal('Error Sending Transaction', `Opid ${id} Failed. ${result.error.message}`);
           }
         } catch (err) {
           // If we can't get a response for this OPID, then just forget it and move on
