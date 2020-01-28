@@ -58,6 +58,10 @@
   color: green;
 }
 
+.yellow {
+  color: yellow;
+}
+
 .breakword {
   overflow-wrap: break-word;
 }

@@ -36,6 +36,19 @@ class Sidebar extends PureComponent {
   render() {
     const { location, info } = this.props;
 
+    let state = 'DISCONNECTED';
+    let progress = 100;
+    if (info && info.version) {
+      if (info.verificationProgress < 0.9999) {
+        state = 'SYNCING';
+        progress = (info.verificationProgress * 100).toFixed(1);
+      } else {
+        state = 'CONNECTED';
+      }
+    }
+
+    console.log(`Verification = ${info.verificationProgress}`);
+
     return (
       <div>
         <div className={[cstyles.center, styles.sidebarlogobg].join(' ')}>
@@ -82,13 +95,27 @@ class Sidebar extends PureComponent {
         </div>
 
         <div className={cstyles.center}>
-          {info && info.version && (
+          {state === 'CONNECTED' && (
             <div className={[cstyles.padsmallall, cstyles.margintopsmall, cstyles.blackbg].join(' ')}>
               <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
               &nbsp; Connected
             </div>
           )}
-          {!(info && info.version) && <div>DISCONNECTED</div>}
+          {state === 'SYNCING' && (
+            <div className={[cstyles.padsmallall, cstyles.margintopsmall, cstyles.blackbg].join(' ')}>
+              <div>
+                <i className={[cstyles.yellow, 'fas', 'fa-sync'].join(' ')} />
+                &nbsp; Syncing
+              </div>
+              <div>{`${progress}%`}</div>
+            </div>
+          )}
+          {state === 'DISCONNECTED' && (
+            <div className={[cstyles.padsmallall, cstyles.margintopsmall, cstyles.blackbg].join(' ')}>
+              <i className={[cstyles.yellow, 'fas', 'fa-times-circle'].join(' ')} />
+              &nbsp; Connected
+            </div>
+          )}
         </div>
       </div>
     );

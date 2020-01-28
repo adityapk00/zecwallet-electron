@@ -142,7 +142,7 @@ export default class RPC {
     info.currencyName = info.testnet ? 'TAZ' : 'ZEC';
 
     const blkInfoResult = await RPC.doRPC('getblockchaininfo', [], rpcConfig);
-    info.verificationProgress = blkInfoResult.verificationProgress;
+    info.verificationProgress = blkInfoResult.result.verificationprogress;
 
     const solps = await RPC.doRPC('getnetworksolps', [], rpcConfig);
     info.solps = solps.result;

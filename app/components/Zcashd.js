@@ -41,6 +41,12 @@ export default class Zcashd extends Component<Props> {
       );
       // eslint-disable-next-line no-else-return
     } else {
+      let height = info.latestBlock;
+      if (info.verificationProgress < 0.9999) {
+        const progress = (info.verificationProgress * 100).toFixed(1);
+        height = `${height} (${progress}%)`;
+      }
+
       return (
         <div style={{ overflow: 'hidden' }}>
           <div className={cstyles.sidebarcontainer}>
@@ -55,7 +61,7 @@ export default class Zcashd extends Component<Props> {
               <div className={styles.detailcontainer}>
                 <div className={styles.detaillines}>
                   <DetailLine label="Network" value={info.testnet ? 'Testnet' : 'Mainnet'} />
-                  <DetailLine label="Block Height" value={info.latestBlock} />
+                  <DetailLine label="Block Height" value={height} />
                   <DetailLine label="Connections" value={info.connections} />
                   <DetailLine label="Network Solution Rate" value={`${info.solps} Sol/s`} />
                 </div>
