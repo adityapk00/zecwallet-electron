@@ -47,8 +47,6 @@ class Sidebar extends PureComponent {
       }
     }
 
-    console.log(`Verification = ${info.verificationProgress}`);
-
     return (
       <div>
         <div className={[cstyles.center, styles.sidebarlogobg].join(' ')}>

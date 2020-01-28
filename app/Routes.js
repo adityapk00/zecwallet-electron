@@ -64,12 +64,10 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setInfo = (info: Info) => {
     this.setState({ info });
-    console.log('set info');
   };
 
   setTotalBalance = (totalBalance: TotalBalance) => {
     this.setState({ totalBalance });
-    console.log('updated balances');
   };
 
   setAddressesWithBalances = (addressesWithBalance: AddressBalance[]) => {
@@ -103,17 +101,14 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setState({ sendPageState: newSendPageState });
       }
     }
-    console.log('updated addressbalances');
   };
 
   setTransactionList = (transactions: Transaction[]) => {
     this.setState({ transactions });
-    console.log('updated transactions');
   };
 
   setAllAddresses = (addresses: string[]) => {
     this.setState({ addresses });
-    console.log('updated all addresses');
   };
 
   setSendPageState = (sendPageState: SendPageState) => {
@@ -128,7 +123,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
 
   setInfo = (info: Info) => {
     this.setState({ info });
-    console.log('updated info');
   };
 
   setSinglePrivateKey = (address: string, key: string) => {
