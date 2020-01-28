@@ -21,23 +21,6 @@ type OptionType = {
   label: string
 };
 
-class SendState {
-  modalIsOpen: boolean;
-
-  errorModalIsOpen: boolean;
-
-  errorModalTitle: string;
-
-  errorModalBody: string;
-
-  constructor() {
-    this.modalIsOpen = false;
-    this.errorModalIsOpen = false;
-    this.errorModalBody = '';
-    this.errorModalTitle = '';
-  }
-}
-
 const Spacer = () => {
   return <div style={{ marginTop: '24px' }} />;
 };
@@ -231,10 +214,7 @@ const ConfirmModal = ({
       overlayClassName={styles.confirmOverlay}
     >
       <div className={[cstyles.verticalflex].join(' ')}>
-        <div
-          className={cstyles.marginbottomlarge}
-          style={{ textAlign: 'center' }}
-        >
+        <div className={[cstyles.marginbottomlarge, cstyles.center].join(' ')}>
           Confirm Transaction
         </div>
         <div className={cstyles.flex}>
@@ -304,6 +284,23 @@ type Props = {
 
   info: Info
 };
+
+class SendState {
+  modalIsOpen: boolean;
+
+  errorModalIsOpen: boolean;
+
+  errorModalTitle: string;
+
+  errorModalBody: string;
+
+  constructor() {
+    this.modalIsOpen = false;
+    this.errorModalIsOpen = false;
+    this.errorModalBody = '';
+    this.errorModalTitle = '';
+  }
+}
 
 export default class Send extends PureComponent<Props, SendState> {
   constructor(props: Props) {
