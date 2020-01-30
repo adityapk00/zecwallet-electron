@@ -357,6 +357,12 @@ export default class RPC {
 
           if (result.status === 'success') {
             this.opids.delete(id);
+            const { txid } = result.result;
+
+            this.fnOpenSendErrorModal(
+              'Successfully Broadcast Transaction',
+              `Transaction was successfully broadcast. TXID: ${txid}`
+            );
           } else if (result.status === 'failed') {
             this.opids.delete(id);
 

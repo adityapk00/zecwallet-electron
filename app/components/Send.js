@@ -192,6 +192,13 @@ const ConfirmModal = ({
   const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(sendingTotal);
 
   const sendButton = () => {
+    // First, close the confirm modal.
+    closeModal();
+    // This will be replaced by either a success TXID or error message that the user
+    // has to close manually.
+    openErrorModal('Computing Transaction', 'Please wait...');
+
+    // Then send the Tx async
     (async () => {
       const sendJson = getSendManyJSON(sendPageState);
       let success = false;
@@ -206,8 +213,6 @@ const ConfirmModal = ({
       if (success) {
         clearToAddrs();
       }
-
-      closeModal();
     })();
   };
 
