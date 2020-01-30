@@ -54,6 +54,10 @@
   text-align: center;
 }
 
+.red {
+  color: red;
+}
+
 .green {
   color: green;
 }
@@ -79,6 +83,13 @@
   border-color: #c3921f;
   margin-left: 8px;
   margin-right: 8px;
+}
+
+.primarybutton:disabled,
+.primarybutton[disabled] {
+  border: 1px solid #999;
+  background-color: #ccc;
+  color: #666;
 }
 
 .primarybutton:hover {

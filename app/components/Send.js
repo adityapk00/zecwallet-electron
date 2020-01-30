@@ -26,18 +26,45 @@ const Spacer = () => {
 };
 
 // $FlowFixMe
-const ToAddrBox = ({ toaddr, updateToField, setMaxAmount, totalAmountAvailable }) => {
+const ToAddrBox = ({ toaddr, updateToField, fromAmount, setMaxAmount, setSendButtonEnable, totalAmountAvailable }) => {
   const isMemoDisabled = !Utils.isZaddr(toaddr.to);
+
+  const addressIsValid = Utils.isZaddr(toaddr.to) || Utils.isTransparent(toaddr.to);
+  const memoIsValid = toaddr.memo.length <= 512;
+
+  let amountError = null;
+  if (toaddr.amount) {
+    if (toaddr.amount > fromAmount) {
+      amountError = 'Amount Exceeds Balance';
+    }
+    const s = toaddr.amount.toString().split('.');
+    if (s && s.length > 1 && s[1].length > 8) {
+      amountError = 'Too Many Decimals';
+    }
+  }
+
+  if (!addressIsValid || amountError || !memoIsValid) {
+    setSendButtonEnable(false);
+  } else {
+    setSendButtonEnable(true);
+  }
 
   return (
     <div>
       <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
         <div className={[cstyles.flexspacebetween].join(' ')}>
           <div className={cstyles.sublight}>To</div>
-          <div className={cstyles.validationerror}>Address Validation</div>
+          <div className={cstyles.validationerror}>
+            {addressIsValid ? (
+              <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
+            ) : (
+              <span className={cstyles.red}>Invalid Address</span>
+            )}
+          </div>
         </div>
         <input
           type="text"
+          placeholder="Z or T address"
           className={styles.inputbox}
           value={toaddr.to}
           onChange={e => updateToField(toaddr.id, e, null, null)}
@@ -45,11 +72,17 @@ const ToAddrBox = ({ toaddr, updateToField, setMaxAmount, totalAmountAvailable }
         <Spacer />
         <div className={[cstyles.flexspacebetween].join(' ')}>
           <div className={cstyles.sublight}>Amount</div>
-          <div className={cstyles.validationerror}>Amount Validation</div>
+          <div className={cstyles.validationerror}>
+            {amountError ? (
+              <span className={cstyles.red}>{amountError}</span>
+            ) : (
+              <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
+            )}
+          </div>
         </div>
         <div className={[cstyles.flexspacebetween].join(' ')}>
           <input
-            type="text"
+            type="number"
             className={styles.inputbox}
             value={toaddr.amount}
             onChange={e => updateToField(toaddr.id, null, e, null)}
@@ -64,7 +97,9 @@ const ToAddrBox = ({ toaddr, updateToField, setMaxAmount, totalAmountAvailable }
         <Spacer />
         <div className={[cstyles.flexspacebetween].join(' ')}>
           <div className={cstyles.sublight}>Memo</div>
-          <div className={cstyles.validationerror}>{toaddr.memo.length} / 512</div>
+          <div className={cstyles.validationerror}>
+            {memoIsValid ? toaddr.memo.length : <span className={cstyles.red}>{toaddr.memo.length}</span>} / 512
+          </div>
         </div>
         <input
           type="text"
@@ -247,11 +282,14 @@ class SendState {
 
   errorModalBody: string;
 
+  sendButtonEnabled: boolean;
+
   constructor() {
     this.modalIsOpen = false;
     this.errorModalIsOpen = false;
     this.errorModalBody = '';
     this.errorModalTitle = '';
+    this.sendButtonEnabled = false;
   }
 }
 
@@ -352,6 +390,10 @@ export default class Send extends PureComponent<Props, SendState> {
     setSendPageState(newState);
   };
 
+  setSendButtonEnable = (sendButtonEnabled: boolean) => {
+    this.setState({ sendButtonEnabled });
+  };
+
   openModal = () => {
     this.setState({ modalIsOpen: true });
   };
@@ -389,7 +431,7 @@ export default class Send extends PureComponent<Props, SendState> {
   };
 
   render() {
-    const { modalIsOpen, errorModalIsOpen, errorModalTitle, errorModalBody } = this.state;
+    const { modalIsOpen, errorModalIsOpen, errorModalTitle, errorModalBody, sendButtonEnabled } = this.state;
     const { sendPageState, info } = this.props;
 
     const customStyles = {
@@ -466,7 +508,9 @@ export default class Send extends PureComponent<Props, SendState> {
                     key={toaddr.id}
                     toaddr={toaddr}
                     updateToField={this.updateToField}
+                    fromAmount={totalAmountAvailable}
                     setMaxAmount={this.setMaxAmount}
+                    setSendButtonEnable={this.setSendButtonEnable}
                     totalAmountAvailable={totalAmountAvailable}
                   />
                 );
@@ -479,7 +523,12 @@ export default class Send extends PureComponent<Props, SendState> {
             </ScrollPane>
 
             <div className={styles.buttoncontainer}>
-              <button type="button" className={cstyles.primarybutton} onClick={this.openModal}>
+              <button
+                type="button"
+                disabled={!sendButtonEnabled}
+                className={cstyles.primarybutton}
+                onClick={this.openModal}
+              >
                 Send
               </button>
               <button type="button" className={cstyles.primarybutton} onClick={this.clearToAddrs}>
