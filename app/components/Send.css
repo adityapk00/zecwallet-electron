@@ -2,18 +2,6 @@
   margin: 16px;
 }
 
-.inputbox {
-  width: calc(100% - 16px);
-  min-height: 38px;
-  padding-left: 8px;
-  padding-right: 8px;
-  font-size: 18px;
-  border: none;
-  border-bottom: grey 1px solid;
-  background-color: #000;
-  color: white;
-}
-
 .toaddrcontainer {
   overflow-y: auto;
 }

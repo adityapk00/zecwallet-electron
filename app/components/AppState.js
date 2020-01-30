@@ -28,6 +28,17 @@ export class AddressBalance {
   }
 }
 
+export class AddressBookEntry {
+  label: string;
+
+  address: string;
+
+  constructor(label: string, address: string) {
+    this.label = label;
+    this.address = address;
+  }
+}
+
 export class TxDetail {
   address: string;
 
@@ -142,6 +153,9 @@ export default class AppState {
   // List of all addresses in the wallet, including change addresses and addresses
   // that don't have any balance or are unused
   addresses: string[];
+
+  // List of Address / Label pairs
+  addressBook: AddressBookEntry[];
 
   // List of all T and Z transactions
   transactions: Transaction[];

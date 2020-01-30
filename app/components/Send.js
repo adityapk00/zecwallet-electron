@@ -65,7 +65,7 @@ const ToAddrBox = ({ toaddr, updateToField, fromAmount, setMaxAmount, setSendBut
         <input
           type="text"
           placeholder="Z or T address"
-          className={styles.inputbox}
+          className={cstyles.inputbox}
           value={toaddr.to}
           onChange={e => updateToField(toaddr.id, e, null, null)}
         />
@@ -83,7 +83,7 @@ const ToAddrBox = ({ toaddr, updateToField, fromAmount, setMaxAmount, setSendBut
         <div className={[cstyles.flexspacebetween].join(' ')}>
           <input
             type="number"
-            className={styles.inputbox}
+            className={cstyles.inputbox}
             value={toaddr.amount}
             onChange={e => updateToField(toaddr.id, null, e, null)}
           />
@@ -103,7 +103,7 @@ const ToAddrBox = ({ toaddr, updateToField, fromAmount, setMaxAmount, setSendBut
         </div>
         <input
           type="text"
-          className={styles.inputbox}
+          className={cstyles.inputbox}
           value={isMemoDisabled ? '<Memos only for z-addresses>' : toaddr.memo}
           disabled={isMemoDisabled}
           onChange={e => updateToField(toaddr.id, null, null, e)}

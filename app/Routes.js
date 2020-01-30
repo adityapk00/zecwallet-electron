@@ -16,11 +16,14 @@ import AppState, {
   ToAddr,
   RPCConfig,
   Info,
-  ReceivePageState
+  ReceivePageState,
+  AddressBookEntry
 } from './components/AppState';
 import RPC from './rpc';
 import Utils from './utils/utils';
 import Zcashd from './components/Zcashd';
+import AddressBook from './components/Addressbook';
+import AddressbookImpl from './utils/AddressbookImpl';
 
 type Props = {};
 
@@ -35,6 +38,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addressesWithBalance: [],
       addressPrivateKeys: {},
       addresses: [],
+      addressBook: [],
       transactions: [],
       sendPageState: new SendPageState(),
       receivePageState: new ReceivePageState(),
@@ -58,6 +62,14 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setInfo
       );
     }
+
+    // Read the address book
+    (async () => {
+      const addressBook = await AddressbookImpl.readAddressBook();
+      if (addressBook) {
+        this.setState({ addressBook });
+      }
+    })();
   }
 
   componentWillUnmount() {}
@@ -142,6 +154,17 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.rpc.fetchPrivateKey(address);
   };
 
+  addAddressBookEntry = (label: string, address: string) => {
+    // Add an entry into the address book
+    const { addressBook } = this.state;
+    const newAddressBook = addressBook.concat(new AddressBookEntry(label, address));
+
+    // Write to disk. This method is async
+    AddressbookImpl.writeAddressBook(newAddressBook);
+
+    this.setState({ addressBook: newAddressBook });
+  };
+
   createNewAddress = async (zaddress: boolean) => {
     // Create a new address
     const newaddress = await this.rpc.createNewAddress(zaddress);
@@ -167,6 +190,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addressesWithBalance,
       addressPrivateKeys,
       addresses,
+      addressBook,
       sendPageState,
       receivePageState,
       info
@@ -199,6 +223,12 @@ export default class RouteApp extends React.Component<Props, AppState> {
                 getSinglePrivateKey={this.getSinglePrivateKey}
                 createNewAddress={this.createNewAddress}
               />
+            )}
+          />
+          <Route
+            path={routes.ADDRESSBOOK}
+            render={() => (
+              <AddressBook info={info} addressBook={addressBook} addAddressBookEntry={this.addAddressBookEntry} />
             )}
           />
           <Route

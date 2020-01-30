@@ -1,0 +1,15 @@
+.addressbookcontainer {
+  display: flex;
+  flex-direction: column;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.addressbooklist {
+  margin-top: 24px;
+}
+
+.addressbookentry:hover {
+  color: #c3921f;
+  cursor: pointer;
+}
