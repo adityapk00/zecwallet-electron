@@ -1,25 +1,49 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import styles from './Addressbook.css';
 import cstyles from './Common.css';
 import { AddressBookEntry, Info } from './AppState';
 import ScrollPane from './ScrollPane';
 import Utils from '../utils/utils';
+import routes from '../constants/routes.json';
 
-const AddressBookItem = ({ item }) => {
+// Internal because we're using withRouter just below
+const AddressBookItemInteral = ({ item, removeAddressBookEntry, setSendTo, history }) => {
   return (
-    <div className={[cstyles.flexspacebetween, cstyles.marginbottomsmall, styles.addressbookentry].join(' ')}>
-      <div>{item.label}</div>
-      <div>{item.address}</div>
+    <div className={[cstyles.verticalflex, styles.addressbookentry].join(' ')}>
+      <div className={[cstyles.flexspacebetween, cstyles.marginbottomsmall].join(' ')}>
+        <div>{item.label}</div>
+        <div>{item.address}</div>
+      </div>
+
+      <div className={[cstyles.well, styles.addressbookentrybuttons].join(' ')}>
+        <button
+          type="button"
+          className={cstyles.primarybutton}
+          onClick={() => {
+            setSendTo(item.address, null, null);
+            history.push(routes.SEND);
+          }}
+        >
+          Send To
+        </button>
+        <button type="button" className={cstyles.primarybutton} onClick={() => removeAddressBookEntry(item.label)}>
+          Delete
+        </button>
+      </div>
     </div>
   );
 };
+const AddressBookItem = withRouter(AddressBookItemInteral);
 
 type Props = {
   info: Info,
   addressBook: AddressBookEntry[],
-  addAddressBookEntry: (label: string, address: string) => void
+  addAddressBookEntry: (label: string, address: string) => void,
+  removeAddressBookEntry: (label: string) => void,
+  setSendTo: (address: string, amount: number | null, memo: string | null) => void
 };
 
 type State = {
@@ -74,7 +98,7 @@ export default class AddressBook extends Component<Props, State> {
   };
 
   render() {
-    const { addressBook, info } = this.props;
+    const { addressBook, info, removeAddressBookEntry, setSendTo } = this.props;
     const { currentLabel, currentAddress, addButtonEnabled } = this.state;
 
     const { labelIsValid, addressIsValid } = this.validate(currentLabel, currentAddress);
@@ -139,11 +163,19 @@ export default class AddressBook extends Component<Props, State> {
 
             <ScrollPane offsetHeight={300}>
               <div className={styles.addressbooklist}>
-                <div className={[cstyles.flexspacebetween, cstyles.marginbottomsmall, cstyles.sublight].join(' ')}>
+                <div className={[cstyles.flexspacebetween, styles.tableheader, cstyles.sublight].join(' ')}>
                   <div>Label</div>
                   <div>Address</div>
                 </div>
-                {addressBook && addressBook.map(item => <AddressBookItem key={item.label} item={item} />)}
+                {addressBook &&
+                  addressBook.map(item => (
+                    <AddressBookItem
+                      key={item.label}
+                      item={item}
+                      removeAddressBookEntry={removeAddressBookEntry}
+                      setSendTo={setSendTo}
+                    />
+                  ))}
               </div>
             </ScrollPane>
           </div>

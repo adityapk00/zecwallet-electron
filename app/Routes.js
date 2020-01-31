@@ -127,6 +127,28 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.setState({ sendPageState });
   };
 
+  setSendTo = (address: string, amount: number | null, memo: string | null) => {
+    // Clear the existing send page state and set up the new one
+    const { sendPageState } = this.state;
+
+    const newSendPageState = new SendPageState();
+    newSendPageState.fromaddr = sendPageState.fromaddr;
+
+    const to = new ToAddr();
+    if (address) {
+      to.to = address;
+    }
+    if (amount) {
+      to.amount = amount;
+    }
+    if (memo) {
+      to.memo = memo;
+    }
+    newSendPageState.toaddrs = [to];
+
+    this.setState({ sendPageState: newSendPageState });
+  };
+
   setRPCConfig = (rpcConfig: RPCConfig) => {
     this.setState({ rpcConfig });
     console.log(rpcConfig);
@@ -158,6 +180,16 @@ export default class RouteApp extends React.Component<Props, AppState> {
     // Add an entry into the address book
     const { addressBook } = this.state;
     const newAddressBook = addressBook.concat(new AddressBookEntry(label, address));
+
+    // Write to disk. This method is async
+    AddressbookImpl.writeAddressBook(newAddressBook);
+
+    this.setState({ addressBook: newAddressBook });
+  };
+
+  removeAddressBookEntry = (label: string) => {
+    const { addressBook } = this.state;
+    const newAddressBook = addressBook.filter(i => i.label !== label);
 
     // Write to disk. This method is async
     AddressbookImpl.writeAddressBook(newAddressBook);
@@ -228,7 +260,13 @@ export default class RouteApp extends React.Component<Props, AppState> {
           <Route
             path={routes.ADDRESSBOOK}
             render={() => (
-              <AddressBook info={info} addressBook={addressBook} addAddressBookEntry={this.addAddressBookEntry} />
+              <AddressBook
+                info={info}
+                addressBook={addressBook}
+                addAddressBookEntry={this.addAddressBookEntry}
+                removeAddressBookEntry={this.removeAddressBookEntry}
+                setSendTo={this.setSendTo}
+              />
             )}
           />
           <Route
