@@ -151,3 +151,8 @@
   background-color: #000;
   color: white;
 }
+
+.buttoncontainer {
+  text-align: center;
+  padding-top: 24px;
+}

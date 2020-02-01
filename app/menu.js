@@ -179,8 +179,11 @@ export default class MenuBuilder {
         label: '&File',
         submenu: [
           {
-            label: '&Open',
-            accelerator: 'Ctrl+O'
+            label: '&Pay URI',
+            accelerator: 'Ctrl+P',
+            click: () => {
+              mainWindow.webContents.send('payuri');
+            }
           },
           {
             label: '&Close',

@@ -1,6 +1,9 @@
 /* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/prop-types */
 import React, { PureComponent } from 'react';
+import url from 'url';
+import querystring from 'querystring';
+import Modal from 'react-modal';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
@@ -10,6 +13,60 @@ import routes from '../constants/routes.json';
 import Logo from '../assets/img/logobig.gif';
 import { Info } from './AppState';
 import Utils from '../utils/utils';
+
+const PayURIModal = ({
+  modalIsOpen,
+  modalInput,
+  setModalInput,
+  closeModal,
+  modalTitle,
+  actionButtonName,
+  actionCallback
+}) => {
+  return (
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      className={styles.modal}
+      overlayClassName={styles.modalOverlay}
+    >
+      <div className={[cstyles.verticalflex].join(' ')}>
+        <div className={cstyles.marginbottomlarge} style={{ textAlign: 'center' }}>
+          {modalTitle}
+        </div>
+
+        <div className={cstyles.well} style={{ textAlign: 'center' }}>
+          <input
+            type="text"
+            className={cstyles.inputbox}
+            placeholder="URI"
+            value={modalInput}
+            onChange={e => setModalInput(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className={cstyles.buttoncontainer}>
+        {actionButtonName && (
+          <button
+            type="button"
+            className={cstyles.primarybutton}
+            onClick={() => {
+              actionCallback(modalInput);
+              closeModal();
+            }}
+          >
+            {actionButtonName}
+          </button>
+        )}
+
+        <button type="button" className={cstyles.primarybutton} onClick={closeModal}>
+          Close
+        </button>
+      </div>
+    </Modal>
+  );
+};
 
 const SidebarMenuItem = ({ name, routeName, currentRoute, iconname }) => {
   let isActive = false;
@@ -42,9 +99,15 @@ type Props = {
   history: PropTypes.object.isRequired
 };
 
-class Sidebar extends PureComponent<Props> {
+type State = {
+  uriModalIsOpen: boolean,
+  uriModalInputValue: string | null
+};
+
+class Sidebar extends PureComponent<Props, State> {
   constructor(props) {
     super(props);
+    this.state = { uriModalIsOpen: false, uriModalInputValue: null };
 
     this.setupMenuHandlers();
   }
@@ -54,10 +117,8 @@ class Sidebar extends PureComponent<Props> {
     const { info, setSendTo, history } = this.props;
     const { testnet } = info;
 
-    // Handle the donate button
+    // Donate button
     ipcRenderer.on('donate', () => {
-      console.log('Donate');
-
       setSendTo(
         Utils.getDonationAddress(testnet),
         Utils.getDefaultDonationAmount(testnet),
@@ -66,10 +127,35 @@ class Sidebar extends PureComponent<Props> {
 
       history.push(routes.SEND);
     });
+
+    // Pay URI
+    ipcRenderer.on('payuri', (event, uri) => {
+      this.openURIModal(uri);
+    });
+  };
+
+  openURIModal = (defaultValue: string | null) => {
+    const uriModalInputValue = defaultValue || '';
+    this.setState({ uriModalIsOpen: true, uriModalInputValue });
+  };
+
+  setURIInputValue = (uriModalInputValue: string) => {
+    this.setState({ uriModalInputValue });
+  };
+
+  closeURIModal = () => {
+    this.setState({ uriModalIsOpen: false });
+  };
+
+  payURI = (uri: string) => {
+    console.log(`Paying ${uri}`);
+    console.log(url.parse(uri));
+    console.log(querystring.parse(url.parse(uri).query));
   };
 
   render() {
     const { location, info } = this.props;
+    const { uriModalIsOpen, uriModalInputValue } = this.state;
 
     let state = 'DISCONNECTED';
     let progress = 100;
@@ -84,6 +170,16 @@ class Sidebar extends PureComponent<Props> {
 
     return (
       <div>
+        <PayURIModal
+          modalInput={uriModalInputValue}
+          setModalInput={this.setURIInputValue}
+          modalIsOpen={uriModalIsOpen}
+          closeModal={this.closeURIModal}
+          modalTitle="Pay URI"
+          actionButtonName="Pay URI"
+          actionCallback={this.payURI}
+        />
+
         <div className={[cstyles.center, styles.sidebarlogobg].join(' ')}>
           <img src={Logo} width="70" alt="logo" />
         </div>

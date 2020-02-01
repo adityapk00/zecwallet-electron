@@ -144,7 +144,7 @@ const ErrorModal = ({ title, body, modalIsOpen, closeModal }) => {
         </div>
       </div>
 
-      <div className={styles.buttoncontainer}>
+      <div className={cstyles.buttoncontainer}>
         <button type="button" className={cstyles.primarybutton} onClick={closeModal}>
           Close
         </button>
@@ -252,7 +252,7 @@ const ConfirmModal = ({
 
         <ConfirmModalToAddr toaddr={{ to: 'Fee', amount: 0.0001, memo: null }} info={info} />
 
-        <div className={styles.buttoncontainer}>
+        <div className={cstyles.buttoncontainer}>
           <button type="button" className={cstyles.primarybutton} onClick={() => sendButton()}>
             Send
           </button>
