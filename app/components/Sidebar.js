@@ -1,11 +1,15 @@
+/* eslint-disable react/destructuring-assignment */
 /* eslint-disable react/prop-types */
 import React, { PureComponent } from 'react';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
+import { ipcRenderer } from 'electron';
 import styles from './Sidebar.css';
 import cstyles from './Common.css';
 import routes from '../constants/routes.json';
 import Logo from '../assets/img/logobig.gif';
+import { Info } from './AppState';
+import Utils from '../utils/utils';
 
 const SidebarMenuItem = ({ name, routeName, currentRoute, iconname }) => {
   let isActive = false;
@@ -32,7 +36,38 @@ const SidebarMenuItem = ({ name, routeName, currentRoute, iconname }) => {
   );
 };
 
-class Sidebar extends PureComponent {
+type Props = {
+  info: Info,
+  setSendTo: (address: string, amount: number | null, memo: string | null) => void,
+  history: PropTypes.object.isRequired
+};
+
+class Sidebar extends PureComponent<Props> {
+  constructor(props) {
+    super(props);
+
+    this.setupMenuHandlers();
+  }
+
+  // Handle menu items
+  setupMenuHandlers = async () => {
+    const { info, setSendTo, history } = this.props;
+    const { testnet } = info;
+
+    // Handle the donate button
+    ipcRenderer.on('donate', () => {
+      console.log('Donate');
+
+      setSendTo(
+        Utils.getDonationAddress(testnet),
+        Utils.getDefaultDonationAmount(testnet),
+        Utils.getDefaultDonationMemo(testnet)
+      );
+
+      history.push(routes.SEND);
+    });
+  };
+
   render() {
     const { location, info } = this.props;
 

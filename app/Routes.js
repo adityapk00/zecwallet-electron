@@ -1,7 +1,6 @@
 /* eslint-disable react/no-unused-state */
 import React from 'react';
 import { Switch, Route } from 'react-router';
-import { ipcRenderer } from 'electron';
 import cstyles from './components/Common.css';
 import routes from './constants/routes.json';
 import App from './containers/App';
@@ -74,9 +73,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setState({ addressBook });
       }
     })();
-
-    // Setup the menu listeners
-    this.setupMenuHandlers();
   }
 
   componentWillUnmount() {}
@@ -141,7 +137,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
     const newSendPageState = new SendPageState();
     newSendPageState.fromaddr = sendPageState.fromaddr;
 
-    const to = new ToAddr();
+    const to = new ToAddr(Utils.getNextToAddrID());
     if (address) {
       to.to = address;
     }
@@ -222,28 +218,6 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.setState({ receivePageState: newReceivePageState });
   };
 
-  // Handle menu items
-  setupMenuHandlers = async () => {
-    // Handle the donate button
-    ipcRenderer.on('donate', () => {
-      console.log('Donate');
-      // Switch to the send tab, and set the to field to the donation address
-      // Clear the existing send page state and set up the new one
-      const { sendPageState, info } = this.state;
-
-      const newSendPageState = new SendPageState();
-      newSendPageState.fromaddr = sendPageState.fromaddr;
-
-      const to = new ToAddr();
-      to.to = Utils.getDonationAddress(info.testnet);
-      to.amount = Utils.getDefaultDonationAmount(info.testnet);
-      to.memo = Utils.getDefaultDonationMemo(info.testnet);
-      newSendPageState.toaddrs = [to];
-
-      this.setState({ sendPageState: newSendPageState });
-    });
-  };
-
   render() {
     const {
       totalBalance,
@@ -261,7 +235,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
         <div style={{ overflow: 'hidden' }}>
           {info && info.version && (
             <div className={cstyles.sidebarcontainer}>
-              <Sidebar info={info} />
+              <Sidebar info={info} setSendTo={this.setSendTo} />
             </div>
           )}
           <div className={cstyles.contentcontainer}>
