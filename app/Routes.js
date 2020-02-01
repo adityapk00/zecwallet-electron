@@ -1,6 +1,8 @@
 /* eslint-disable react/no-unused-state */
 import React from 'react';
 import { Switch, Route } from 'react-router';
+import { ipcRenderer } from 'electron';
+import cstyles from './components/Common.css';
 import routes from './constants/routes.json';
 import App from './containers/App';
 import Dashboard from './components/Dashboard';
@@ -24,6 +26,7 @@ import Utils from './utils/utils';
 import Zcashd from './components/Zcashd';
 import AddressBook from './components/Addressbook';
 import AddressbookImpl from './utils/AddressbookImpl';
+import Sidebar from './components/Sidebar';
 
 type Props = {};
 
@@ -43,7 +46,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
       sendPageState: new SendPageState(),
       receivePageState: new ReceivePageState(),
       rpcConfig: new RPCConfig(),
-      info: new Info()
+      info: new Info(),
+      location: null
     };
 
     // Create the initial ToAddr box
@@ -70,6 +74,9 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setState({ addressBook });
       }
     })();
+
+    // Setup the menu listeners
+    this.setupMenuHandlers();
   }
 
   componentWillUnmount() {}
@@ -215,6 +222,28 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.setState({ receivePageState: newReceivePageState });
   };
 
+  // Handle menu items
+  setupMenuHandlers = async () => {
+    // Handle the donate button
+    ipcRenderer.on('donate', () => {
+      console.log('Donate');
+      // Switch to the send tab, and set the to field to the donation address
+      // Clear the existing send page state and set up the new one
+      const { sendPageState, info } = this.state;
+
+      const newSendPageState = new SendPageState();
+      newSendPageState.fromaddr = sendPageState.fromaddr;
+
+      const to = new ToAddr();
+      to.to = Utils.getDonationAddress(info.testnet);
+      to.amount = Utils.getDefaultDonationAmount(info.testnet);
+      to.memo = Utils.getDefaultDonationMemo(info.testnet);
+      newSendPageState.toaddrs = [to];
+
+      this.setState({ sendPageState: newSendPageState });
+    });
+  };
+
   render() {
     const {
       totalBalance,
@@ -229,57 +258,65 @@ export default class RouteApp extends React.Component<Props, AppState> {
     } = this.state;
     return (
       <App>
-        <Switch>
-          <Route
-            path={routes.SEND}
-            render={() => (
-              <Send
-                addressesWithBalance={addressesWithBalance}
-                sendTransaction={this.sendTransaction}
-                sendPageState={sendPageState}
-                setSendPageState={this.setSendPageState}
-                info={info}
+        <div style={{ overflow: 'hidden' }}>
+          {info && info.version && (
+            <div className={cstyles.sidebarcontainer}>
+              <Sidebar info={info} />
+            </div>
+          )}
+          <div className={cstyles.contentcontainer}>
+            <Switch>
+              <Route
+                path={routes.SEND}
+                render={() => (
+                  <Send
+                    addressesWithBalance={addressesWithBalance}
+                    sendTransaction={this.sendTransaction}
+                    sendPageState={sendPageState}
+                    setSendPageState={this.setSendPageState}
+                    info={info}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            path={routes.RECEIVE}
-            render={() => (
-              <Receive
-                rerenderKey={receivePageState.rerenderKey}
-                addresses={addresses}
-                addressesWithBalance={addressesWithBalance}
-                addressPrivateKeys={addressPrivateKeys}
-                receivePageState={receivePageState}
-                info={info}
-                getSinglePrivateKey={this.getSinglePrivateKey}
-                createNewAddress={this.createNewAddress}
+              <Route
+                path={routes.RECEIVE}
+                render={() => (
+                  <Receive
+                    rerenderKey={receivePageState.rerenderKey}
+                    addresses={addresses}
+                    addressesWithBalance={addressesWithBalance}
+                    addressPrivateKeys={addressPrivateKeys}
+                    receivePageState={receivePageState}
+                    info={info}
+                    getSinglePrivateKey={this.getSinglePrivateKey}
+                    createNewAddress={this.createNewAddress}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            path={routes.ADDRESSBOOK}
-            render={() => (
-              <AddressBook
-                info={info}
-                addressBook={addressBook}
-                addAddressBookEntry={this.addAddressBookEntry}
-                removeAddressBookEntry={this.removeAddressBookEntry}
-                setSendTo={this.setSendTo}
+              <Route
+                path={routes.ADDRESSBOOK}
+                render={() => (
+                  <AddressBook
+                    addressBook={addressBook}
+                    addAddressBookEntry={this.addAddressBookEntry}
+                    removeAddressBookEntry={this.removeAddressBookEntry}
+                    setSendTo={this.setSendTo}
+                  />
+                )}
               />
-            )}
-          />
-          <Route
-            path={routes.DASHBOARD}
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            render={() => <Dashboard totalBalance={totalBalance} transactions={transactions} info={info} />}
-          />
-          <Route path={routes.ZCASHD} render={() => <Zcashd info={info} />} />
-          <Route
-            path={routes.LOADING}
-            render={() => <LoadingScreen setRPCConfig={this.setRPCConfig} setInfo={this.setInfo} />}
-          />
-        </Switch>
+              <Route
+                path={routes.DASHBOARD}
+                // eslint-disable-next-line react/jsx-props-no-spreading
+                render={() => <Dashboard totalBalance={totalBalance} transactions={transactions} info={info} />}
+              />
+              <Route path={routes.ZCASHD} render={() => <Zcashd info={info} />} />
+              <Route
+                path={routes.LOADING}
+                render={() => <LoadingScreen setRPCConfig={this.setRPCConfig} setInfo={this.setInfo} />}
+              />
+            </Switch>
+          </div>
+        </div>
       </App>
     );
   }

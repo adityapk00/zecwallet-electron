@@ -140,21 +140,21 @@ export default class MenuBuilder {
       label: 'Help',
       submenu: [
         {
-          label: 'Learn More',
+          label: 'Donate',
           click() {
-            shell.openExternal('http://electron.atom.io');
+            //
           }
         },
         {
-          label: 'Documentation',
+          label: 'Check github.com for updates',
           click() {
-            shell.openExternal('https://github.com/atom/electron/tree/master/docs#readme');
+            shell.openExternal('https://github.com/adityapk00/zecwallet-electron/releases');
           }
         },
         {
-          label: 'Community Discussions',
+          label: 'File a bug...',
           click() {
-            shell.openExternal('https://discuss.atom.io/c/electron');
+            shell.openExternal('https://github.com/adityapk00/zecwallet-electron/issues');
           }
         },
         {
@@ -172,6 +172,8 @@ export default class MenuBuilder {
   }
 
   buildDefaultTemplate() {
+    const { mainWindow } = this;
+
     const templateDefault = [
       {
         label: '&File',
@@ -230,21 +232,21 @@ export default class MenuBuilder {
         label: 'Help',
         submenu: [
           {
-            label: 'Learn More',
+            label: 'Donate',
             click() {
-              shell.openExternal('http://electron.atom.io');
+              mainWindow.webContents.send('donate');
             }
           },
           {
-            label: 'Documentation',
+            label: 'Check github.com for updates',
             click() {
-              shell.openExternal('https://github.com/atom/electron/tree/master/docs#readme');
+              shell.openExternal('https://github.com/adityapk00/zecwallet-electron/releases');
             }
           },
           {
-            label: 'Community Discussions',
+            label: 'File a bug...',
             click() {
-              shell.openExternal('https://discuss.atom.io/c/electron');
+              shell.openExternal('https://github.com/adityapk00/zecwallet-electron/issues');
             }
           },
           {

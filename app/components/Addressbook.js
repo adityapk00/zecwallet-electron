@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
-import Sidebar from './Sidebar';
 import styles from './Addressbook.css';
 import cstyles from './Common.css';
-import { AddressBookEntry, Info } from './AppState';
+import { AddressBookEntry } from './AppState';
 import ScrollPane from './ScrollPane';
 import Utils from '../utils/utils';
 import routes from '../constants/routes.json';
@@ -39,7 +38,6 @@ const AddressBookItemInteral = ({ item, removeAddressBookEntry, setSendTo, histo
 const AddressBookItem = withRouter(AddressBookItemInteral);
 
 type Props = {
-  info: Info,
   addressBook: AddressBookEntry[],
   addAddressBookEntry: (label: string, address: string) => void,
   removeAddressBookEntry: (label: string) => void,
@@ -98,87 +96,82 @@ export default class AddressBook extends Component<Props, State> {
   };
 
   render() {
-    const { addressBook, info, removeAddressBookEntry, setSendTo } = this.props;
+    const { addressBook, removeAddressBookEntry, setSendTo } = this.props;
     const { currentLabel, currentAddress, addButtonEnabled } = this.state;
 
     const { labelIsValid, addressIsValid } = this.validate(currentLabel, currentAddress);
 
     return (
-      <div style={{ overflow: 'hidden' }}>
-        <div className={cstyles.sidebarcontainer}>
-          <Sidebar info={info} />
-        </div>
-        <div className={cstyles.contentcontainer}>
-          <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Address Book</div>
+      <div>
+        <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Address Book</div>
 
-          <div className={styles.addressbookcontainer}>
-            <div className={[cstyles.well].join(' ')}>
-              <div className={[cstyles.flexspacebetween].join(' ')}>
-                <div className={cstyles.sublight}>Label</div>
-                <div className={cstyles.validationerror}>
-                  {labelIsValid ? (
-                    <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
-                  ) : (
-                    <span className={cstyles.red}>Duplicate Label</span>
-                  )}
-                </div>
+        <div className={styles.addressbookcontainer}>
+          <div className={[cstyles.well].join(' ')}>
+            <div className={[cstyles.flexspacebetween].join(' ')}>
+              <div className={cstyles.sublight}>Label</div>
+              <div className={cstyles.validationerror}>
+                {labelIsValid ? (
+                  <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
+                ) : (
+                  <span className={cstyles.red}>Duplicate Label</span>
+                )}
               </div>
-              <input
-                type="text"
-                value={currentLabel}
-                className={[cstyles.inputbox, cstyles.margintopsmall].join(' ')}
-                onChange={e => this.updateLabel(e.target.value)}
-              />
-
-              <div className={cstyles.margintoplarge} />
-
-              <div className={[cstyles.flexspacebetween].join(' ')}>
-                <div className={cstyles.sublight}>Address</div>
-                <div className={cstyles.validationerror}>
-                  {addressIsValid ? (
-                    <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
-                  ) : (
-                    <span className={cstyles.red}>Invalid Address</span>
-                  )}
-                </div>
-              </div>
-              <input
-                type="text"
-                value={currentAddress}
-                className={[cstyles.inputbox, cstyles.margintopsmall].join(' ')}
-                onChange={e => this.updateAddress(e.target.value)}
-              />
-
-              <div className={cstyles.margintoplarge} />
-
-              <button
-                type="button"
-                className={cstyles.primarybutton}
-                disabled={!addButtonEnabled}
-                onClick={this.addButtonClicked}
-              >
-                Add
-              </button>
             </div>
+            <input
+              type="text"
+              value={currentLabel}
+              className={[cstyles.inputbox, cstyles.margintopsmall].join(' ')}
+              onChange={e => this.updateLabel(e.target.value)}
+            />
 
-            <ScrollPane offsetHeight={300}>
-              <div className={styles.addressbooklist}>
-                <div className={[cstyles.flexspacebetween, styles.tableheader, cstyles.sublight].join(' ')}>
-                  <div>Label</div>
-                  <div>Address</div>
-                </div>
-                {addressBook &&
-                  addressBook.map(item => (
-                    <AddressBookItem
-                      key={item.label}
-                      item={item}
-                      removeAddressBookEntry={removeAddressBookEntry}
-                      setSendTo={setSendTo}
-                    />
-                  ))}
+            <div className={cstyles.margintoplarge} />
+
+            <div className={[cstyles.flexspacebetween].join(' ')}>
+              <div className={cstyles.sublight}>Address</div>
+              <div className={cstyles.validationerror}>
+                {addressIsValid ? (
+                  <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
+                ) : (
+                  <span className={cstyles.red}>Invalid Address</span>
+                )}
               </div>
-            </ScrollPane>
+            </div>
+            <input
+              type="text"
+              value={currentAddress}
+              className={[cstyles.inputbox, cstyles.margintopsmall].join(' ')}
+              onChange={e => this.updateAddress(e.target.value)}
+            />
+
+            <div className={cstyles.margintoplarge} />
+
+            <button
+              type="button"
+              className={cstyles.primarybutton}
+              disabled={!addButtonEnabled}
+              onClick={this.addButtonClicked}
+            >
+              Add
+            </button>
           </div>
+
+          <ScrollPane offsetHeight={300}>
+            <div className={styles.addressbooklist}>
+              <div className={[cstyles.flexspacebetween, styles.tableheader, cstyles.sublight].join(' ')}>
+                <div>Label</div>
+                <div>Address</div>
+              </div>
+              {addressBook &&
+                addressBook.map(item => (
+                  <AddressBookItem
+                    key={item.label}
+                    item={item}
+                    removeAddressBookEntry={removeAddressBookEntry}
+                    setSendTo={setSendTo}
+                  />
+                ))}
+            </div>
+          </ScrollPane>
         </div>
       </div>
     );

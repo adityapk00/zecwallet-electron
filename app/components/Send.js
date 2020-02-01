@@ -11,7 +11,6 @@ import escape from 'escape-html';
 import styles from './Send.css';
 import cstyles from './Common.css';
 import { ToAddr, AddressBalance, SendPageState, Info } from './AppState';
-import Sidebar from './Sidebar';
 import Utils from '../utils/utils';
 import ScrollPane from './ScrollPane';
 import ArrowUpLight from '../assets/img/arrow_up_dark.png';
@@ -485,79 +484,74 @@ export default class Send extends PureComponent<Props, SendState> {
     const totalAmountAvailable = this.getBalanceForAddress(fromaddr.value, addressesWithBalance);
 
     return (
-      <div style={{ overflow: 'hidden' }}>
-        <div className={cstyles.sidebarcontainer}>
-          <Sidebar info={info} />
-        </div>
-        <div className={cstyles.contentcontainer}>
-          <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Send</div>
+      <div>
+        <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Send</div>
 
-          <div className={styles.sendcontainer}>
-            <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
-              <div className={[cstyles.sublight, cstyles.padbottomsmall].join(' ')}>Send From</div>
-              <Select
-                value={fromaddr}
-                options={sendFromList}
-                styles={customStyles}
-                // $FlowFixMe
-                onChange={this.changeFrom}
-              />
-            </div>
-
-            <Spacer />
-
-            <ScrollPane offsetHeight={300}>
-              {sendPageState.toaddrs.map(toaddr => {
-                return (
-                  <ToAddrBox
-                    key={toaddr.id}
-                    toaddr={toaddr}
-                    updateToField={this.updateToField}
-                    fromAmount={totalAmountAvailable}
-                    setMaxAmount={this.setMaxAmount}
-                    setSendButtonEnable={this.setSendButtonEnable}
-                    totalAmountAvailable={totalAmountAvailable}
-                  />
-                );
-              })}
-              <div style={{ textAlign: 'right' }}>
-                <button type="button" onClick={this.addToAddr}>
-                  <i className={['fas', 'fa-plus'].join(' ')} />
-                </button>
-              </div>
-            </ScrollPane>
-
-            <div className={styles.buttoncontainer}>
-              <button
-                type="button"
-                disabled={!sendButtonEnabled}
-                className={cstyles.primarybutton}
-                onClick={this.openModal}
-              >
-                Send
-              </button>
-              <button type="button" className={cstyles.primarybutton} onClick={this.clearToAddrs}>
-                Cancel
-              </button>
-            </div>
-
-            <ConfirmModal
-              sendPageState={sendPageState}
-              info={info}
-              sendTransaction={sendTransaction}
-              openErrorModal={this.openErrorModal}
-              closeModal={this.closeModal}
-              modalIsOpen={modalIsOpen}
-              clearToAddrs={this.clearToAddrs}
-            />
-
-            <ErrorModal
-              title={errorModalTitle}
-              body={errorModalBody}
-              modalIsOpen={errorModalIsOpen}
-              closeModal={this.closeErrorModal}
+        <div className={styles.sendcontainer}>
+          <div className={[cstyles.well, cstyles.verticalflex].join(' ')}>
+            <div className={[cstyles.sublight, cstyles.padbottomsmall].join(' ')}>Send From</div>
+            <Select
+              value={fromaddr}
+              options={sendFromList}
+              styles={customStyles}
+              // $FlowFixMe
+              onChange={this.changeFrom}
             />
           </div>
+
+          <Spacer />
+
+          <ScrollPane offsetHeight={300}>
+            {sendPageState.toaddrs.map(toaddr => {
+              return (
+                <ToAddrBox
+                  key={toaddr.id}
+                  toaddr={toaddr}
+                  updateToField={this.updateToField}
+                  fromAmount={totalAmountAvailable}
+                  setMaxAmount={this.setMaxAmount}
+                  setSendButtonEnable={this.setSendButtonEnable}
+                  totalAmountAvailable={totalAmountAvailable}
+                />
+              );
+            })}
+            <div style={{ textAlign: 'right' }}>
+              <button type="button" onClick={this.addToAddr}>
+                <i className={['fas', 'fa-plus'].join(' ')} />
+              </button>
+            </div>
+          </ScrollPane>
+
+          <div className={styles.buttoncontainer}>
+            <button
+              type="button"
+              disabled={!sendButtonEnabled}
+              className={cstyles.primarybutton}
+              onClick={this.openModal}
+            >
+              Send
+            </button>
+            <button type="button" className={cstyles.primarybutton} onClick={this.clearToAddrs}>
+              Cancel
+            </button>
+          </div>
+
+          <ConfirmModal
+            sendPageState={sendPageState}
+            info={info}
+            sendTransaction={sendTransaction}
+            openErrorModal={this.openErrorModal}
+            closeModal={this.closeModal}
+            modalIsOpen={modalIsOpen}
+            clearToAddrs={this.clearToAddrs}
+          />
+
+          <ErrorModal
+            title={errorModalTitle}
+            body={errorModalBody}
+            modalIsOpen={errorModalIsOpen}
+            closeModal={this.closeErrorModal}
+          />
         </div>
       </div>
     );

@@ -10,7 +10,6 @@ import {
 } from 'react-accessible-accordion';
 import QRCode from 'qrcode.react';
 import { clipboard } from 'electron';
-import Sidebar from './Sidebar';
 import styles from './Receive.css';
 import cstyles from './Common.css';
 import Utils from '../utils/utils';
@@ -146,73 +145,68 @@ export default class Receive extends Component<Props> {
     }
 
     return (
-      <div style={{ overflow: 'hidden' }}>
-        <div className={cstyles.sidebarcontainer}>
-          <Sidebar info={info} />
-        </div>
-        <div className={cstyles.contentcontainer}>
-          <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Receive</div>
+      <div>
+        <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Receive</div>
 
-          <div className={styles.receivecontainer}>
-            <Tabs>
-              <TabList>
-                <Tab>Shielded</Tab>
-                <Tab>Transparent</Tab>
-              </TabList>
+        <div className={styles.receivecontainer}>
+          <Tabs>
+            <TabList>
+              <Tab>Shielded</Tab>
+              <Tab>Transparent</Tab>
+            </TabList>
 
-              <TabPanel key={`z${rerenderKey}`}>
-                {/* Change the hardcoded height */}
-                <ScrollPane offsetHeight={150}>
-                  <Accordion preExpanded={[defaultZaddr]}>
-                    {zaddrs.map(a => (
-                      <AddressBlock
-                        key={a.address}
-                        addressBalance={a}
-                        currencyName={info.currencyName}
-                        privateKey={addressPrivateKeys[a.address]}
-                        getSinglePrivateKey={getSinglePrivateKey}
-                        rerender={this.rerender}
-                      />
-                    ))}
-                  </Accordion>
+            <TabPanel key={`z${rerenderKey}`}>
+              {/* Change the hardcoded height */}
+              <ScrollPane offsetHeight={150}>
+                <Accordion preExpanded={[defaultZaddr]}>
+                  {zaddrs.map(a => (
+                    <AddressBlock
+                      key={a.address}
+                      addressBalance={a}
+                      currencyName={info.currencyName}
+                      privateKey={addressPrivateKeys[a.address]}
+                      getSinglePrivateKey={getSinglePrivateKey}
+                      rerender={this.rerender}
+                    />
+                  ))}
+                </Accordion>
 
-                  <button
-                    className={[cstyles.primarybutton, cstyles.margintoplarge, cstyles.marginbottomlarge].join(' ')}
-                    onClick={() => createNewAddress(true)}
-                    type="button"
-                  >
-                    New Shielded Address
-                  </button>
-                </ScrollPane>
-              </TabPanel>
+                <button
+                  className={[cstyles.primarybutton, cstyles.margintoplarge, cstyles.marginbottomlarge].join(' ')}
+                  onClick={() => createNewAddress(true)}
+                  type="button"
+                >
+                  New Shielded Address
+                </button>
+              </ScrollPane>
+            </TabPanel>
 
-              <TabPanel key={`t${rerenderKey}`}>
-                {/* Change the hardcoded height */}
-                <ScrollPane offsetHeight={150}>
-                  <Accordion preExpanded={[defaultTaddr]}>
-                    {taddrs.map(a => (
-                      <AddressBlock
-                        key={a.address}
-                        addressBalance={a}
-                        currencyName={info.currencyName}
-                        privateKey={addressPrivateKeys[a.address]}
-                        getSinglePrivateKey={getSinglePrivateKey}
-                        rerender={this.rerender}
-                      />
-                    ))}
-                  </Accordion>
+            <TabPanel key={`t${rerenderKey}`}>
+              {/* Change the hardcoded height */}
+              <ScrollPane offsetHeight={150}>
+                <Accordion preExpanded={[defaultTaddr]}>
+                  {taddrs.map(a => (
+                    <AddressBlock
+                      key={a.address}
+                      addressBalance={a}
+                      currencyName={info.currencyName}
+                      privateKey={addressPrivateKeys[a.address]}
+                      getSinglePrivateKey={getSinglePrivateKey}
+                      rerender={this.rerender}
+                    />
+                  ))}
+                </Accordion>
 
-                  <button
-                    className={[cstyles.primarybutton, cstyles.margintoplarge, cstyles.marginbottomlarge].join(' ')}
-                    type="button"
-                    onClick={() => createNewAddress(false)}
-                  >
-                    New Transparent Address
-                  </button>
-                </ScrollPane>
-              </TabPanel>
-            </Tabs>
-          </div>
+                <button
+                  className={[cstyles.primarybutton, cstyles.margintoplarge, cstyles.marginbottomlarge].join(' ')}
+                  type="button"
+                  onClick={() => createNewAddress(false)}
+                >
+                  New Transparent Address
+                </button>
+              </ScrollPane>
+            </TabPanel>
+          </Tabs>
         </div>
       </div>
     );

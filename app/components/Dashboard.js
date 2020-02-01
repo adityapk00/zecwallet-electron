@@ -10,7 +10,6 @@ import escape from 'escape-html';
 import styles from './Dashboard.css';
 import cstyles from './Common.css';
 import { TotalBalance, Transaction, Info } from './AppState';
-import Sidebar from './Sidebar';
 import ScrollPane from './ScrollPane';
 import Utils from '../utils/utils';
 
@@ -259,48 +258,43 @@ export default class Home extends Component<Props, State> {
     const { clickedTx, modalIsOpen } = this.state;
 
     return (
-      <div style={{ overflow: 'hidden' }}>
-        <div className={cstyles.sidebarcontainer}>
-          <Sidebar info={info} />
-        </div>
-        <div className={cstyles.contentcontainer}>
-          <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Dashboard</div>
-          <div className={[cstyles.well, styles.balancebox].join(' ')}>
-            <BalanceBlockHighlight zecValue={totalBalance.total} usdValue="12.12" currencyName={info.currencyName} />
-            <BalanceBlock
-              topLabel="Shileded"
-              zecValue={totalBalance.private}
-              usdValue="12.12"
-              currencyName={info.currencyName}
-            />
-            <BalanceBlock
-              topLabel="Transparent"
-              zecValue={totalBalance.transparent}
-              usdValue="12.12"
-              currencyName={info.currencyName}
-            />
-          </div>
-          {/* Change the hardcoded height */}
-          <ScrollPane offsetHeight={250}>
-            {/* If no transactions, show the "loading..." text */
-            transactions.length === 0 && (
-              <div className={[cstyles.center, cstyles.margintoplarge].join(' ')}>Loading...</div>
-            )}
-            {transactions.map(t => {
-              const key = t.type + t.txid + t.address;
-              return (
-                <TxItemBlock key={key} transaction={t} currencyName={info.currencyName} txClicked={this.txClicked} />
-              );
-            })}
-          </ScrollPane>
-
-          <TxModal
-            modalIsOpen={modalIsOpen}
-            tx={clickedTx}
-            closeModal={this.closeModal}
+      <div>
+        <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Dashboard</div>
+        <div className={[cstyles.well, styles.balancebox].join(' ')}>
+          <BalanceBlockHighlight zecValue={totalBalance.total} usdValue="12.12" currencyName={info.currencyName} />
+          <BalanceBlock
+            topLabel="Shileded"
+            zecValue={totalBalance.private}
+            usdValue="12.12"
+            currencyName={info.currencyName}
+          />
+          <BalanceBlock
+            topLabel="Transparent"
+            zecValue={totalBalance.transparent}
+            usdValue="12.12"
             currencyName={info.currencyName}
           />
         </div>
+        {/* Change the hardcoded height */}
+        <ScrollPane offsetHeight={250}>
+          {/* If no transactions, show the "loading..." text */
+          transactions.length === 0 && (
+            <div className={[cstyles.center, cstyles.margintoplarge].join(' ')}>Loading...</div>
+          )}
+          {transactions.map(t => {
+            const key = t.type + t.txid + t.address;
+            return (
+              <TxItemBlock key={key} transaction={t} currencyName={info.currencyName} txClicked={this.txClicked} />
+            );
+          })}
+        </ScrollPane>
+
+        <TxModal
+          modalIsOpen={modalIsOpen}
+          tx={clickedTx}
+          closeModal={this.closeModal}
+          currencyName={info.currencyName}
+        />
       </div>
     );
   }

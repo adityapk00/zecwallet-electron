@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable no-else-return */
 /* eslint-disable no-plusplus */
 export const NO_CONNECTION: string = 'Could not connect to zcashd';
 
@@ -78,5 +80,21 @@ export default class Utils {
   static getNextToAddrID(): number {
     // eslint-disable-next-line no-plusplus
     return Utils.nextToAddrID++;
+  }
+
+  static getDonationAddress(testnet: boolean): string {
+    if (testnet) {
+      return 'ztestsapling1wn6889vznyu42wzmkakl2effhllhpe4azhu696edg2x6me4kfsnmqwpglaxzs7tmqsq7kudemp5';
+    } else {
+      return 'zs1gv64eu0v2wx7raxqxlmj354y9ycznwaau9kduljzczxztvs4qcl00kn2sjxtejvrxnkucw5xx9u';
+    }
+  }
+
+  static getDefaultDonationAmount(testnet: boolean): number {
+    return 0.1;
+  }
+
+  static getDefaultDonationMemo(testnet: boolean): string {
+    return 'Thanks for supporting Zecwallet!';
   }
 }
