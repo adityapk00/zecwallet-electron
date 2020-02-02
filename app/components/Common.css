@@ -156,3 +156,25 @@
   text-align: center;
   padding-top: 24px;
 }
+
+.modal {
+  top: 25%;
+  left: 25%;
+  right: auto;
+  bottom: auto;
+  opacity: 1;
+  transform: translate(-12.5%, -12.5%);
+  background: #212124;
+  position: absolute;
+  padding: 16px;
+  min-width: 700px;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(100, 100, 100, 0.5);
+}

@@ -1,6 +1,10 @@
+/* eslint-disable react/jsx-props-no-spreading */
+/* eslint-disable max-classes-per-file */
+/* eslint-disable react/prop-types */
 /* eslint-disable react/no-unused-state */
 import React from 'react';
 import { Switch, Route } from 'react-router';
+import { ErrorModal, ErrorModalData } from './components/ErrorModal';
 import cstyles from './components/Common.css';
 import routes from './constants/routes.json';
 import App from './containers/App';
@@ -8,7 +12,6 @@ import Dashboard from './components/Dashboard';
 import Send from './components/Send';
 import Receive from './components/Receive';
 import LoadingScreen from './components/LoadingScreen';
-
 import AppState, {
   AddressBalance,
   TotalBalance,
@@ -46,7 +49,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
       receivePageState: new ReceivePageState(),
       rpcConfig: new RPCConfig(),
       info: new Info(),
-      location: null
+      location: null,
+      errorModalData: new ErrorModalData()
     };
 
     // Create the initial ToAddr box
@@ -76,6 +80,22 @@ export default class RouteApp extends React.Component<Props, AppState> {
   }
 
   componentWillUnmount() {}
+
+  openErrorModal = (title: string, body: string) => {
+    const errorModalData = new ErrorModalData();
+    errorModalData.modalIsOpen = true;
+    errorModalData.title = title;
+    errorModalData.body = body;
+
+    this.setState({ errorModalData });
+  };
+
+  closeErrorModal = () => {
+    const errorModalData = new ErrorModalData();
+    errorModalData.modalIsOpen = false;
+
+    this.setState({ errorModalData });
+  };
 
   setInfo = (info: Info) => {
     this.setState({ info });
@@ -228,14 +248,30 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addressBook,
       sendPageState,
       receivePageState,
-      info
+      info,
+      errorModalData
     } = this.state;
+
+    const standardProps = {
+      openErrorModal: this.openErrorModal,
+      closeErrorModal: this.closeErrorModal,
+      setSendTo: this.setSendTo,
+      info
+    };
+
     return (
       <App>
+        <ErrorModal
+          title={errorModalData.title}
+          body={errorModalData.body}
+          modalIsOpen={errorModalData.modalIsOpen}
+          closeModal={this.closeErrorModal}
+        />
+
         <div style={{ overflow: 'hidden' }}>
           {info && info.version && (
             <div className={cstyles.sidebarcontainer}>
-              <Sidebar info={info} setSendTo={this.setSendTo} />
+              <Sidebar info={info} setSendTo={this.setSendTo} {...standardProps} />
             </div>
           )}
           <div className={cstyles.contentcontainer}>
@@ -248,7 +284,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
                     sendTransaction={this.sendTransaction}
                     sendPageState={sendPageState}
                     setSendPageState={this.setSendPageState}
-                    info={info}
+                    {...standardProps}
                   />
                 )}
               />
@@ -261,7 +297,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
                     addressesWithBalance={addressesWithBalance}
                     addressPrivateKeys={addressPrivateKeys}
                     receivePageState={receivePageState}
-                    info={info}
+                    {...standardProps}
                     getSinglePrivateKey={this.getSinglePrivateKey}
                     createNewAddress={this.createNewAddress}
                   />
@@ -274,7 +310,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
                     addressBook={addressBook}
                     addAddressBookEntry={this.addAddressBookEntry}
                     removeAddressBookEntry={this.removeAddressBookEntry}
-                    setSendTo={this.setSendTo}
+                    {...standardProps}
                   />
                 )}
               />

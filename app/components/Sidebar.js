@@ -27,8 +27,8 @@ const PayURIModal = ({
     <Modal
       isOpen={modalIsOpen}
       onRequestClose={closeModal}
-      className={styles.modal}
-      overlayClassName={styles.modalOverlay}
+      className={cstyles.modal}
+      overlayClassName={cstyles.modalOverlay}
     >
       <div className={[cstyles.verticalflex].join(' ')}>
         <div className={cstyles.marginbottomlarge} style={{ textAlign: 'center' }}>
@@ -96,7 +96,8 @@ const SidebarMenuItem = ({ name, routeName, currentRoute, iconname }) => {
 type Props = {
   info: Info,
   setSendTo: (address: string, amount: number | null, memo: string | null) => void,
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
+  openErrorModal: (title: string, body: string) => void
 };
 
 type State = {
@@ -149,8 +150,45 @@ class Sidebar extends PureComponent<Props, State> {
 
   payURI = (uri: string) => {
     console.log(`Paying ${uri}`);
-    console.log(url.parse(uri));
-    console.log(querystring.parse(url.parse(uri).query));
+    const { openErrorModal, setSendTo, history } = this.props;
+
+    const errTitle = 'URI Error';
+    const errBody = (
+      <span>
+        The URI &quot;{escape(uri)}&quot; was not recognized.
+        <br />
+        Please type in a valid URI of the form &quot; zcash:address?amout=xx&memo=yy &quot;
+      </span>
+    );
+
+    if (!uri || uri === '') {
+      openErrorModal(errTitle, errBody);
+      return;
+    }
+
+    const parsedUri = url.parse(uri);
+    if (!parsedUri || parsedUri.protocol !== 'zcash:' || !parsedUri.query) {
+      openErrorModal(errTitle, errBody);
+      return;
+    }
+
+    const address = parsedUri.host;
+    if (!address || !(Utils.isTransparent(address) || Utils.isZaddr(address))) {
+      openErrorModal(errTitle, <span>The address ${address} was not recongnized as a zcash address</span>);
+      return;
+    }
+
+    const parsedParams = querystring.parse(parsedUri.query);
+    if (!parsedParams || (!parsedParams.amt && !parsedParams.amount)) {
+      openErrorModal(errTitle, errBody);
+      return;
+    }
+
+    const amount = parsedParams.amt || parsedParams.amount;
+    const memo = parsedParams.memo || '';
+
+    setSendTo(address, amount, memo);
+    history.push(routes.SEND);
   };
 
   render() {
