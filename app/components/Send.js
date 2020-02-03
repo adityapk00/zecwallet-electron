@@ -1,3 +1,4 @@
+/* eslint-disable no-else-return */
 /* eslint-disable radix */
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 /* eslint-disable jsx-a11y/click-events-have-key-events */
@@ -138,7 +139,11 @@ function getSendManyJSON(sendPageState: SendPageState): [] {
     sendPageState.toaddrs.map(to => {
       const textEncoder = new TextEncoder();
       const memo = to.memo ? hex.encode(textEncoder.encode(to.memo)) : '';
-      return { address: to.to, amount: to.amount, memo };
+      if (memo === '') {
+        return { address: to.to, amount: to.amount };
+      } else {
+        return { address: to.to, amount: to.amount, memo };
+      }
     })
   );
 
