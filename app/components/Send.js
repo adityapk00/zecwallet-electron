@@ -56,7 +56,7 @@ const ToAddrBox = ({
     }
   }
 
-  if (!addressIsValid || amountError || !memoIsValid || toaddr.to === '' || toaddr.amount === 0) {
+  if (!addressIsValid || amountError || !memoIsValid || toaddr.to === '' || toaddr.amount === 0 || fromAmount === 0) {
     setSendButtonEnable(false);
   } else {
     setSendButtonEnable(true);
