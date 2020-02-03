@@ -1,5 +1,6 @@
 import axios from 'axios';
 import _ from 'underscore';
+import hex from 'hex-string';
 import { TotalBalance, AddressBalance, Transaction, RPCConfig, TxDetail, Info } from './components/AppState';
 import Utils, { NO_CONNECTION } from './utils/utils';
 import SentTxStore from './utils/SentTxStore';
@@ -11,12 +12,8 @@ const parseMemo = (memoHex: string): string | null => {
   if (parseInt(memoHex.substr(0, 2), 16) >= 246) return null;
 
   // Else, parse as Hex string
-  const memo = _.chunk(memoHex.split(''), 2)
-    .map(hexChunk => parseInt(hexChunk.join(''), 16))
-    .filter(c => c > 0)
-    .map(c => String.fromCharCode(c))
-    .join('');
-
+  const textDecoder = new TextDecoder();
+  const memo = textDecoder.decode(hex.decode(memoHex));
   if (memo === '') return null;
 
   return memo;

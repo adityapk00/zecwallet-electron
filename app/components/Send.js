@@ -8,8 +8,7 @@ import React, { PureComponent } from 'react';
 import Modal from 'react-modal';
 import Select from 'react-select';
 import TextareaAutosize from 'react-textarea-autosize';
-import escape from 'escape-html';
-import hex from 'string-hex';
+import hex from 'hex-string';
 import styles from './Send.css';
 import cstyles from './Common.css';
 import { ToAddr, AddressBalance, SendPageState, Info, AddressBookEntry } from './AppState';
@@ -137,7 +136,8 @@ function getSendManyJSON(sendPageState: SendPageState): [] {
   json.push(sendPageState.fromaddr);
   json.push(
     sendPageState.toaddrs.map(to => {
-      const memo = to.memo ? hex(to.memo) : '';
+      const textEncoder = new TextEncoder();
+      const memo = to.memo ? hex.encode(textEncoder.encode(to.memo)) : '';
       return { address: to.to, amount: to.amount, memo };
     })
   );
@@ -150,7 +150,7 @@ function getSendManyJSON(sendPageState: SendPageState): [] {
 const ConfirmModalToAddr = ({ toaddr, info }) => {
   const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(toaddr.amount);
 
-  const memo: string = toaddr.memo ? escape(toaddr.memo) : '';
+  const memo: string = toaddr.memo ? toaddr.memo : '';
 
   return (
     <div className={cstyles.well}>

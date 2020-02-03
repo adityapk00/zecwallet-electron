@@ -6,7 +6,6 @@
 import React, { Component } from 'react';
 import Modal from 'react-modal';
 import dateformat from 'dateformat';
-import escape from 'escape-html';
 import styles from './Dashboard.css';
 import cstyles from './Common.css';
 import { TotalBalance, Transaction, Info } from './AppState';
@@ -71,10 +70,7 @@ const TxItemBlock = ({ transaction, currencyName, zecPrice, txClicked, addressBo
           const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(Math.abs(txdetail.amount));
 
           let { address } = txdetail;
-          let { memo } = txdetail;
-          if (memo) {
-            memo = escape(memo);
-          }
+          const { memo } = txdetail;
 
           if (!address) {
             address = '(Shielded)';
@@ -186,10 +182,8 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName, zecPrice }) => {
         {detailedTxns.map(txdetail => {
           const { bigPart, smallPart } = Utils.splitZecAmountIntoBigSmall(Math.abs(txdetail.amount));
 
-          let { address, memo } = txdetail;
-          if (memo) {
-            memo = escape(memo);
-          }
+          let { address } = txdetail;
+          const { memo } = txdetail;
 
           if (!address) {
             address = '(Shielded)';
