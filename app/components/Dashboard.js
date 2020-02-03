@@ -12,6 +12,7 @@ import cstyles from './Common.css';
 import { TotalBalance, Transaction, Info } from './AppState';
 import ScrollPane from './ScrollPane';
 import Utils from '../utils/utils';
+import AddressBook from './Addressbook';
 
 // eslint-disable-next-line react/prop-types
 const BalanceBlockHighlight = ({ zecValue, usdValue, currencyName }) => {
@@ -48,7 +49,7 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel, currencyName }) => {
   );
 };
 
-const TxItemBlock = ({ transaction, currencyName, zecPrice, txClicked }) => {
+const TxItemBlock = ({ transaction, currencyName, zecPrice, txClicked, addressBookMap }) => {
   const txDate = new Date(transaction.time * 1000);
   const datePart = dateformat(txDate, 'mmm dd, yyyy');
   const timePart = dateformat(txDate, 'hh:MM tt');
@@ -79,10 +80,12 @@ const TxItemBlock = ({ transaction, currencyName, zecPrice, txClicked }) => {
             address = '(Shielded)';
           }
 
+          const label = addressBookMap[address] || '';
+
           return (
             <div key={address} className={styles.txaddressamount}>
               <div className={styles.txaddress}>
-                <div className={cstyles.highlight}>&quot;Label&quot;</div>
+                <div className={cstyles.highlight}>{label}</div>
                 <div className={cstyles.fixedfont}>{Utils.splitStringIntoChunks(address, 6).join(' ')}</div>
                 <div className={[cstyles.small, cstyles.sublight, cstyles.padtopsmall, styles.txmemo].join(' ')}>
                   {memo}
@@ -232,6 +235,7 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName, zecPrice }) => {
 type Props = {
   totalBalance: TotalBalance,
   transactions: Transaction[],
+  addressBook: AddressBook[],
   info: Info
 };
 
@@ -259,9 +263,14 @@ export default class Home extends Component<Props, State> {
   };
 
   render() {
-    const { totalBalance, transactions, info } = this.props;
-
+    const { totalBalance, transactions, info, addressBook } = this.props;
     const { clickedTx, modalIsOpen } = this.state;
+
+    const addressBookMap = addressBook.reduce((map, obj) => {
+      // eslint-disable-next-line no-param-reassign
+      map[obj.address] = obj.label;
+      return map;
+    }, {});
 
     return (
       <div>
@@ -300,6 +309,7 @@ export default class Home extends Component<Props, State> {
                 currencyName={info.currencyName}
                 zecPrice={info.zecPrice}
                 txClicked={this.txClicked}
+                addressBookMap={addressBookMap}
               />
             );
           })}

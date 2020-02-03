@@ -13,10 +13,10 @@ import { clipboard } from 'electron';
 import styles from './Receive.css';
 import cstyles from './Common.css';
 import Utils from '../utils/utils';
-import { AddressBalance, Info, ReceivePageState } from './AppState';
+import { AddressBalance, Info, ReceivePageState, AddressBookEntry } from './AppState';
 import ScrollPane from './ScrollPane';
 
-const AddressBlock = ({ addressBalance, currencyName, zecPrice, privateKey, getSinglePrivateKey }) => {
+const AddressBlock = ({ addressBalance, label, currencyName, zecPrice, privateKey, getSinglePrivateKey }) => {
   const { address } = addressBalance;
 
   const [copied, setCopied] = useState(false);
@@ -32,11 +32,20 @@ const AddressBlock = ({ addressBalance, currencyName, zecPrice, privateKey, getS
           <div>
             <QRCode value={address} className={[styles.receiveQrcode].join(' ')} />
           </div>
+
           <div className={[cstyles.verticalflex, cstyles.marginleft].join(' ')}>
             <div className={[cstyles.sublight].join(' ')}>Address</div>
             <div className={[cstyles.padtopsmall, cstyles.fixedfont].join(' ')}>
               {Utils.splitStringIntoChunks(address, 6).join(' ')}
             </div>
+
+            {label && (
+              <div className={cstyles.margintoplarge}>
+                <div className={[cstyles.sublight].join(' ')}>Label</div>
+                <div className={[cstyles.padtopsmall, cstyles.fixedfont].join(' ')}>{label}</div>
+              </div>
+            )}
+
             <div>
               <button
                 className={[cstyles.primarybutton, cstyles.margintoplarge].join(' ')}
@@ -59,11 +68,13 @@ const AddressBlock = ({ addressBalance, currencyName, zecPrice, privateKey, getS
                 </button>
               )}
             </div>
+
             <div className={[cstyles.sublight, cstyles.margintoplarge].join(' ')}>Funds</div>
             <div className={[cstyles.padtopsmall].join(' ')}>
               {currencyName} {balance}
             </div>
             <div className={[cstyles.padtopsmall].join(' ')}>{Utils.getZecToUsdString(zecPrice, balance)}</div>
+
             <div className={[cstyles.margintoplarge, cstyles.breakword].join(' ')}>
               {privateKey && (
                 <div>
@@ -87,6 +98,7 @@ const AddressBlock = ({ addressBalance, currencyName, zecPrice, privateKey, getS
 type Props = {
   addresses: string[],
   addressesWithBalance: AddressBalance[],
+  addressBook: AddressBookEntry[],
   info: Info,
   receivePageState: ReceivePageState,
   getSinglePrivateKey: string => void,
@@ -100,6 +112,7 @@ export default class Receive extends Component<Props> {
       addresses,
       addressesWithBalance,
       addressPrivateKeys,
+      addressBook,
       info,
       receivePageState,
       getSinglePrivateKey,
@@ -146,6 +159,12 @@ export default class Receive extends Component<Props> {
       });
     }
 
+    const addressBookMap = addressBook.reduce((map, obj) => {
+      // eslint-disable-next-line no-param-reassign
+      map[obj.address] = obj.label;
+      return map;
+    }, {});
+
     return (
       <div>
         <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Receive</div>
@@ -166,6 +185,7 @@ export default class Receive extends Component<Props> {
                       key={a.address}
                       addressBalance={a}
                       currencyName={info.currencyName}
+                      label={addressBookMap[a.address]}
                       zecPrice={info.zecPrice}
                       privateKey={addressPrivateKeys[a.address]}
                       getSinglePrivateKey={getSinglePrivateKey}

@@ -10,7 +10,7 @@ import Select from 'react-select';
 import escape from 'escape-html';
 import styles from './Send.css';
 import cstyles from './Common.css';
-import { ToAddr, AddressBalance, SendPageState, Info } from './AppState';
+import { ToAddr, AddressBalance, SendPageState, Info, AddressBookEntry } from './AppState';
 import Utils from '../utils/utils';
 import ScrollPane from './ScrollPane';
 import ArrowUpLight from '../assets/img/arrow_up_dark.png';
@@ -249,6 +249,8 @@ const ConfirmModal = ({
 type Props = {
   addressesWithBalance: AddressBalance[],
 
+  addressBook: AddressBookEntry[],
+
   sendPageState: SendPageState,
 
   sendTransaction: (sendJson: [], (string, string) => void) => void,
@@ -404,9 +406,13 @@ export default class Send extends PureComponent<Props, SendState> {
 
   getLabelForFromAddress = (addr: string, addressesWithBalance: AddressBalance[], currencyName: string) => {
     // Find the addr in addressesWithBalance
+    const { addressBook } = this.props;
+    const label = addressBook.find(ab => ab.address === addr);
+    const labelStr = label ? ` [ ${label.label} ]` : '';
+
     const balance = this.getBalanceForAddress(addr, addressesWithBalance);
 
-    return `[ ${currencyName} ${balance.toString()} ] ${addr}`;
+    return `[ ${currencyName} ${balance.toString()} ]${labelStr} ${addr}`;
   };
 
   render() {

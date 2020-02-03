@@ -303,6 +303,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
                     sendTransaction={this.sendTransaction}
                     sendPageState={sendPageState}
                     setSendPageState={this.setSendPageState}
+                    addressBook={addressBook}
                     {...standardProps}
                   />
                 )}
@@ -316,6 +317,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
                     addressesWithBalance={addressesWithBalance}
                     addressPrivateKeys={addressPrivateKeys}
                     receivePageState={receivePageState}
+                    addressBook={addressBook}
                     {...standardProps}
                     getSinglePrivateKey={this.getSinglePrivateKey}
                     createNewAddress={this.createNewAddress}
@@ -336,7 +338,14 @@ export default class RouteApp extends React.Component<Props, AppState> {
               <Route
                 path={routes.DASHBOARD}
                 // eslint-disable-next-line react/jsx-props-no-spreading
-                render={() => <Dashboard totalBalance={totalBalance} transactions={transactions} info={info} />}
+                render={() => (
+                  <Dashboard
+                    totalBalance={totalBalance}
+                    transactions={transactions}
+                    info={info}
+                    addressBook={addressBook}
+                  />
+                )}
               />
               <Route path={routes.ZCASHD} render={() => <Zcashd info={info} />} />
               <Route
