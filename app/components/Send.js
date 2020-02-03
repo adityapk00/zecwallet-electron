@@ -26,7 +26,15 @@ const Spacer = () => {
 };
 
 // $FlowFixMe
-const ToAddrBox = ({ toaddr, updateToField, fromAmount, setMaxAmount, setSendButtonEnable, totalAmountAvailable }) => {
+const ToAddrBox = ({
+  toaddr,
+  zecPrice,
+  updateToField,
+  fromAmount,
+  setMaxAmount,
+  setSendButtonEnable,
+  totalAmountAvailable
+}) => {
   const isMemoDisabled = !Utils.isZaddr(toaddr.to);
 
   const addressIsValid = Utils.isZaddr(toaddr.to) || Utils.isTransparent(toaddr.to);
@@ -48,6 +56,8 @@ const ToAddrBox = ({ toaddr, updateToField, fromAmount, setMaxAmount, setSendBut
   } else {
     setSendButtonEnable(true);
   }
+
+  const usdValue = Utils.getZecToUsdString(zecPrice, toaddr.amount);
 
   return (
     <div>
@@ -73,11 +83,7 @@ const ToAddrBox = ({ toaddr, updateToField, fromAmount, setMaxAmount, setSendBut
         <div className={[cstyles.flexspacebetween].join(' ')}>
           <div className={cstyles.sublight}>Amount</div>
           <div className={cstyles.validationerror}>
-            {amountError ? (
-              <span className={cstyles.red}>{amountError}</span>
-            ) : (
-              <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
-            )}
+            {amountError ? <span className={cstyles.red}>{amountError}</span> : <span>{usdValue}</span>}
           </div>
         </div>
         <div className={[cstyles.flexspacebetween].join(' ')}>
@@ -172,7 +178,7 @@ const ConfirmModal = ({
     closeModal();
     // This will be replaced by either a success TXID or error message that the user
     // has to close manually.
-    openErrorModal('Computing Transaction', 'Please wait...');
+    openErrorModal('Computing Transaction', 'Please wait...This could take a while');
 
     // Then send the Tx async
     (async () => {
@@ -488,6 +494,7 @@ export default class Send extends PureComponent<Props, SendState> {
                 <ToAddrBox
                   key={toaddr.id}
                   toaddr={toaddr}
+                  zecPrice={info.zecPrice}
                   updateToField={this.updateToField}
                   fromAmount={totalAmountAvailable}
                   setMaxAmount={this.setMaxAmount}
