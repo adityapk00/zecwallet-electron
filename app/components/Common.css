@@ -150,6 +150,7 @@
 
 .inputbox {
   width: calc(100% - 16px);
+  font-family: Roboto, Arial, Helvetica, Helvetica Neue, serif;
   min-height: 38px;
   padding-left: 8px;
   padding-right: 8px;

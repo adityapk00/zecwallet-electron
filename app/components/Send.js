@@ -7,6 +7,7 @@
 import React, { PureComponent } from 'react';
 import Modal from 'react-modal';
 import Select from 'react-select';
+import TextareaAutosize from 'react-textarea-autosize';
 import escape from 'escape-html';
 import hex from 'string-hex';
 import styles from './Send.css';
@@ -111,8 +112,7 @@ const ToAddrBox = ({
             {memoIsValid ? toaddr.memo.length : <span className={cstyles.red}>{toaddr.memo.length}</span>} / 512
           </div>
         </div>
-        <input
-          type="text"
+        <TextareaAutosize
           className={cstyles.inputbox}
           value={isMemoDisabled ? '<Memos only for z-addresses>' : toaddr.memo}
           disabled={isMemoDisabled}
