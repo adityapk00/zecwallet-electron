@@ -97,4 +97,12 @@ export default class Utils {
   static getDefaultDonationMemo(testnet: boolean): string {
     return 'Thanks for supporting Zecwallet!';
   }
+
+  static getZecToUsdString(price: number | null, zecValue: number | null): string {
+    if (!price || !zecValue) {
+      return 'USD --';
+    }
+
+    return `USD ${(price * zecValue).toFixed(2)}`;
+  }
 }

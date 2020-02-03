@@ -135,6 +135,8 @@ export class Info {
   currencyName: string;
 
   solps: number;
+
+  zecPrice: number;
 }
 
 // eslint-disable-next-line max-classes-per-file

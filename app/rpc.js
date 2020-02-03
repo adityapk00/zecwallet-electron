@@ -40,11 +40,15 @@ export default class RPC {
   // This function is not set via a constructor, but via the sendTransaction method
   fnOpenSendErrorModal: (string, string) => void;
 
+  fnSetZecPrice: number => void;
+
   opids: Set<string>;
 
   refreshTimerID: TimerID;
 
   opTimerID: TimerID;
+
+  priceTimerID: TimerID;
 
   constructor(
     fnSetTotalBalance: TotalBalance => void,
@@ -52,7 +56,8 @@ export default class RPC {
     fnSetTransactionsList: (Transaction[]) => void,
     fnSetAllAddresses: (string[]) => void,
     fnSetSinglePrivateKey: (string, string) => void,
-    fnSetInfo: Info => void
+    fnSetInfo: Info => void,
+    fnSetZecPrice: number => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
@@ -60,6 +65,7 @@ export default class RPC {
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetSinglePrivateKey = fnSetSinglePrivateKey;
     this.fnSetInfo = fnSetInfo;
+    this.fnSetZecPrice = fnSetZecPrice;
 
     this.opids = new Set();
   }
@@ -73,6 +79,10 @@ export default class RPC {
 
     if (!this.opTimerID) {
       this.opTimerID = setTimeout(() => this.refreshOpStatus(), 1000);
+    }
+
+    if (!this.priceTimerID) {
+      this.priceTimerID = setTimeout(() => this.getZecPrice(), 1000);
     }
   }
 
@@ -140,6 +150,7 @@ export default class RPC {
     info.connections = infoResult.result.connections;
     info.version = infoResult.result.version;
     info.currencyName = info.testnet ? 'TAZ' : 'ZEC';
+    info.zecPrice = null; // Setting this to null will copy over the existing price
 
     const blkInfoResult = await RPC.doRPC('getblockchaininfo', [], rpcConfig);
     info.verificationProgress = blkInfoResult.result.verificationprogress;
@@ -376,5 +387,35 @@ export default class RPC {
     }
 
     this.setupNextOpidSatusFetch();
+  }
+
+  setupNextZecPriceRefresh() {
+    // Every hour
+    this.priceTimerID = setTimeout(() => this.getZecPrice(), 1000 * 60 * 60);
+  }
+
+  async getZecPrice() {
+    try {
+      const response = await new Promise((resolve, reject) => {
+        axios('https://api.coinmarketcap.com/v1/ticker/', {
+          method: 'GET'
+        })
+          .then(r => resolve(r.data))
+          .catch(err => {
+            reject(err);
+          });
+      });
+
+      const zecData = response.find(i => i.symbol.toUpperCase() === 'ZEC');
+      if (zecData) {
+        this.fnSetZecPrice(zecData.price_usd);
+      } else {
+        this.fnSetZecPrice(null);
+      }
+    } catch (err) {
+      this.fnSetZecPrice(null);
+    }
+
+    this.setupNextZecPriceRefresh();
   }
 }

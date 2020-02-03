@@ -25,7 +25,7 @@ const BalanceBlockHighlight = ({ zecValue, usdValue, currencyName }) => {
         </span>
         <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
       </div>
-      <div className={[cstyles.sublight, cstyles.small].join(' ')}>USD {usdValue}</div>
+      <div className={[cstyles.sublight, cstyles.small].join(' ')}>{usdValue}</div>
     </div>
   );
 };
@@ -43,12 +43,12 @@ const BalanceBlock = ({ zecValue, usdValue, topLabel, currencyName }) => {
         </span>
         <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
       </div>
-      <div className={[cstyles.sublight, cstyles.small].join(' ')}>USD {usdValue}</div>
+      <div className={[cstyles.sublight, cstyles.small].join(' ')}>{usdValue}</div>
     </div>
   );
 };
 
-const TxItemBlock = ({ transaction, currencyName, txClicked }) => {
+const TxItemBlock = ({ transaction, currencyName, zecPrice, txClicked }) => {
   const txDate = new Date(transaction.time * 1000);
   const datePart = dateformat(txDate, 'mmm dd, yyyy');
   const timePart = dateformat(txDate, 'hh:MM tt');
@@ -95,7 +95,9 @@ const TxItemBlock = ({ transaction, currencyName, txClicked }) => {
                   </span>
                   <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
                 </div>
-                <div className={[cstyles.sublight, cstyles.small, cstyles.padtopsmall].join(' ')}>USD 12.12</div>
+                <div className={[cstyles.sublight, cstyles.small, cstyles.padtopsmall].join(' ')}>
+                  {Utils.getZecToUsdString(zecPrice, Math.abs(txdetail.amount))}
+                </div>
               </div>
             </div>
           );
@@ -261,17 +263,21 @@ export default class Home extends Component<Props, State> {
       <div>
         <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Dashboard</div>
         <div className={[cstyles.well, styles.balancebox].join(' ')}>
-          <BalanceBlockHighlight zecValue={totalBalance.total} usdValue="12.12" currencyName={info.currencyName} />
+          <BalanceBlockHighlight
+            zecValue={totalBalance.total}
+            usdValue={Utils.getZecToUsdString(info.zecPrice, totalBalance.total)}
+            currencyName={info.currencyName}
+          />
           <BalanceBlock
             topLabel="Shileded"
             zecValue={totalBalance.private}
-            usdValue="12.12"
+            usdValue={Utils.getZecToUsdString(info.zecPrice, totalBalance.private)}
             currencyName={info.currencyName}
           />
           <BalanceBlock
             topLabel="Transparent"
             zecValue={totalBalance.transparent}
-            usdValue="12.12"
+            usdValue={Utils.getZecToUsdString(info.zecPrice, totalBalance.transparent)}
             currencyName={info.currencyName}
           />
         </div>
@@ -284,7 +290,13 @@ export default class Home extends Component<Props, State> {
           {transactions.map(t => {
             const key = t.type + t.txid + t.address;
             return (
-              <TxItemBlock key={key} transaction={t} currencyName={info.currencyName} txClicked={this.txClicked} />
+              <TxItemBlock
+                key={key}
+                transaction={t}
+                currencyName={info.currencyName}
+                zecPrice={info.zecPrice}
+                txClicked={this.txClicked}
+              />
             );
           })}
         </ScrollPane>

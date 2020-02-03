@@ -11,6 +11,7 @@ import routes from '../constants/routes.json';
 import { RPCConfig, Info } from './AppState';
 import RPC from '../rpc';
 import cstyles from './Common.css';
+import styles from './LoadingScreen.css';
 import { NO_CONNECTION } from '../utils/utils';
 import Logo from '../assets/img/logobig.gif';
 
@@ -168,7 +169,7 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
     // If still loading, show the status
     if (!loadingDone) {
       return (
-        <div className={[cstyles.verticalflex, cstyles.center].join(' ')}>
+        <div className={[cstyles.verticalflex, cstyles.center, styles.loadingcontainer].join(' ')}>
           <div style={{ marginTop: '100px' }}>
             <img src={Logo} width="200px;" alt="Logo" />
           </div>

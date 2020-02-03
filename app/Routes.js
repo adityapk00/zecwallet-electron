@@ -66,7 +66,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setTransactionList,
         this.setAllAddresses,
         this.setSinglePrivateKey,
-        this.setInfo
+        this.setInfo,
+        this.setZecPrice
       );
     }
 
@@ -178,8 +179,26 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.rpc.configure(rpcConfig);
   };
 
-  setInfo = (info: Info) => {
-    this.setState({ info });
+  setZecPrice = (price: number | null) => {
+    console.log(`Price = ${price}`);
+    const { info } = this.state;
+
+    const newInfo = new Info();
+    Object.assign(newInfo, info);
+    newInfo.zecPrice = price;
+
+    this.setState({ info: newInfo });
+  };
+
+  setInfo = (newInfo: Info) => {
+    // If the price is not set in this object, copy it over from the current object
+    const { info } = this.state;
+    if (!newInfo.zecPrice) {
+      // eslint-disable-next-line no-param-reassign
+      newInfo.zecPrice = info.zecPrice;
+    }
+
+    this.setState({ info: newInfo });
   };
 
   setSinglePrivateKey = (address: string, key: string) => {
