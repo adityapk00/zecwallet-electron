@@ -43,6 +43,9 @@ const ToAddrBox = ({
 
   let amountError = null;
   if (toaddr.amount) {
+    if (toaddr.amount < 0) {
+      amountError = 'Amount cannot be negative';
+    }
     if (toaddr.amount > fromAmount) {
       amountError = 'Amount Exceeds Balance';
     }
@@ -514,7 +517,7 @@ export default class Send extends PureComponent<Props, SendState> {
             </div>
           </ScrollPane>
 
-          <div className={styles.buttoncontainer}>
+          <div className={cstyles.center}>
             <button
               type="button"
               disabled={!sendButtonEnabled}
