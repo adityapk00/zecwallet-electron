@@ -64,17 +64,17 @@ export default class AddressBook extends Component<Props, State> {
     const { currentAddress } = this.state;
     this.setState({ currentLabel });
 
-    const { labelIsValid, addressIsValid } = this.validate(currentLabel, currentAddress);
-    this.setAddButtonEnabled(labelIsValid && addressIsValid);
+    const { labelError, addressIsValid } = this.validate(currentLabel, currentAddress);
+    this.setAddButtonEnabled(!labelError && addressIsValid && currentLabel !== '' && currentAddress !== '');
   };
 
   updateAddress = (currentAddress: string) => {
     const { currentLabel } = this.state;
     this.setState({ currentAddress });
 
-    const { labelIsValid, addressIsValid } = this.validate(currentLabel, currentAddress);
+    const { labelError, addressIsValid } = this.validate(currentLabel, currentAddress);
 
-    this.setAddButtonEnabled(labelIsValid && addressIsValid);
+    this.setAddButtonEnabled(!labelError && addressIsValid && currentLabel !== '' && currentAddress !== '');
   };
 
   addButtonClicked = () => {
@@ -94,7 +94,9 @@ export default class AddressBook extends Component<Props, State> {
 
     let labelError = addressBook.find(i => i.label === currentLabel) ? 'Duplicate Label' : null;
     labelError = currentLabel.length > 12 ? 'Label is too long' : labelError;
-    const addressIsValid = Utils.isZaddr(currentAddress) || Utils.isTransparent(currentAddress);
+
+    const addressIsValid =
+      currentAddress === '' || Utils.isZaddr(currentAddress) || Utils.isTransparent(currentAddress);
 
     return { labelError, addressIsValid };
   };
