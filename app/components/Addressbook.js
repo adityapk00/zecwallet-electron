@@ -58,6 +58,9 @@ export default class AddressBook extends Component<Props, State> {
   }
 
   updateLabel = (currentLabel: string) => {
+    // Don't update the field if it is longer than 20 chars
+    if (currentLabel.length > 20) return;
+
     const { currentAddress } = this.state;
     this.setState({ currentLabel });
 
@@ -89,17 +92,18 @@ export default class AddressBook extends Component<Props, State> {
   validate = (currentLabel, currentAddress) => {
     const { addressBook } = this.props;
 
-    const labelIsValid = !addressBook.find(i => i.label === currentLabel);
+    let labelError = addressBook.find(i => i.label === currentLabel) ? 'Duplicate Label' : null;
+    labelError = currentLabel.length > 12 ? 'Label is too long' : labelError;
     const addressIsValid = Utils.isZaddr(currentAddress) || Utils.isTransparent(currentAddress);
 
-    return { labelIsValid, addressIsValid };
+    return { labelError, addressIsValid };
   };
 
   render() {
     const { addressBook, removeAddressBookEntry, setSendTo } = this.props;
     const { currentLabel, currentAddress, addButtonEnabled } = this.state;
 
-    const { labelIsValid, addressIsValid } = this.validate(currentLabel, currentAddress);
+    const { labelError, addressIsValid } = this.validate(currentLabel, currentAddress);
 
     return (
       <div>
@@ -110,10 +114,10 @@ export default class AddressBook extends Component<Props, State> {
             <div className={[cstyles.flexspacebetween].join(' ')}>
               <div className={cstyles.sublight}>Label</div>
               <div className={cstyles.validationerror}>
-                {labelIsValid ? (
+                {!labelError ? (
                   <i className={[cstyles.green, 'fas', 'fa-check'].join(' ')} />
                 ) : (
-                  <span className={cstyles.red}>Duplicate Label</span>
+                  <span className={cstyles.red}>{labelError}</span>
                 )}
               </div>
             </div>
