@@ -283,6 +283,7 @@
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0",
     "source-map-support": "^0.5.16",
+    "string-hex": "^1.0.0",
     "underscore": "^1.9.2"
   },
   "devEngines": {

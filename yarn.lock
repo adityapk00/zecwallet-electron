@@ -13580,6 +13580,11 @@ string-argv@^0.3.0:
   resolved "https://registry.yarnpkg.com/string-argv/-/string-argv-0.3.1.tgz#95e2fbec0427ae19184935f816d74aaa4c5c19da"
   integrity sha512-a1uQGz7IyVy9YwhqjZIZu1c8JO8dNIe20xBmSS6qu9kv++k3JGzCVmprbNN5Kn+BgzD5E7YYwg1CcjuJMRNsvg==
 
+string-hex@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/string-hex/-/string-hex-1.0.0.tgz#ff14ff039e750d3bceba16543f5bdd6d4c8a6dda"
+  integrity sha512-BVj+jcFkid8p2hDu96wRks4U3Dz/OfPnNR4vmABQqVIZgeSRAXYB5/zGrYT/8QhGhcEi/fMnjtLDz0rcJ5pEIQ==
+
 string-length@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/string-length/-/string-length-2.0.0.tgz#d40dbb686a3ace960c1cffca562bf2c45f8363ed"

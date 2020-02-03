@@ -8,6 +8,7 @@ import React, { PureComponent } from 'react';
 import Modal from 'react-modal';
 import Select from 'react-select';
 import escape from 'escape-html';
+import hex from 'string-hex';
 import styles from './Send.css';
 import cstyles from './Common.css';
 import { ToAddr, AddressBalance, SendPageState, Info, AddressBookEntry } from './AppState';
@@ -126,10 +127,13 @@ function getSendManyJSON(sendPageState: SendPageState): [] {
   json.push(sendPageState.fromaddr);
   json.push(
     sendPageState.toaddrs.map(to => {
-      return { address: to.to, amount: to.amount };
+      const memo = to.memo ? hex(to.memo) : '';
+      return { address: to.to, amount: to.amount, memo };
     })
   );
 
+  console.log('Sending:');
+  console.log(json);
   return json;
 }
 
