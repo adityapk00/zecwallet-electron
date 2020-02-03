@@ -107,7 +107,7 @@ const TxItemBlock = ({ transaction, currencyName, zecPrice, txClicked }) => {
   );
 };
 
-const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
+const TxModal = ({ modalIsOpen, tx, closeModal, currencyName, zecPrice }) => {
   let txid = '';
   let type = '';
   let typeIcon = '';
@@ -153,7 +153,11 @@ const TxModal = ({ modalIsOpen, tx, closeModal, currencyName }) => {
 
         <div className={[cstyles.center].join(' ')}>
           {type}
-          <BalanceBlockHighlight zecValue={amount} usdValue={12.12} currencyName={currencyName} />
+          <BalanceBlockHighlight
+            zecValue={amount}
+            usdValue={Utils.getZecToUsdString(zecPrice, Math.abs(amount))}
+            currencyName={currencyName}
+          />
         </div>
 
         <div className={[cstyles.flexspacebetween].join(' ')}>
@@ -306,6 +310,7 @@ export default class Home extends Component<Props, State> {
           tx={clickedTx}
           closeModal={this.closeModal}
           currencyName={info.currencyName}
+          zecPrice={info.zecPrice}
         />
       </div>
     );

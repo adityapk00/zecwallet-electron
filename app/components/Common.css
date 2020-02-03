@@ -38,6 +38,10 @@
   font-size: 24px;
 }
 
+.normal {
+  font-size: 16px;
+}
+
 .small {
   font-size: 14px;
 }
@@ -52,6 +56,10 @@
 
 .center {
   text-align: center;
+}
+
+.right {
+  text-align: right;
 }
 
 .red {

@@ -16,10 +16,11 @@ import Utils from '../utils/utils';
 import { AddressBalance, Info, ReceivePageState } from './AppState';
 import ScrollPane from './ScrollPane';
 
-const AddressBlock = ({ addressBalance, currencyName, privateKey, getSinglePrivateKey }) => {
+const AddressBlock = ({ addressBalance, currencyName, zecPrice, privateKey, getSinglePrivateKey }) => {
   const { address } = addressBalance;
 
   const [copied, setCopied] = useState(false);
+  const balance = addressBalance.balance || 0;
 
   return (
     <AccordionItem key={copied} className={[cstyles.well, styles.receiveblock].join(' ')} uuid={address}>
@@ -60,8 +61,9 @@ const AddressBlock = ({ addressBalance, currencyName, privateKey, getSinglePriva
             </div>
             <div className={[cstyles.sublight, cstyles.margintoplarge].join(' ')}>Funds</div>
             <div className={[cstyles.padtopsmall].join(' ')}>
-              {currencyName} {addressBalance.balance || 0}
+              {currencyName} {balance}
             </div>
+            <div className={[cstyles.padtopsmall].join(' ')}>{Utils.getZecToUsdString(zecPrice, balance)}</div>
             <div className={[cstyles.margintoplarge, cstyles.breakword].join(' ')}>
               {privateKey && (
                 <div>
@@ -164,6 +166,7 @@ export default class Receive extends Component<Props> {
                       key={a.address}
                       addressBalance={a}
                       currencyName={info.currencyName}
+                      zecPrice={info.zecPrice}
                       privateKey={addressPrivateKeys[a.address]}
                       getSinglePrivateKey={getSinglePrivateKey}
                       rerender={this.rerender}
@@ -190,6 +193,7 @@ export default class Receive extends Component<Props> {
                       key={a.address}
                       addressBalance={a}
                       currencyName={info.currencyName}
+                      zecPrice={info.zecPrice}
                       privateKey={addressPrivateKeys[a.address]}
                       getSinglePrivateKey={getSinglePrivateKey}
                       rerender={this.rerender}

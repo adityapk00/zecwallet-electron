@@ -138,13 +138,16 @@ const ConfirmModalToAddr = ({ toaddr, info }) => {
         <div className={[cstyles.small, cstyles.fixedfont, styles.confirmModalAddress].join(' ')}>
           {Utils.splitStringIntoChunks(toaddr.to, 6).join(' ')}
         </div>
-        <div className={cstyles.large}>
-          <div>
-            <span>
-              {info.currencyName} {bigPart}
-            </span>
-            <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
+        <div className={[cstyles.verticalflex, cstyles.right].join(' ')}>
+          <div className={cstyles.large}>
+            <div>
+              <span>
+                {info.currencyName} {bigPart}
+              </span>
+              <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
+            </div>
           </div>
+          <div>{Utils.getZecToUsdString(info.zecPrice, toaddr.amount)}</div>
         </div>
       </div>
       <div className={cstyles.sublight}>{memo}</div>
@@ -209,11 +212,15 @@ const ConfirmModal = ({
             ].join(' ')}
           >
             <div>Total</div>
-            <div>
-              <span>
-                {info.currencyName} {bigPart}
-              </span>
-              <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
+            <div className={[cstyles.right, cstyles.verticalflex].join(' ')}>
+              <div>
+                <span>
+                  {info.currencyName} {bigPart}
+                </span>
+                <span className={[cstyles.small, styles.zecsmallpart].join(' ')}>{smallPart}</span>
+              </div>
+
+              <div className={cstyles.normal}>{Utils.getZecToUsdString(info.zecPrice, sendingTotal)}</div>
             </div>
           </div>
         </div>
