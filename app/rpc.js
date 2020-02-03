@@ -86,8 +86,8 @@ export default class RPC {
     }
   }
 
-  setupNextFetch() {
-    this.refreshTimerID = setTimeout(() => this.refresh(), 20000);
+  setupNextFetch(lastBlockHeight: number) {
+    this.refreshTimerID = setTimeout(() => this.refresh(lastBlockHeight), 20000);
   }
 
   static async doRPC(method: string, params: [], rpcConfig: RPCConfig) {
@@ -122,22 +122,28 @@ export default class RPC {
     return response;
   }
 
-  async refresh() {
-    const balP = this.fetchTotalBalance();
-    const abP = this.fetchTandZAddressesWithBalances();
-    const txns = this.fetchTandZTransactions();
-    const addrs = this.fetchAllAddresses();
-    const info = this.fetchInfo();
+  async refresh(lastBlockHeight: number) {
+    const latestBlockHeight = await this.fetchInfo();
 
-    await balP;
-    await abP;
-    await txns;
-    await addrs;
-    await info;
+    if (!lastBlockHeight || lastBlockHeight < latestBlockHeight) {
+      const balP = this.fetchTotalBalance();
+      const abP = this.fetchTandZAddressesWithBalances();
+      const txns = this.fetchTandZTransactions();
+      const addrs = this.fetchAllAddresses();
 
-    // All done, set up next fetch
-    console.log('All done, setting up next fetch');
-    this.setupNextFetch();
+      await balP;
+      await abP;
+      await txns;
+      await addrs;
+
+      // All done, set up next fetch
+      console.log(`Finished full refresh at ${latestBlockHeight}`);
+    } else {
+      // Still at the latest block
+      console.log('Already have latest block, waiting for next refresh');
+    }
+
+    this.setupNextFetch(latestBlockHeight);
   }
 
   // Special method to ge the Info object. This is used both internally and by the Loading screen
@@ -161,10 +167,12 @@ export default class RPC {
     return info;
   }
 
-  async fetchInfo() {
+  async fetchInfo(): number {
     const info = await RPC.getInfoObject(this.rpcConfig);
 
     this.fnSetInfo(info);
+
+    return info.latestBlock;
   }
 
   // This method will get the total balances
