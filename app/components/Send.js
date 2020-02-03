@@ -37,7 +37,7 @@ const ToAddrBox = ({
 }) => {
   const isMemoDisabled = !Utils.isZaddr(toaddr.to);
 
-  const addressIsValid = Utils.isZaddr(toaddr.to) || Utils.isTransparent(toaddr.to);
+  const addressIsValid = toaddr.to === '' || Utils.isZaddr(toaddr.to) || Utils.isTransparent(toaddr.to);
   const memoIsValid = toaddr.memo.length <= 512;
 
   let amountError = null;
