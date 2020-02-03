@@ -38,18 +38,23 @@ export default class MenuBuilder {
   }
 
   buildDarwinTemplate() {
+    const { mainWindow } = this;
+
     const subMenuAbout = {
       label: 'Electron',
       submenu: [
         {
-          label: 'About ElectronReact',
-          selector: 'orderFrontStandardAboutPanel:'
+          label: 'About Zecwallet Fullnode',
+          selector: 'orderFrontStandardAboutPanel:',
+          click: () => {
+            mainWindow.webContents.send('about');
+          }
         },
         { type: 'separator' },
         { label: 'Services', submenu: [] },
         { type: 'separator' },
         {
-          label: 'Hide ElectronReact',
+          label: 'Hide Zecwallet Fullnode',
           accelerator: 'Command+H',
           selector: 'hide:'
         },
@@ -234,6 +239,12 @@ export default class MenuBuilder {
       {
         label: 'Help',
         submenu: [
+          {
+            label: 'About Zecwallet Fullnode',
+            click: () => {
+              mainWindow.webContents.send('about');
+            }
+          },
           {
             label: 'Donate',
             click() {
