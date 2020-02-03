@@ -118,9 +118,9 @@ input[disabled] {
   display: block;
 }
 
-*,
-*::after,
-*::before {
+img,
+img::after,
+img::before {
   -webkit-user-select: none;
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;

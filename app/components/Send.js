@@ -56,7 +56,14 @@ const ToAddrBox = ({
     }
   }
 
-  if (!addressIsValid || amountError || !memoIsValid || toaddr.to === '' || toaddr.amount === 0 || fromAmount === 0) {
+  if (
+    !addressIsValid ||
+    amountError ||
+    !memoIsValid ||
+    toaddr.to === '' ||
+    parseFloat(toaddr.amount) === 0 ||
+    fromAmount === 0
+  ) {
     setSendButtonEnable(false);
   } else {
     setSendButtonEnable(true);
@@ -163,7 +170,7 @@ const ConfirmModalToAddr = ({ toaddr, info }) => {
           <div>{Utils.getZecToUsdString(info.zecPrice, toaddr.amount)}</div>
         </div>
       </div>
-      <div className={cstyles.sublight}>{memo}</div>
+      <div className={[cstyles.sublight, cstyles.breakword].join(' ')}>{memo}</div>
     </div>
   );
 };

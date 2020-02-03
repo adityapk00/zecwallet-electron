@@ -75,7 +75,7 @@
 }
 
 .breakword {
-  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 .primarybutton {
