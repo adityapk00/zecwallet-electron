@@ -6,7 +6,8 @@
 .sidebarmenuitem {
   height: 40px;
   padding: 10px;
-  font-size: 24px;
+  margin-left: 16px;
+  font-size: 20px;
 }
 
 .sidebarmenuitemactive {
