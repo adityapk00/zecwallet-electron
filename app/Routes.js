@@ -3,6 +3,7 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/no-unused-state */
 import React from 'react';
+import ReactModal from 'react-modal';
 import { Switch, Route } from 'react-router';
 import { ErrorModal, ErrorModalData } from './components/ErrorModal';
 import cstyles from './components/Common.css';
@@ -56,6 +57,9 @@ export default class RouteApp extends React.Component<Props, AppState> {
     // Create the initial ToAddr box
     // eslint-disable-next-line react/destructuring-assignment
     this.state.sendPageState.toaddrs = [new ToAddr(Utils.getNextToAddrID())];
+
+    // Set the Modal's app element
+    ReactModal.setAppElement('#root');
   }
 
   componentDidMount() {

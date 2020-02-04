@@ -25,7 +25,7 @@ const AddressBlock = ({ addressBalance, label, currencyName, zecPrice, privateKe
   return (
     <AccordionItem key={copied} className={[cstyles.well, styles.receiveblock].join(' ')} uuid={address}>
       <AccordionItemHeading>
-        <AccordionItemButton className={styles.accordionHeader}>{address}</AccordionItemButton>
+        <AccordionItemButton className={cstyles.accordionHeader}>{address}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel className={[styles.receiveDetail].join(' ')}>
         <div className={[cstyles.flex].join(' ')}>

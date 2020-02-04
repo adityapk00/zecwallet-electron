@@ -16,11 +16,3 @@
   padding: 8px;
   background-color: white;
 }
-
-.accordionHeader:hover {
-  cursor: pointer;
-}
-
-.accordionHeader:focus {
-  outline: none;
-}

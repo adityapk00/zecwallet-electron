@@ -1,6 +1,13 @@
 /* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import {
+  AccordionItemButton,
+  AccordionItem,
+  AccordionItemHeading,
+  AccordionItemPanel,
+  Accordion
+} from 'react-accessible-accordion';
 import styles from './Addressbook.css';
 import cstyles from './Common.css';
 import { AddressBookEntry } from './AppState';
@@ -11,28 +18,33 @@ import routes from '../constants/routes.json';
 // Internal because we're using withRouter just below
 const AddressBookItemInteral = ({ item, removeAddressBookEntry, setSendTo, history }) => {
   return (
-    <div className={[cstyles.verticalflex, styles.addressbookentry].join(' ')}>
-      <div className={[cstyles.flexspacebetween, cstyles.marginbottomsmall].join(' ')}>
-        <div>{item.label}</div>
-        <div>{item.address}</div>
-      </div>
-
-      <div className={[cstyles.well, styles.addressbookentrybuttons].join(' ')}>
-        <button
-          type="button"
-          className={cstyles.primarybutton}
-          onClick={() => {
-            setSendTo(item.address, null, null);
-            history.push(routes.SEND);
-          }}
-        >
-          Send To
-        </button>
-        <button type="button" className={cstyles.primarybutton} onClick={() => removeAddressBookEntry(item.label)}>
-          Delete
-        </button>
-      </div>
-    </div>
+    <AccordionItem key={item.label} className={[cstyles.well, cstyles.margintopsmall].join(' ')} uuid={item.label}>
+      <AccordionItemHeading>
+        <AccordionItemButton className={cstyles.accordionHeader}>
+          <div className={[cstyles.flexspacebetween].join(' ')}>
+            <div>{item.label}</div>
+            <div>{item.address}</div>
+          </div>
+        </AccordionItemButton>
+      </AccordionItemHeading>
+      <AccordionItemPanel>
+        <div className={[cstyles.well, styles.addressbookentrybuttons].join(' ')}>
+          <button
+            type="button"
+            className={cstyles.primarybutton}
+            onClick={() => {
+              setSendTo(item.address, null, null);
+              history.push(routes.SEND);
+            }}
+          >
+            Send To
+          </button>
+          <button type="button" className={cstyles.primarybutton} onClick={() => removeAddressBookEntry(item.label)}>
+            Delete
+          </button>
+        </div>
+      </AccordionItemPanel>
+    </AccordionItem>
   );
 };
 const AddressBookItem = withRouter(AddressBookItemInteral);
@@ -167,15 +179,18 @@ export default class AddressBook extends Component<Props, State> {
                 <div>Label</div>
                 <div>Address</div>
               </div>
-              {addressBook &&
-                addressBook.map(item => (
-                  <AddressBookItem
-                    key={item.label}
-                    item={item}
-                    removeAddressBookEntry={removeAddressBookEntry}
-                    setSendTo={setSendTo}
-                  />
-                ))}
+              {addressBook && (
+                <Accordion>
+                  {addressBook.map(item => (
+                    <AddressBookItem
+                      key={item.label}
+                      item={item}
+                      removeAddressBookEntry={removeAddressBookEntry}
+                      setSendTo={setSendTo}
+                    />
+                  ))}
+                </Accordion>
+              )}
             </div>
           </ScrollPane>
         </div>
