@@ -32,6 +32,7 @@ const ToAddrBox = ({
   toaddr,
   zecPrice,
   updateToField,
+  fromAddress,
   fromAmount,
   setMaxAmount,
   setSendButtonEnable,
@@ -70,6 +71,14 @@ const ToAddrBox = ({
   }
 
   const usdValue = Utils.getZecToUsdString(zecPrice, toaddr.amount);
+
+  const addReplyTo = () => {
+    if (toaddr.memo.endsWith(fromAddress)) {
+      return;
+    }
+
+    updateToField(toaddr.id, null, null, `${toaddr.memo}\nReply-To:\n${fromAddress}`);
+  };
 
   return (
     <div>
@@ -112,19 +121,29 @@ const ToAddrBox = ({
             onClick={() => setMaxAmount(toaddr.id, totalAmountAvailable)}
           />
         </div>
+
         <Spacer />
-        <div className={[cstyles.flexspacebetween].join(' ')}>
-          <div className={cstyles.sublight}>Memo</div>
-          <div className={cstyles.validationerror}>
-            {memoIsValid ? toaddr.memo.length : <span className={cstyles.red}>{toaddr.memo.length}</span>} / 512
+
+        {isMemoDisabled && <div className={cstyles.sublight}>Memos only for z-addresses</div>}
+
+        {!isMemoDisabled && (
+          <div>
+            <div className={[cstyles.flexspacebetween].join(' ')}>
+              <div className={cstyles.sublight}>Memo</div>
+              <div className={cstyles.validationerror}>
+                {memoIsValid ? toaddr.memo.length : <span className={cstyles.red}>{toaddr.memo.length}</span>} / 512
+              </div>
+            </div>
+            <TextareaAutosize
+              className={cstyles.inputbox}
+              value={toaddr.memo}
+              disabled={isMemoDisabled}
+              onChange={e => updateToField(toaddr.id, null, null, e)}
+            />
+            <input type="checkbox" onChange={e => e.target.checked && addReplyTo()} />
+            Include Reply-To address
           </div>
-        </div>
-        <TextareaAutosize
-          className={cstyles.inputbox}
-          value={isMemoDisabled ? '<Memos only for z-addresses>' : toaddr.memo}
-          disabled={isMemoDisabled}
-          onChange={e => updateToField(toaddr.id, null, null, e)}
-        />
+        )}
         <Spacer />
       </div>
       <Spacer />
@@ -351,7 +370,7 @@ export default class Send extends PureComponent<Props, SendState> {
     setSendPageState(newState);
   };
 
-  updateToField = (id: number, address: Event | null, amount: Event | null, memo: Event | null) => {
+  updateToField = (id: number, address: Event | null, amount: Event | null, memo: Event | string | null) => {
     const { sendPageState, setSendPageState } = this.props;
 
     const newToAddrs = sendPageState.toaddrs.slice(0);
@@ -368,8 +387,12 @@ export default class Send extends PureComponent<Props, SendState> {
     }
 
     if (memo) {
-      // $FlowFixMe
-      toAddr.memo = memo.target.value;
+      if (typeof memo === 'string') {
+        toAddr.memo = memo;
+      } else {
+        // $FlowFixMe
+        toAddr.memo = memo.target.value;
+      }
     }
 
     // Create the new state object
@@ -515,6 +538,7 @@ export default class Send extends PureComponent<Props, SendState> {
                   toaddr={toaddr}
                   zecPrice={info.zecPrice}
                   updateToField={this.updateToField}
+                  fromAddress={fromaddr.value}
                   fromAmount={totalAmountAvailable}
                   setMaxAmount={this.setMaxAmount}
                   setSendButtonEnable={this.setSendButtonEnable}

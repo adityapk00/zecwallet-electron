@@ -87,7 +87,7 @@ const TxItemBlock = ({ transaction, currencyName, zecPrice, txClicked, addressBo
                   {memo}
                 </div>
               </div>
-              <div className={[styles.txamount].join(' ')}>
+              <div className={[styles.txamount, cstyles.right].join(' ')}>
                 <div>
                   <span>
                     {currencyName} {bigPart}
@@ -268,7 +268,6 @@ export default class Home extends Component<Props, State> {
 
     return (
       <div>
-        <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Dashboard</div>
         <div className={[cstyles.well, styles.balancebox].join(' ')}>
           <BalanceBlockHighlight
             zecValue={totalBalance.total}

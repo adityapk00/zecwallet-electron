@@ -34,10 +34,12 @@ const AddressBlock = ({ addressBalance, label, currencyName, zecPrice, privateKe
           </div>
 
           <div className={[cstyles.verticalflex, cstyles.marginleft].join(' ')}>
+            {/*
             <div className={[cstyles.sublight].join(' ')}>Address</div>
             <div className={[cstyles.padtopsmall, cstyles.fixedfont].join(' ')}>
               {Utils.splitStringIntoChunks(address, 6).join(' ')}
             </div>
+            */}
 
             {label && (
               <div className={cstyles.margintoplarge}>
@@ -45,6 +47,26 @@ const AddressBlock = ({ addressBalance, label, currencyName, zecPrice, privateKe
                 <div className={[cstyles.padtopsmall, cstyles.fixedfont].join(' ')}>{label}</div>
               </div>
             )}
+
+            <div className={[cstyles.sublight, cstyles.margintoplarge].join(' ')}>Funds</div>
+            <div className={[cstyles.padtopsmall].join(' ')}>
+              {currencyName} {balance}
+            </div>
+            <div className={[cstyles.padtopsmall].join(' ')}>{Utils.getZecToUsdString(zecPrice, balance)}</div>
+
+            <div className={[cstyles.margintoplarge, cstyles.breakword].join(' ')}>
+              {privateKey && (
+                <div>
+                  <div className={[cstyles.sublight].join(' ')}>Private Key</div>
+                  <div
+                    className={[cstyles.breakword, cstyles.padtopsmall, cstyles.fixedfont].join(' ')}
+                    style={{ maxWidth: '600px' }}
+                  >
+                    {privateKey}
+                  </div>
+                </div>
+              )}
+            </div>
 
             <div>
               <button
@@ -66,26 +88,6 @@ const AddressBlock = ({ addressBalance, label, currencyName, zecPrice, privateKe
                 >
                   Export Private Key
                 </button>
-              )}
-            </div>
-
-            <div className={[cstyles.sublight, cstyles.margintoplarge].join(' ')}>Funds</div>
-            <div className={[cstyles.padtopsmall].join(' ')}>
-              {currencyName} {balance}
-            </div>
-            <div className={[cstyles.padtopsmall].join(' ')}>{Utils.getZecToUsdString(zecPrice, balance)}</div>
-
-            <div className={[cstyles.margintoplarge, cstyles.breakword].join(' ')}>
-              {privateKey && (
-                <div>
-                  <div className={[cstyles.sublight].join(' ')}>Private Key</div>
-                  <div
-                    className={[cstyles.breakword, cstyles.padtopsmall, cstyles.fixedfont].join(' ')}
-                    style={{ maxWidth: '600px' }}
-                  >
-                    {privateKey}
-                  </div>
-                </div>
               )}
             </div>
           </div>
