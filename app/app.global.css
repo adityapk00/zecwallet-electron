@@ -51,12 +51,6 @@ a {
   text-decoration: none;
 }
 
-a:hover {
-  opacity: 0.8;
-  text-decoration: none;
-  cursor: pointer;
-}
-
 input[disabled] {
   color: grey;
 }
@@ -125,6 +119,21 @@ img::before {
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;
   cursor: default;
+}
+
+a,
+a::after,
+a::before {
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+  -webkit-app-region: no-drag;
+  cursor: default;
+}
+
+a:hover {
+  opacity: 0.8;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 input[type='number']::-webkit-inner-spin-button,
