@@ -288,7 +288,7 @@ export default class Home extends Component<Props, State> {
           />
         </div>
         {/* Change the hardcoded height */}
-        <ScrollPane offsetHeight={250}>
+        <ScrollPane offsetHeight={200}>
           {/* If no transactions, show the "loading..." text */
           transactions.length === 0 && (
             <div className={[cstyles.center, cstyles.margintoplarge].join(' ')}>Loading...</div>
