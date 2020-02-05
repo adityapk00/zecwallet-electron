@@ -49,7 +49,7 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1600,
+    width: 1300,
     height: 728,
     minHeight: 500,
     minWidth: 1100,

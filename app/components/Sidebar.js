@@ -279,12 +279,14 @@ class Sidebar extends PureComponent<Props, State> {
             currentRoute={location.pathname}
             iconname="fa-address-book"
           />
+          {/*
           <SidebarMenuItem
             name="Settings"
             routeName={routes.SETTINGS}
             currentRoute={location.pathname}
             iconname="fa-cogs"
           />
+          */}
           <SidebarMenuItem
             name="zcashd"
             routeName={routes.ZCASHD}

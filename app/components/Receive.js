@@ -169,8 +169,6 @@ export default class Receive extends Component<Props> {
 
     return (
       <div>
-        <div className={[cstyles.xlarge, cstyles.padall, cstyles.center].join(' ')}>Receive</div>
-
         <div className={styles.receivecontainer}>
           <Tabs>
             <TabList>
@@ -180,7 +178,7 @@ export default class Receive extends Component<Props> {
 
             <TabPanel key={`z${rerenderKey}`}>
               {/* Change the hardcoded height */}
-              <ScrollPane offsetHeight={150}>
+              <ScrollPane offsetHeight={100}>
                 <Accordion preExpanded={[defaultZaddr]}>
                   {zaddrs.map(a => (
                     <AddressBlock
@@ -208,7 +206,7 @@ export default class Receive extends Component<Props> {
 
             <TabPanel key={`t${rerenderKey}`}>
               {/* Change the hardcoded height */}
-              <ScrollPane offsetHeight={150}>
+              <ScrollPane offsetHeight={100}>
                 <Accordion preExpanded={[defaultTaddr]}>
                   {taddrs.map(a => (
                     <AddressBlock

@@ -161,12 +161,6 @@ export default class MenuBuilder {
           click() {
             shell.openExternal('https://github.com/adityapk00/zecwallet-electron/issues');
           }
-        },
-        {
-          label: 'Search Issues',
-          click() {
-            shell.openExternal('https://github.com/atom/electron/issues');
-          }
         }
       ]
     };
@@ -261,12 +255,6 @@ export default class MenuBuilder {
             label: 'File a bug...',
             click() {
               shell.openExternal('https://github.com/adityapk00/zecwallet-electron/issues');
-            }
-          },
-          {
-            label: 'Search Issues',
-            click() {
-              shell.openExternal('https://github.com/atom/electron/issues');
             }
           }
         ]

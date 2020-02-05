@@ -74,7 +74,7 @@ input[disabled] {
   list-style: none;
   padding: 6px 12px;
   cursor: pointer;
-  font-size: 24px;
+  font-size: 16px;
 }
 
 .react-tabs__tab--selected {
