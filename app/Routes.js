@@ -45,7 +45,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
       addressPrivateKeys: {},
       addresses: [],
       addressBook: [],
-      transactions: [],
+      transactions: null,
       sendPageState: new SendPageState(),
       receivePageState: new ReceivePageState(),
       rpcConfig: new RPCConfig(),

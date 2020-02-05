@@ -290,22 +290,25 @@ export default class Home extends Component<Props, State> {
         {/* Change the hardcoded height */}
         <ScrollPane offsetHeight={200}>
           {/* If no transactions, show the "loading..." text */
-          transactions.length === 0 && (
-            <div className={[cstyles.center, cstyles.margintoplarge].join(' ')}>Loading...</div>
+          !transactions && <div className={[cstyles.center, cstyles.margintoplarge].join(' ')}>Loading...</div>}
+
+          {transactions && transactions.length === 0 && (
+            <div className={[cstyles.center, cstyles.margintoplarge].join(' ')}>No Transactions Yet</div>
           )}
-          {transactions.map(t => {
-            const key = t.type + t.txid + t.address;
-            return (
-              <TxItemBlock
-                key={key}
-                transaction={t}
-                currencyName={info.currencyName}
-                zecPrice={info.zecPrice}
-                txClicked={this.txClicked}
-                addressBookMap={addressBookMap}
-              />
-            );
-          })}
+          {transactions &&
+            transactions.map(t => {
+              const key = t.type + t.txid + t.address;
+              return (
+                <TxItemBlock
+                  key={key}
+                  transaction={t}
+                  currencyName={info.currencyName}
+                  zecPrice={info.zecPrice}
+                  txClicked={this.txClicked}
+                  addressBookMap={addressBookMap}
+                />
+              );
+            })}
         </ScrollPane>
 
         <TxModal
