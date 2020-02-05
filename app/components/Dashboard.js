@@ -275,7 +275,7 @@ export default class Home extends Component<Props, State> {
             currencyName={info.currencyName}
           />
           <BalanceBlock
-            topLabel="Shileded"
+            topLabel="Shielded"
             zecValue={totalBalance.private}
             usdValue={Utils.getZecToUsdString(info.zecPrice, totalBalance.private)}
             currencyName={info.currencyName}

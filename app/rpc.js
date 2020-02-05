@@ -143,7 +143,7 @@ export default class RPC {
     this.setupNextFetch(latestBlockHeight);
   }
 
-  // Special method to ge the Info object. This is used both internally and by the Loading screen
+  // Special method to get the Info object. This is used both internally and by the Loading screen
   static async getInfoObject(rpcConfig: RPCConfig) {
     const infoResult = await RPC.doRPC('getinfo', [], rpcConfig);
 

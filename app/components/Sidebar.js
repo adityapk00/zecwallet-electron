@@ -206,7 +206,7 @@ class Sidebar extends PureComponent<Props, State> {
 
     const address = parsedUri.host;
     if (!address || !(Utils.isTransparent(address) || Utils.isZaddr(address))) {
-      openErrorModal(errTitle, <span>The address ${address} was not recongnized as a zcash address</span>);
+      openErrorModal(errTitle, <span>The address ${address} was not recognized as a Zcash address</span>);
       return;
     }
 
