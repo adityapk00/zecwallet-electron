@@ -147,7 +147,7 @@ export default class MenuBuilder {
         {
           label: 'Donate',
           click() {
-            //
+            mainWindow.webContents.send('donate');
           }
         },
         {
