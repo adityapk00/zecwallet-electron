@@ -394,12 +394,17 @@ export default class RPC {
     this.setupNextOpidSatusFetch();
   }
 
-  setupNextZecPriceRefresh() {
+  setupNextZecPriceRefresh(retryCount: number, timeout: number) {
     // Every hour
-    this.priceTimerID = setTimeout(() => this.getZecPrice(), 1000 * 60 * 60);
+    this.priceTimerID = setTimeout(() => this.getZecPrice(retryCount), timeout);
   }
 
-  async getZecPrice() {
+  async getZecPrice(retryCount: number) {
+    if (!retryCount) {
+      // eslint-disable-next-line no-param-reassign
+      retryCount = 0;
+    }
+
     try {
       const response = await new Promise((resolve, reject) => {
         axios('https://api.coinmarketcap.com/v1/ticker/', {
@@ -414,13 +419,23 @@ export default class RPC {
       const zecData = response.find(i => i.symbol.toUpperCase() === 'ZEC');
       if (zecData) {
         this.fnSetZecPrice(zecData.price_usd);
+        this.setupNextZecPriceRefresh(0, 1000 * 60 * 60); // Every hour
       } else {
         this.fnSetZecPrice(null);
+        let timeout = 1000 * 60; // 1 minute
+        if (retryCount > 5) {
+          timeout = 1000 * 60 * 60; // an hour later
+        }
+        this.setupNextZecPriceRefresh(retryCount + 1, timeout);
       }
     } catch (err) {
+      console.log(err);
       this.fnSetZecPrice(null);
+      let timeout = 1000 * 60; // 1 minute
+      if (retryCount > 5) {
+        timeout = 1000 * 60 * 60; // an hour later
+      }
+      this.setupNextZecPriceRefresh(retryCount + 1, timeout);
     }
-
-    this.setupNextZecPriceRefresh();
   }
 }
