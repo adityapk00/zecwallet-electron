@@ -28,11 +28,7 @@ const AddressBlock = ({ addressBalance, label, currencyName, zecPrice, privateKe
         <AccordionItemButton className={cstyles.accordionHeader}>{address}</AccordionItemButton>
       </AccordionItemHeading>
       <AccordionItemPanel className={[styles.receiveDetail].join(' ')}>
-        <div className={[cstyles.flex].join(' ')}>
-          <div>
-            <QRCode value={address} className={[styles.receiveQrcode].join(' ')} />
-          </div>
-
+        <div className={[cstyles.flexspacebetween].join(' ')}>
           <div className={[cstyles.verticalflex, cstyles.marginleft].join(' ')}>
             {/*
             <div className={[cstyles.sublight].join(' ')}>Address</div>
@@ -90,6 +86,9 @@ const AddressBlock = ({ addressBalance, label, currencyName, zecPrice, privateKe
                 </button>
               )}
             </div>
+          </div>
+          <div>
+            <QRCode value={address} className={[styles.receiveQrcode].join(' ')} />
           </div>
         </div>
       </AccordionItemPanel>

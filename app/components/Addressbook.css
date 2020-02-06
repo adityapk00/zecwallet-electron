@@ -36,8 +36,3 @@
 .addressbookentry:hover .addressbookentrybuttons {
   display: flex;
 }
-
-.tableheader {
-  margin: 8px;
-  border-bottom: solid 1px grey;
-}

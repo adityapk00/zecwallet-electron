@@ -179,7 +179,7 @@ const ConfirmModalToAddr = ({ toaddr, info }) => {
   return (
     <div className={cstyles.well}>
       <div className={[cstyles.flexspacebetween, cstyles.margintoplarge].join(' ')}>
-        <div className={[cstyles.small, cstyles.fixedfont, styles.confirmModalAddress].join(' ')}>
+        <div className={[styles.confirmModalAddress].join(' ')}>
           {Utils.splitStringIntoChunks(toaddr.to, 6).join(' ')}
         </div>
         <div className={[cstyles.verticalflex, cstyles.right].join(' ')}>

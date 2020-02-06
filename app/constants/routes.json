@@ -4,6 +4,7 @@
   "SEND": "/send",
   "RECEIVE": "/receive",
   "ADDRESSBOOK": "/addressbook",
+  "TRANSACTIONS": "/transactions",
   "SETTINGS": "/settings",
   "ZCASHD": "/zcashd"
 }

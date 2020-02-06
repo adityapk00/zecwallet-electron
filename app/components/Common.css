@@ -140,6 +140,10 @@
   padding: 4px;
 }
 
+.zecsmallpart {
+  padding-left: 2px;
+}
+
 .blackbg {
   background-color: #000;
 }
@@ -194,4 +198,9 @@
 
 .accordionHeader:focus {
   outline: none;
+}
+
+.tableheader {
+  margin: 8px;
+  border-bottom: solid 1px grey;
 }

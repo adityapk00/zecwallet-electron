@@ -259,7 +259,7 @@ class Sidebar extends PureComponent<Props, State> {
             name="Dashboard"
             routeName={routes.DASHBOARD}
             currentRoute={location.pathname}
-            iconname="fa-list"
+            iconname="fa-home"
           />
           <SidebarMenuItem
             name="Send"
@@ -272,6 +272,12 @@ class Sidebar extends PureComponent<Props, State> {
             routeName={routes.RECEIVE}
             currentRoute={location.pathname}
             iconname="fa-download"
+          />
+          <SidebarMenuItem
+            name="Transactions"
+            routeName={routes.TRANSACTIONS}
+            currentRoute={location.pathname}
+            iconname="fa-list"
           />
           <SidebarMenuItem
             name="Address Book"

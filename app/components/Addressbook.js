@@ -175,7 +175,7 @@ export default class AddressBook extends Component<Props, State> {
 
           <ScrollPane offsetHeight={300}>
             <div className={styles.addressbooklist}>
-              <div className={[cstyles.flexspacebetween, styles.tableheader, cstyles.sublight].join(' ')}>
+              <div className={[cstyles.flexspacebetween, cstyles.tableheader, cstyles.sublight].join(' ')}>
                 <div>Label</div>
                 <div>Address</div>
               </div>

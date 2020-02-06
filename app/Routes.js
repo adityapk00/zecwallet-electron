@@ -30,6 +30,7 @@ import Zcashd from './components/Zcashd';
 import AddressBook from './components/Addressbook';
 import AddressbookImpl from './utils/AddressbookImpl';
 import Sidebar from './components/Sidebar';
+import Transactions from './components/Transactions';
 
 type Props = {};
 
@@ -343,13 +344,12 @@ export default class RouteApp extends React.Component<Props, AppState> {
                 path={routes.DASHBOARD}
                 // eslint-disable-next-line react/jsx-props-no-spreading
                 render={() => (
-                  <Dashboard
-                    totalBalance={totalBalance}
-                    transactions={transactions}
-                    info={info}
-                    addressBook={addressBook}
-                  />
+                  <Dashboard totalBalance={totalBalance} info={info} addressesWithBalance={addressesWithBalance} />
                 )}
+              />
+              <Route
+                path={routes.TRANSACTIONS}
+                render={() => <Transactions transactions={transactions} info={info} addressBook={addressBook} />}
               />
               <Route path={routes.ZCASHD} render={() => <Zcashd info={info} />} />
               <Route
