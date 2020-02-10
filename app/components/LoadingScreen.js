@@ -3,10 +3,13 @@ import React, { Component } from 'react';
 import { Redirect } from 'react-router';
 import ini from 'ini';
 import fs from 'fs';
+import request from 'request';
+import progress from 'progress-stream';
 import os from 'os';
 import path from 'path';
 import { remote } from 'electron';
 import { spawn } from 'child_process';
+import { promisify } from 'util';
 import routes from '../constants/routes.json';
 import { RPCConfig, Info } from './AppState';
 import RPC from '../rpc';
@@ -26,6 +29,18 @@ const locateZcashConf = () => {
   }
 
   return path.join(remote.app.getPath('appData'), 'Zcash', 'zcash.conf');
+};
+
+const locateZcashParamsDir = () => {
+  if (os.platform() === 'darwin') {
+    return path.join(remote.app.getPath('appData'), 'ZcashParams');
+  }
+
+  if (os.platform() === 'linux') {
+    return path.join(remote.app.getPath('home'), '.zcash-params');
+  }
+
+  return path.join(remote.app.getPath('appData'), 'ZcashParams');
 };
 
 type Props = {
@@ -68,8 +83,87 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
   }
 
   componentDidMount() {
-    this.loadZcashConf(true);
+    (async () => {
+      const success = await this.ensureZcashParams();
+      if (success) {
+        await this.loadZcashConf(true);
+      }
+    })();
   }
+
+  download = (url, dest, name, cb) => {
+    const file = fs.createWriteStream(dest);
+    const sendReq = request.get(url);
+
+    // verify response code
+    sendReq.on('response', response => {
+      if (response.statusCode !== 200) {
+        return cb(`Response status was ${response.statusCode}`);
+      }
+
+      const totalSize = (parseInt(response.headers['content-length'], 10) / 1024 / 1024).toFixed(0);
+
+      const str = progress({ time: 1000 }, pgrs => {
+        this.setState({
+          currentStatus: `Downloading ${name}... (${(pgrs.transferred / 1024 / 1024).toFixed(0)} MB / ${totalSize} MB)`
+        });
+      });
+
+      sendReq.pipe(str).pipe(file);
+    });
+
+    // close() is async, call cb after close completes
+    file.on('finish', () => file.close(cb));
+
+    // check for request errors
+    sendReq.on('error', err => {
+      fs.unlink(dest);
+      return cb(err.message);
+    });
+
+    file.on('error', err => {
+      // Handle errors
+      fs.unlink(dest); // Delete the file async. (But we don't check the result)
+      return cb(err.message);
+    });
+  };
+
+  ensureZcashParams = async () => {
+    // Check if the zcash params dir exists and if the params files are present
+    const dir = locateZcashParamsDir();
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
+
+    // Check for the params
+    const params = [
+      { name: 'sapling-output.params', url: 'https://z.cash/downloads/sapling-output.params' },
+      { name: 'sapling-spend.params', url: 'https://z.cash/downloads/sapling-spend.params' },
+      { name: 'sprout-groth16.params', url: 'https://z.cash/downloads/sprout-groth16.params' }
+    ];
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < params.length; i++) {
+      const p = params[i];
+
+      const fileName = path.join(dir, p.name);
+      if (!fs.existsSync(fileName)) {
+        // Download and save this file
+        this.setState({ currentStatus: `Downloading ${p.name}...` });
+
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          await promisify(this.download)(p.url, fileName, p.name);
+        } catch (err) {
+          console.log(`error: ${err}`);
+          this.setState({ currentStatus: `Error downloading ${p.name}. The error was: ${err}` });
+          return false;
+        }
+      }
+    }
+
+    return true;
+  };
 
   async loadZcashConf(createIfMissing: boolean) {
     // Load the RPC config from zcash.conf file
