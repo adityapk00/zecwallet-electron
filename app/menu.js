@@ -74,6 +74,32 @@ export default class MenuBuilder {
         }
       ]
     };
+
+    const subMenuFile = {
+      label: 'File',
+      submenu: [
+        {
+          label: '&Pay URI',
+          accelerator: 'Ctrl+P',
+          click: () => {
+            mainWindow.webContents.send('payuri');
+          }
+        },
+        {
+          label: '&Import Private Keys',
+          click: () => {
+            mainWindow.webContents.send('import');
+          }
+        },
+        {
+          label: '&Export All Private Keys',
+          click: () => {
+            mainWindow.webContents.send('exportall');
+          }
+        }
+      ]
+    };
+
     const subMenuEdit = {
       label: 'Edit',
       submenu: [
@@ -167,7 +193,7 @@ export default class MenuBuilder {
 
     const subMenuView = process.env.NODE_ENV === 'development' ? subMenuViewDev : subMenuViewProd;
 
-    return [subMenuAbout, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
+    return [subMenuAbout, subMenuFile, subMenuEdit, subMenuView, subMenuWindow, subMenuHelp];
   }
 
   buildDefaultTemplate() {
@@ -182,6 +208,18 @@ export default class MenuBuilder {
             accelerator: 'Ctrl+P',
             click: () => {
               mainWindow.webContents.send('payuri');
+            }
+          },
+          {
+            label: '&Import Private Keys...',
+            click: () => {
+              mainWindow.webContents.send('import');
+            }
+          },
+          {
+            label: '&Export All Private Keys',
+            click: () => {
+              mainWindow.webContents.send('exportall');
             }
           },
           {

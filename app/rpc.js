@@ -164,6 +164,27 @@ export default class RPC {
     return info;
   }
 
+  async doImportPrivKey(key: string, rescan: boolean) {
+    // Z address
+    if (key.startsWith('SK') || key.startsWith('secret')) {
+      try {
+        const r = await RPC.doRPC('z_importkey', [key, rescan ? 'yes' : 'no'], this.rpcConfig);
+        console.log(r.result);
+        return '';
+      } catch (err) {
+        return err;
+      }
+    } else {
+      try {
+        const r = await RPC.doRPC('importprivkey', [key, 'imported', rescan], this.rpcConfig);
+        console.log(r.result);
+        return '';
+      } catch (err) {
+        return err;
+      }
+    }
+  }
+
   async fetchInfo(): number {
     const info = await RPC.getInfoObject(this.rpcConfig);
 

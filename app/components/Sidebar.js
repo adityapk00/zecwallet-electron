@@ -7,12 +7,59 @@ import Modal from 'react-modal';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 import { ipcRenderer } from 'electron';
+import TextareaAutosize from 'react-textarea-autosize';
 import styles from './Sidebar.css';
 import cstyles from './Common.css';
 import routes from '../constants/routes.json';
 import Logo from '../assets/img/logobig.gif';
 import { Info } from './AppState';
 import Utils from '../utils/utils';
+
+const ImportPrivKeyModal = ({ modalIsOpen, modalInput, setModalInput, closeModal, doImportPrivKeys }) => {
+  return (
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      className={cstyles.modal}
+      overlayClassName={cstyles.modalOverlay}
+    >
+      <div className={[cstyles.verticalflex].join(' ')}>
+        <div className={cstyles.marginbottomlarge} style={{ textAlign: 'center' }}>
+          Import Private Keys
+        </div>
+
+        <div className={cstyles.marginbottomlarge}>
+          Please paste your private keys here (transparent address or shielded address), one line per key.
+        </div>
+
+        <div className={cstyles.well} style={{ textAlign: 'center' }}>
+          <TextareaAutosize
+            className={cstyles.inputbox}
+            placeholder="Private Keys"
+            value={modalInput}
+            onChange={e => setModalInput(e.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className={cstyles.buttoncontainer}>
+        <button
+          type="button"
+          className={cstyles.primarybutton}
+          onClick={() => {
+            doImportPrivKeys();
+            closeModal();
+          }}
+        >
+          Import
+        </button>
+        <button type="button" className={cstyles.primarybutton} onClick={closeModal}>
+          Close
+        </button>
+      </div>
+    </Modal>
+  );
+};
 
 const PayURIModal = ({
   modalIsOpen,
@@ -96,13 +143,16 @@ const SidebarMenuItem = ({ name, routeName, currentRoute, iconname }) => {
 type Props = {
   info: Info,
   setSendTo: (address: string, amount: number | null, memo: string | null) => void,
+  importPrivKeys: (keys: string[]) => void,
   history: PropTypes.object.isRequired,
   openErrorModal: (title: string, body: string) => void
 };
 
 type State = {
   uriModalIsOpen: boolean,
-  uriModalInputValue: string | null
+  uriModalInputValue: string | null,
+  privKeyModalIsOpen: boolean,
+  privKeyInputValue: string | null
 };
 
 class Sidebar extends PureComponent<Props, State> {
@@ -165,11 +215,58 @@ class Sidebar extends PureComponent<Props, State> {
     ipcRenderer.on('payuri', (event, uri) => {
       this.openURIModal(uri);
     });
+
+    // Import Private Keys
+    ipcRenderer.on('import', () => {
+      this.openImportPrivKeyModal();
+    });
+
+    // Export all private keys
+    ipcRenderer.on('exportall', () => {
+      // Get all the addresses and run export key on each of them.
+    });
+  };
+
+  openImportPrivKeyModal = (defaultValue: string | null) => {
+    const privKeyInputValue = defaultValue || '';
+    this.setState({ privKeyModalIsOpen: true, privKeyInputValue });
+  };
+
+  setImprovPrivKeyInputValue = (privKeyInputValue: string) => {
+    this.setState({ privKeyInputValue });
+  };
+
+  closeImportPrivKeyModal = () => {
+    this.setState({ privKeyModalIsOpen: false });
   };
 
   openURIModal = (defaultValue: string | null) => {
-    const uriModalInputValue = defaultValue || '';
-    this.setState({ uriModalIsOpen: true, uriModalInputValue });
+    const privKeyInputValue = defaultValue || '';
+    this.setState({ privKeyModalIsOpen: true, privKeyInputValue });
+  };
+
+  doImportPrivKeys = () => {
+    const { importPrivKeys } = this.props;
+    const { privKeyInputValue } = this.state;
+
+    // eslint-disable-next-line no-control-regex
+    let keys = privKeyInputValue.split(new RegExp('[\n\r]+'));
+    if (!keys || keys.length === 0) {
+      this.openErrorModal('No Keys Imported', 'No keys were specified, so none were imported');
+      return;
+    }
+
+    // Filter out empty lines and clean up the private keys
+    keys = keys.filter(k => !(k.trim().startsWith('#') || k.trim().length === 0));
+
+    // Special case.
+    // Sometimes, when importing from a paperwallet or such, the key is split by newlines, and might have
+    // been pasted like that. So check to see if the whole thing is one big private key
+    if (Utils.isValidSaplingPrivateKey(keys.join(''))) {
+      keys = [keys.join('')];
+    }
+
+    importPrivKeys(keys);
   };
 
   setURIInputValue = (uriModalInputValue: string) => {
@@ -225,7 +322,7 @@ class Sidebar extends PureComponent<Props, State> {
 
   render() {
     const { location, info } = this.props;
-    const { uriModalIsOpen, uriModalInputValue } = this.state;
+    const { uriModalIsOpen, uriModalInputValue, privKeyModalIsOpen, privKeyInputValue } = this.state;
 
     let state = 'DISCONNECTED';
     let progress = 100;
@@ -240,6 +337,7 @@ class Sidebar extends PureComponent<Props, State> {
 
     return (
       <div>
+        {/* Payment URI Modal */}
         <PayURIModal
           modalInput={uriModalInputValue}
           setModalInput={this.setURIInputValue}
@@ -248,6 +346,15 @@ class Sidebar extends PureComponent<Props, State> {
           modalTitle="Pay URI"
           actionButtonName="Pay URI"
           actionCallback={this.payURI}
+        />
+
+        {/* Payment URI Modal */}
+        <ImportPrivKeyModal
+          modalIsOpen={privKeyModalIsOpen}
+          setModalInput={this.setImprovPrivKeyInputValue}
+          modalInput={privKeyInputValue}
+          closeModal={this.closeImportPrivKeyModal}
+          doImportPrivKeys={this.doImportPrivKeys}
         />
 
         <div className={[cstyles.center, styles.sidebarlogobg].join(' ')}>

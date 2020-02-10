@@ -156,6 +156,45 @@ export default class RouteApp extends React.Component<Props, AppState> {
     this.setState({ sendPageState });
   };
 
+  importPrivKeys = async (keys: string[]) => {
+    console.log(keys);
+
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < keys.length; i++) {
+      // The last doImport will take forever, because it will trigger the rescan. So, show
+      // the dialog. If the last one fails, there will be an error displayed anyways
+      if (i === keys.length - 1) {
+        this.openErrorModal(
+          'Key Import Started',
+          <span>
+            The import process for the private keys has started.
+            <br />
+            This will take a long time, upto 6 hours!
+            <br />
+            Please be patient!
+          </span>
+        );
+      }
+
+      // eslint-disable-next-line no-await-in-loop
+      const result = await this.rpc.doImportPrivKey(keys[i], i === keys.length - 1);
+      if (result !== '') {
+        this.openErrorModal(
+          'Failed to import key',
+          <span>
+            A private key failed to import.
+            <br />
+            The error was:
+            <br />
+            {result}
+          </span>
+        );
+
+        return;
+      }
+    }
+  };
+
   setSendTo = (address: string, amount: number | null, memo: string | null) => {
     // Clear the existing send page state and set up the new one
     const { sendPageState } = this.state;
@@ -295,7 +334,7 @@ export default class RouteApp extends React.Component<Props, AppState> {
         <div style={{ overflow: 'hidden' }}>
           {info && info.version && (
             <div className={cstyles.sidebarcontainer}>
-              <Sidebar info={info} setSendTo={this.setSendTo} {...standardProps} />
+              <Sidebar info={info} setSendTo={this.setSendTo} importPrivKeys={this.importPrivKeys} {...standardProps} />
             </div>
           )}
           <div className={cstyles.contentcontainer}>

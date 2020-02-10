@@ -24,6 +24,13 @@ export default class Utils {
     return addr.startsWith('t');
   }
 
+  static isValidSaplingPrivateKey(key: string): boolean {
+    return (
+      new RegExp('^secret-extended-key-test[0-9a-z]{278}$').test(key) ||
+      new RegExp('^secret-extended-key-main[0-9a-z]{278}$').test(key)
+    );
+  }
+
   // Convert to max 8 decimal places, and remove trailing zeros
   static maxPrecision(v: number): number {
     if (!v) return v;
