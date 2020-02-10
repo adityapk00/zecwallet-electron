@@ -14,6 +14,7 @@ import cstyles from './Common.css';
 import styles from './LoadingScreen.css';
 import { NO_CONNECTION } from '../utils/utils';
 import Logo from '../assets/img/logobig.gif';
+import zcashdlogo from '../assets/img/zcashdlogo.gif';
 
 const locateZcashConf = () => {
   if (os.platform() === 'darwin') {
@@ -33,6 +34,12 @@ type Props = {
 };
 
 class LoadingScreenState {
+  creatingZcashConf: boolean;
+
+  connectOverTor: boolean;
+
+  enableFastSync: boolean;
+
   currentStatus: string;
 
   loadingDone: boolean;
@@ -45,6 +52,7 @@ class LoadingScreenState {
 
   constructor() {
     this.currentStatus = 'Loading...';
+    this.creatingZcashConf = false;
     this.loadingDone = false;
     this.zcashdSpawned = 0;
     this.getinfoRetryCount = 0;
@@ -60,29 +68,70 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
   }
 
   componentDidMount() {
-    (async () => {
-      // Load the RPC config from zcash.conf file
-      const zcashLocation = locateZcashConf();
-      const confValues = ini.parse(await fs.promises.readFile(zcashLocation, { encoding: 'utf-8' }));
-
-      // Get the username and password
-      const rpcConfig = new RPCConfig();
-      rpcConfig.username = confValues.rpcuser;
-      rpcConfig.password = confValues.rpcpassword;
-
-      const isTestnet = (confValues.testnet && confValues.testnet === 1) || false;
-      const server = confValues.rpcbind || '127.0.0.1';
-      const port = confValues.rpcport || (isTestnet ? '18232' : '8232');
-      rpcConfig.url = `http://${server}:${port}`;
-
-      this.setState({ rpcConfig });
-
-      // And setup the next getinfo
-      this.setupNextGetInfo();
-    })();
+    this.loadZcashConf(true);
   }
 
-  async startZcashd() {
+  async loadZcashConf(createIfMissing: boolean) {
+    // Load the RPC config from zcash.conf file
+    const zcashLocation = locateZcashConf();
+    let confValues;
+    try {
+      confValues = ini.parse(await fs.promises.readFile(zcashLocation, { encoding: 'utf-8' }));
+    } catch (err) {
+      if (createIfMissing) {
+        this.setState({ creatingZcashConf: true });
+        return;
+      }
+
+      this.setState({
+        currentStatus: 'Could not create zcash.conf. This is a bug, please file an issue with Zecwallet'
+      });
+      return;
+    }
+
+    // Get the username and password
+    const rpcConfig = new RPCConfig();
+    rpcConfig.username = confValues.rpcuser;
+    rpcConfig.password = confValues.rpcpassword;
+
+    const isTestnet = (confValues.testnet && confValues.testnet === 1) || false;
+    const server = confValues.rpcbind || '127.0.0.1';
+    const port = confValues.rpcport || (isTestnet ? '18232' : '8232');
+    rpcConfig.url = `http://${server}:${port}`;
+
+    this.setState({ rpcConfig });
+
+    // And setup the next getinfo
+    this.setupNextGetInfo();
+  }
+
+  createZcashconf = async () => {
+    const { connectOverTor, enableFastSync } = this.state;
+
+    const zcashConfPath = await locateZcashConf();
+
+    let confContent = '';
+    confContent += 'server=1\n';
+    confContent += 'rpcuser=zecwallet\n';
+    confContent += `rpcpassword=${Math.random()
+      .toString(36)
+      .substring(2, 15)}\n`;
+
+    if (connectOverTor) {
+      confContent += 'proxy=127.0.0.1:9050\n';
+    }
+
+    if (enableFastSync) {
+      confContent += 'ibdskiptxverification=1\n';
+    }
+
+    await fs.promises.writeFile(zcashConfPath, confContent);
+
+    this.setState({ creatingZcashConf: false });
+    this.loadZcashConf();
+  };
+
+  startZcashd = async () => {
     const { zcashdSpawned } = this.state;
 
     if (zcashdSpawned) {
@@ -114,7 +163,7 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
     remote.getCurrentWindow().on('close', () => {
       zcashd.kill();
     });
-  }
+  };
 
   setupNextGetInfo() {
     setTimeout(() => this.getInfo(), 1000);
@@ -154,7 +203,15 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
 
       if (err === NO_CONNECTION && zcashdSpawned && getinfoRetryCount >= 10) {
         // Give up
-        this.setState({ currentStatus: 'Failed to start zcashd. Giving up!' });
+        this.setState({
+          currentStatus: (
+            <span>
+              Failed to start zcashd. Giving up!
+              <br />
+              Please file an issue with Zecwallet
+            </span>
+          )
+        });
       }
 
       if (err !== NO_CONNECTION) {
@@ -163,17 +220,71 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
     }
   }
 
+  handleEnableFastSync = event => {
+    this.setState({ enableFastSync: event.target.checked });
+  };
+
+  handleTorEnabled = event => {
+    this.setState({ connectOverTor: event.target.checked });
+  };
+
   render() {
-    const { loadingDone, currentStatus } = this.state;
+    const { loadingDone, currentStatus, creatingZcashConf, connectOverTor, enableFastSync } = this.state;
 
     // If still loading, show the status
     if (!loadingDone) {
       return (
-        <div className={[cstyles.verticalflex, cstyles.center, styles.loadingcontainer].join(' ')}>
-          <div style={{ marginTop: '100px' }}>
-            <img src={Logo} width="200px;" alt="Logo" />
-          </div>
-          <div>{currentStatus}</div>
+        <div className={[cstyles.center, styles.loadingcontainer].join(' ')}>
+          {!creatingZcashConf && (
+            <div className={cstyles.verticalflex}>
+              <div style={{ marginTop: '100px' }}>
+                <img src={Logo} width="200px;" alt="Logo" />
+              </div>
+              <div>{currentStatus}</div>
+            </div>
+          )}
+
+          {creatingZcashConf && (
+            <div>
+              <div className={cstyles.verticalflex}>
+                <div style={{ marginTop: '100px' }}>
+                  <img src={zcashdlogo} width="400px" alt="zcashdlogo" />
+                </div>
+
+                <div className={cstyles.left} style={{ width: '75%', marginLeft: '15%' }}>
+                  <div className={cstyles.margintoplarge} />
+                  <div className={[cstyles.verticalflex].join(' ')}>
+                    <div>
+                      <input type="checkbox" onChange={this.handleTorEnabled} defaultChecked={connectOverTor} />
+                      &nbsp; Connect over Tor
+                    </div>
+                    <div className={cstyles.sublight}>
+                      Will connect over Tor. Please make sure you have the Tor client installed and listening on port
+                      9050.
+                    </div>
+                  </div>
+
+                  <div className={cstyles.margintoplarge} />
+                  <div className={[cstyles.verticalflex].join(' ')}>
+                    <div>
+                      <input type="checkbox" onChange={this.handleEnableFastSync} defaultChecked={enableFastSync} />
+                      &nbsp; Enable Fast Sync
+                    </div>
+                    <div className={cstyles.sublight}>
+                      When enabled, Zecwallet will skip some expensive verifications of the zcashd blockchain when
+                      downloading. This option is safe to use if you are creating a brand new wallet.
+                    </div>
+                  </div>
+                </div>
+
+                <div className={cstyles.buttoncontainer}>
+                  <button type="button" className={cstyles.primarybutton} onClick={this.createZcashconf}>
+                    Start Zcash
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       );
     }
