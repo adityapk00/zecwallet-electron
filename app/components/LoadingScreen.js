@@ -31,6 +31,22 @@ const locateZcashConf = () => {
   return path.join(remote.app.getPath('appData'), 'Zcash', 'zcash.conf');
 };
 
+const locateZcashd = () => {
+  const con = remote.getGlobal('console');
+  con.log(`App path = ${remote.app.getAppPath()}`);
+  con.log(`Unified = ${path.join(remote.app.getAppPath(), '..', 'bin', 'linux', 'zcashd')}`);
+
+  if (os.platform() === 'darwin') {
+    return path.join(remote.app.getAppPath(), 'resources', 'bin', 'mac', 'zcashd');
+  }
+
+  if (os.platform() === 'linux') {
+    return path.join(remote.app.getAppPath(), '..', 'bin', 'linux', 'zcashd');
+  }
+
+  return path.join(remote.app.getAppPath(), 'resources', 'bin', 'win', 'zcashd.exe');
+};
+
 const locateZcashParamsDir = () => {
   if (os.platform() === 'darwin') {
     return path.join(remote.app.getPath('appData'), 'ZcashParams');
@@ -233,7 +249,7 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
       return;
     }
 
-    const program = path.join(remote.app.getAppPath(), 'zcashd');
+    const program = locateZcashd();
     console.log(program);
 
     const zcashd = spawn(program);

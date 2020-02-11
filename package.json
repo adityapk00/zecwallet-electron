@@ -82,18 +82,48 @@
       ]
     },
     "win": {
+      "icon": "./resources/icon.ico",
+      "extraFiles": [
+        {
+          "from": "bin/win",
+          "to": "resources/bin/win",
+          "filter": ["**/**"]
+        }
+      ],
       "target": [
-        "nsis",
-        "msi"
+        "zip"
+      ]
+    },
+    "mac" : {
+      "category": "public.app-category.productivity",
+      "type": "distribution",
+      "target": [
+        "dmg"
+      ],
+      "icon": "./resources/icon.icns",
+      "extraFiles": [
+        {
+          "from": "bin/mac",
+          "to": "resources/bin/mac",
+          "filter": [
+            "**/*"
+          ]
+        }
       ]
     },
     "linux": {
-      "target": [
-        "deb",
-        "rpm",
-        "AppImage"
+      "category": "Development",
+      "icon": "./resources/icon.png",
+      "extraFiles": [
+        {
+          "from": "bin/linux",
+          "to": "resources/bin/linux",
+          "filter": ["**/**"]
+        }
       ],
-      "category": "Development"
+      "target": [
+        "zip"
+      ]
     },
     "directories": {
       "buildResources": "resources",
