@@ -32,19 +32,19 @@ const locateZcashConf = () => {
 };
 
 const locateZcashd = () => {
-  const con = remote.getGlobal('console');
-  con.log(`App path = ${remote.app.getAppPath()}`);
-  con.log(`Unified = ${path.join(remote.app.getAppPath(), '..', 'bin', 'linux', 'zcashd')}`);
+  // const con = remote.getGlobal('console');
+  // con.log(`App path = ${remote.app.getAppPath()}`);
+  // con.log(`Unified = ${path.join(remote.app.getAppPath(), '..', 'bin', 'mac', 'zcashd')}`);
 
   if (os.platform() === 'darwin') {
-    return path.join(remote.app.getAppPath(), 'resources', 'bin', 'mac', 'zcashd');
+    return path.join(remote.app.getAppPath(), '..', 'bin', 'mac', 'zcashd');
   }
 
   if (os.platform() === 'linux') {
     return path.join(remote.app.getAppPath(), '..', 'bin', 'linux', 'zcashd');
   }
 
-  return path.join(remote.app.getAppPath(), 'resources', 'bin', 'win', 'zcashd.exe');
+  return path.join(remote.app.getAppPath(), '..', 'bin', 'win', 'zcashd.exe');
 };
 
 const locateZcashParamsDir = () => {
