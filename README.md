@@ -4,6 +4,6 @@
 Install nodejs, git and yarn
 
 ### Running
-git clone https://github.com/adityapk00/zecwallet-electron
-yarn install 
-yarn dev
+1. git clone https://github.com/adityapk00/zecwallet-electron
+2. yarn install 
+3. yarn dev
