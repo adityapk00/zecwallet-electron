@@ -32,8 +32,6 @@ export default class RPC {
 
   fnSetAllAddresses: (string[]) => void;
 
-  fnSetSinglePrivateKey: (string, string) => void;
-
   // This function is not set via a constructor, but via the sendTransaction method
   fnOpenSendErrorModal: (string, string) => void;
 
@@ -52,7 +50,6 @@ export default class RPC {
     fnSetAddressesWithBalance: (AddressBalance[]) => void,
     fnSetTransactionsList: (Transaction[]) => void,
     fnSetAllAddresses: (string[]) => void,
-    fnSetSinglePrivateKey: (string, string) => void,
     fnSetInfo: Info => void,
     fnSetZecPrice: number => void
   ) {
@@ -60,7 +57,6 @@ export default class RPC {
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
     this.fnSetTransactionsList = fnSetTransactionsList;
     this.fnSetAllAddresses = fnSetAllAddresses;
-    this.fnSetSinglePrivateKey = fnSetSinglePrivateKey;
     this.fnSetInfo = fnSetInfo;
     this.fnSetZecPrice = fnSetZecPrice;
 
@@ -218,8 +214,7 @@ export default class RPC {
     }
   }
 
-  // Fetch a private key for either a t or a z address
-  async fetchPrivateKey(address: string) {
+  async getPrivKeyAsString(address: string): string {
     let method = '';
     if (Utils.isZaddr(address)) {
       method = 'z_exportkey';
@@ -229,7 +224,7 @@ export default class RPC {
 
     const response = await RPC.doRPC(method, [address], this.rpcConfig);
 
-    this.fnSetSinglePrivateKey(address, response.result);
+    return response.result;
   }
 
   // Fetch all addresses and their associated balances

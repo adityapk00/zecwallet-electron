@@ -15,6 +15,37 @@ import Logo from '../assets/img/logobig.gif';
 import { Info } from './AppState';
 import Utils from '../utils/utils';
 
+const ExportPrivKeyModal = ({ modalIsOpen, exportedPrivKeys, closeModal }) => {
+  return (
+    <Modal
+      isOpen={modalIsOpen}
+      onRequestClose={closeModal}
+      className={cstyles.modal}
+      overlayClassName={cstyles.modalOverlay}
+    >
+      <div className={[cstyles.verticalflex].join(' ')}>
+        <div className={cstyles.marginbottomlarge} style={{ textAlign: 'center' }}>
+          Your Wallet Private Keys
+        </div>
+
+        <div className={[cstyles.marginbottomlarge, cstyles.center].join(' ')}>
+          These are all the private keys in your wallet. Please store them carefully!
+        </div>
+
+        {exportedPrivKeys && (
+          <TextareaAutosize value={exportedPrivKeys.join('\n')} className={styles.exportedPrivKeys} disabled />
+        )}
+      </div>
+
+      <div className={cstyles.buttoncontainer}>
+        <button type="button" className={cstyles.primarybutton} onClick={closeModal}>
+          Close
+        </button>
+      </div>
+    </Modal>
+  );
+};
+
 const ImportPrivKeyModal = ({ modalIsOpen, modalInput, setModalInput, closeModal, doImportPrivKeys }) => {
   return (
     <Modal
@@ -142,7 +173,9 @@ const SidebarMenuItem = ({ name, routeName, currentRoute, iconname }) => {
 
 type Props = {
   info: Info,
+  addresses: string[],
   setSendTo: (address: string, amount: number | null, memo: string | null) => void,
+  getPrivKeyAsString: (address: string) => string,
   importPrivKeys: (keys: string[]) => void,
   history: PropTypes.object.isRequired,
   openErrorModal: (title: string, body: string) => void
@@ -152,13 +185,20 @@ type State = {
   uriModalIsOpen: boolean,
   uriModalInputValue: string | null,
   privKeyModalIsOpen: boolean,
-  privKeyInputValue: string | null
+  privKeyInputValue: string | null,
+  exportPrivKeysModalIsOpen: boolean,
+  exportedPrivKeys: string[] | null
 };
 
 class Sidebar extends PureComponent<Props, State> {
   constructor(props) {
     super(props);
-    this.state = { uriModalIsOpen: false, uriModalInputValue: null };
+    this.state = {
+      uriModalIsOpen: false,
+      uriModalInputValue: null,
+      privKeyModalIsOpen: false,
+      exportPrivKeysModalIsOpen: false
+    };
 
     this.setupMenuHandlers();
   }
@@ -222,9 +262,21 @@ class Sidebar extends PureComponent<Props, State> {
     });
 
     // Export all private keys
-    ipcRenderer.on('exportall', () => {
+    ipcRenderer.on('exportall', async () => {
       // Get all the addresses and run export key on each of them.
+      const { addresses, getPrivKeyAsString } = this.props;
+      const privKeysPromise = addresses.map(async a => {
+        const privKey = await getPrivKeyAsString(a);
+        return `${privKey} #${a}`;
+      });
+      const exportedPrivKeys = await Promise.all(privKeysPromise);
+
+      this.setState({ exportPrivKeysModalIsOpen: true, exportedPrivKeys });
     });
+  };
+
+  closeExportPrivKeysModal = () => {
+    this.setState({ exportPrivKeysModalIsOpen: false, exportedPrivKeys: null });
   };
 
   openImportPrivKeyModal = (defaultValue: string | null) => {
@@ -322,7 +374,14 @@ class Sidebar extends PureComponent<Props, State> {
 
   render() {
     const { location, info } = this.props;
-    const { uriModalIsOpen, uriModalInputValue, privKeyModalIsOpen, privKeyInputValue } = this.state;
+    const {
+      uriModalIsOpen,
+      uriModalInputValue,
+      privKeyModalIsOpen,
+      privKeyInputValue,
+      exportPrivKeysModalIsOpen,
+      exportedPrivKeys
+    } = this.state;
 
     let state = 'DISCONNECTED';
     let progress = 100;
@@ -355,6 +414,13 @@ class Sidebar extends PureComponent<Props, State> {
           modalInput={privKeyInputValue}
           closeModal={this.closeImportPrivKeyModal}
           doImportPrivKeys={this.doImportPrivKeys}
+        />
+
+        {/* Exported (all) Private Keys */}
+        <ExportPrivKeyModal
+          modalIsOpen={exportPrivKeysModalIsOpen}
+          exportedPrivKeys={exportedPrivKeys}
+          closeModal={this.closeExportPrivKeysModal}
         />
 
         <div className={[cstyles.center, styles.sidebarlogobg].join(' ')}>
