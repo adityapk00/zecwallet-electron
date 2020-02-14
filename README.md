@@ -1,3 +1,9 @@
 ## Zecwallet Fullnode (Electron version)
 
-This is a Work In Progress.
+### Pre-Requisites
+Install nodejs, git and yarn
+
+### Running
+git clone https://github.com/adityapk00/zecwallet-electron
+yarn install 
+yarn dev
