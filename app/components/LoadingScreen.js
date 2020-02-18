@@ -1,13 +1,13 @@
 /* eslint-disable max-classes-per-file */
 import React, { Component } from 'react';
-import { Redirect } from 'react-router';
+import { Redirect, withRouter } from 'react-router';
 import ini from 'ini';
 import fs from 'fs';
 import request from 'request';
 import progress from 'progress-stream';
 import os from 'os';
 import path from 'path';
-import { remote } from 'electron';
+import { remote, ipcRenderer } from 'electron';
 import { spawn } from 'child_process';
 import { promisify } from 'util';
 import routes from '../constants/routes.json';
@@ -61,7 +61,8 @@ const locateZcashParamsDir = () => {
 
 type Props = {
   setRPCConfig: (rpcConfig: RPCConfig) => void,
-  setInfo: (info: Info) => void
+  setInfo: (info: Info) => void,
+  history: PropTypes.object.isRequired
 };
 
 class LoadingScreenState {
@@ -91,7 +92,7 @@ class LoadingScreenState {
   }
 }
 
-export default class LoadingScreen extends Component<Props, LoadingScreenState> {
+class LoadingScreen extends Component<Props, LoadingScreenState> {
   constructor(props: Props) {
     super(props);
 
@@ -103,6 +104,7 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
       const success = await this.ensureZcashParams();
       if (success) {
         await this.loadZcashConf(true);
+        await this.setupExitHandler();
       }
     })();
   }
@@ -241,6 +243,24 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
     this.loadZcashConf();
   };
 
+  zcashd: ChildProcessWithoutNullStreams | null = null;
+
+  setupExitHandler = () => {
+    // App is quitting, exit zcashd as well
+    ipcRenderer.on('appquitting', () => {
+      if (this.zcashd) {
+        const { history } = this.props;
+
+        this.setState({ currentStatus: 'Waiting for zcashd to exit' });
+        history.push(routes.LOADING);
+        this.zcashd.kill();
+      }
+
+      // And reply that we're all done.
+      ipcRenderer.send('appquitdone');
+    });
+  };
+
   startZcashd = async () => {
     const { zcashdSpawned } = this.state;
 
@@ -252,26 +272,18 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
     const program = locateZcashd();
     console.log(program);
 
-    const zcashd = spawn(program);
+    this.zcashd = spawn(program);
 
     this.setState({ zcashdSpawned: 1 });
     this.setState({ currentStatus: 'zcashd starting...' });
 
-    zcashd.on('close', (code: number) => {
-      console.log(`child process exited with code ${code}`);
-    });
-
-    zcashd.on('error', err => {
+    this.zcashd.on('error', err => {
       console.log(`zcashd start error, giving up. Error: ${err}`);
       // Set that we tried to start zcashd, and failed
       this.setState({ zcashdSpawned: 1 });
+
       // No point retrying.
       this.setState({ getinfoRetryCount: 10 });
-    });
-
-    // Set up to kill zcashd when we exit.
-    remote.getCurrentWindow().on('close', () => {
-      zcashd.kill();
     });
   };
 
@@ -402,3 +414,5 @@ export default class LoadingScreen extends Component<Props, LoadingScreenState> 
     return <Redirect to={routes.DASHBOARD} />;
   }
 }
+
+export default withRouter(LoadingScreen);
