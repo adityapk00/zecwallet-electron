@@ -71,7 +71,8 @@ export default class RouteApp extends React.Component<Props, AppState> {
         this.setTransactionList,
         this.setAllAddresses,
         this.setInfo,
-        this.setZecPrice
+        this.setZecPrice,
+        this.setDisconnected
       );
     }
 
@@ -100,6 +101,18 @@ export default class RouteApp extends React.Component<Props, AppState> {
     errorModalData.modalIsOpen = false;
 
     this.setState({ errorModalData });
+  };
+
+  // Set the state of the current info object to be disconnected
+  setDisconnected = (err: string) => {
+    const { info } = this.state;
+
+    const newInfo = new Info();
+    Object.assign(newInfo, info);
+    newInfo.disconnected = true;
+
+    this.setState({ info: newInfo });
+    this.openErrorModal('Disconnected', err);
   };
 
   setInfo = (info: Info) => {

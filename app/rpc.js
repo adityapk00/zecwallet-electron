@@ -37,6 +37,8 @@ export default class RPC {
 
   fnSetZecPrice: number => void;
 
+  fnSetDisconnected: string => void;
+
   opids: Set<string>;
 
   refreshTimerID: TimerID;
@@ -51,7 +53,8 @@ export default class RPC {
     fnSetTransactionsList: (Transaction[]) => void,
     fnSetAllAddresses: (string[]) => void,
     fnSetInfo: Info => void,
-    fnSetZecPrice: number => void
+    fnSetZecPrice: number => void,
+    fnSetDisconnected: () => void
   ) {
     this.fnSetTotalBalance = fnSetTotalBalance;
     this.fnSetAddressesWithBalance = fnSetAddressesWithBalance;
@@ -59,6 +62,7 @@ export default class RPC {
     this.fnSetAllAddresses = fnSetAllAddresses;
     this.fnSetInfo = fnSetInfo;
     this.fnSetZecPrice = fnSetZecPrice;
+    this.fnSetDisconnected = fnSetDisconnected;
 
     this.opids = new Set();
   }
@@ -116,21 +120,34 @@ export default class RPC {
   }
 
   async refresh(lastBlockHeight: number) {
-    const latestBlockHeight = await this.fetchInfo();
+    let latestBlockHeight;
+    try {
+      latestBlockHeight = await this.fetchInfo();
+    } catch (err) {
+      // If we caught an error, there's something wrong with the connection.
+      this.fnSetDisconnected(`${err}`);
+      return;
+    }
 
     if (!lastBlockHeight || lastBlockHeight < latestBlockHeight) {
-      const balP = this.fetchTotalBalance();
-      const abP = this.fetchTandZAddressesWithBalances();
-      const txns = this.fetchTandZTransactions();
-      const addrs = this.fetchAllAddresses();
+      try {
+        const balP = this.fetchTotalBalance();
+        const abP = this.fetchTandZAddressesWithBalances();
+        const txns = this.fetchTandZTransactions();
+        const addrs = this.fetchAllAddresses();
 
-      await balP;
-      await abP;
-      await txns;
-      await addrs;
+        await balP;
+        await abP;
+        await txns;
+        await addrs;
 
-      // All done, set up next fetch
-      console.log(`Finished full refresh at ${latestBlockHeight}`);
+        // All done, set up next fetch
+        console.log(`Finished full refresh at ${latestBlockHeight}`);
+      } catch (err) {
+        // If we caught an error, there's something wrong with the connection.
+        this.fnSetDisconnected(`${err}`);
+        return;
+      }
     } else {
       // Still at the latest block
       console.log('Already have latest block, waiting for next refresh');
@@ -150,6 +167,7 @@ export default class RPC {
     info.version = infoResult.result.version;
     info.currencyName = info.testnet ? 'TAZ' : 'ZEC';
     info.zecPrice = null; // Setting this to null will copy over the existing price
+    info.disconnected = false;
 
     const blkInfoResult = await RPC.doRPC('getblockchaininfo', [], rpcConfig);
     info.verificationProgress = blkInfoResult.result.verificationprogress;

@@ -390,7 +390,7 @@ class Sidebar extends PureComponent<Props, State> {
 
     let state = 'DISCONNECTED';
     let progress = 100;
-    if (info && info.version) {
+    if (info && info.version && !info.disconnected) {
       if (info.verificationProgress < 0.9999) {
         state = 'SYNCING';
         progress = (info.verificationProgress * 100).toFixed(1);
@@ -483,7 +483,7 @@ class Sidebar extends PureComponent<Props, State> {
           )}
           {state === 'DISCONNECTED' && (
             <div className={[cstyles.padsmallall, cstyles.margintopsmall, cstyles.blackbg].join(' ')}>
-              <i className={[cstyles.yellow, 'fas', 'fa-times-circle'].join(' ')} />
+              <i className={[cstyles.red, 'fas', 'fa-times-circle'].join(' ')} />
               &nbsp; Connected
             </div>
           )}

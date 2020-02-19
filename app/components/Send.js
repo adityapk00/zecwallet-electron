@@ -283,6 +283,18 @@ const ConfirmModal = ({
 
         <ConfirmModalToAddr toaddr={{ to: 'Fee', amount: 0.0001, memo: null }} info={info} />
 
+        {info && info.disconnected && (
+          <div className={[cstyles.red, cstyles.margintoplarge].join(' ')}>
+            You are currently disconnected. This transaction might not work.
+          </div>
+        )}
+
+        {info && info.verificationprogress < 0.9999 && (
+          <div className={[cstyles.red, cstyles.margintoplarge].join(' ')}>
+            You are currently syncing. This transaction might not work.
+          </div>
+        )}
+
         <div className={cstyles.buttoncontainer}>
           <button type="button" className={cstyles.primarybutton} onClick={() => sendButton()}>
             Send
