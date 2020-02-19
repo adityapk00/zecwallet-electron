@@ -41,7 +41,7 @@ export default class MenuBuilder {
     const { mainWindow } = this;
 
     const subMenuAbout = {
-      label: 'Electron',
+      label: 'Zecwallet Fullnode',
       submenu: [
         {
           label: 'About Zecwallet Fullnode',
@@ -146,10 +146,9 @@ export default class MenuBuilder {
       label: 'View',
       submenu: [
         {
-          label: 'Toggle Full Screen',
-          accelerator: 'Ctrl+Command+F',
+          label: 'zcashd info',
           click: () => {
-            this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+            this.mainWindow.webContents.send('zcashd');
           }
         }
       ]
@@ -244,26 +243,24 @@ export default class MenuBuilder {
                   }
                 },
                 {
-                  label: 'Toggle &Full Screen',
-                  accelerator: 'F11',
-                  click: () => {
-                    this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
-                  }
-                },
-                {
                   label: 'Toggle &Developer Tools',
                   accelerator: 'Alt+Ctrl+I',
                   click: () => {
                     this.mainWindow.toggleDevTools();
                   }
+                },
+                {
+                  label: 'zcashd info',
+                  click: () => {
+                    this.mainWindow.webContents.send('zcashd');
+                  }
                 }
               ]
             : [
                 {
-                  label: 'Toggle &Full Screen',
-                  accelerator: 'F11',
+                  label: 'zcashd info',
                   click: () => {
-                    this.mainWindow.setFullScreen(!this.mainWindow.isFullScreen());
+                    this.mainWindow.webContents.send('zcashd');
                   }
                 }
               ]
