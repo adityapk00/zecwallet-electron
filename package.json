@@ -20,9 +20,9 @@
     "package": "yarn build && electron-builder build --publish never",
     "package-all": "yarn build && electron-builder build -mwl",
     "package-ci": "yarn postinstall && yarn build && electron-builder --publish always",
-    "package-mac": "yarn build && electron-builder build --mac dmg",
-    "package-linux": "yarn build && electron-builder build --linux tar.gz",
-    "package-win": "yarn build && electron-builder build --win zip --x64",
+    "package-mac": "yarn build && electron-builder build --mac",
+    "package-linux": "yarn build && electron-builder build --linux",
+    "package-win": "yarn build && electron-builder build --win --x64",
     "postinstall": "node -r @babel/register internals/scripts/CheckNativeDep.js && yarn flow-typed && electron-builder install-app-deps && yarn build-dll && opencollective-postinstall",
     "postlint-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{js,jsx,json,html,css,less,scss,yml}'",
     "postlint-styles-fix": "prettier --ignore-path .eslintignore --single-quote --write '**/*.{css,scss}'",
@@ -91,7 +91,7 @@
         }
       ],
       "target": [
-        "zip"
+        "zip", "msi"
       ]
     },
     "mac" : {
@@ -111,9 +111,19 @@
         }
       ]
     },
+    "deb": {
+      "depends": [
+        "gconf2",
+        "gconf-service",
+        "libnotify4",
+        "libappindicator1",
+        "libxtst6",
+        "libnss3"
+      ]
+    },
     "linux": {
       "category": "Development",
-      "icon": "./resources/icon.png",
+      "icon": "./resources/icon.icns",
       "extraFiles": [
         {
           "from": "bin/linux",
@@ -122,18 +132,24 @@
         }
       ],
       "target": [
-        "zip"
-      ]
+        "deb",
+        "AppImage"
+      ],
+      "desktop": {
+        "Name": "ZecWallet",
+        "Comment": "Full node and wallet for Zcash",
+        "GenericName": "Wallet",
+        "Type": "Application",
+        "StartupNotify": true,
+        "StartupWMClass": "zecwallet",
+        "Categories": "Utility;",
+        "MimeType": "x-scheme-handler/zcash;",
+        "Keywords": "zecwallet;"
+      }
     },
     "directories": {
       "buildResources": "resources",
       "output": "release"
-    },
-    "publish": {
-      "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate",
-      "private": false
     }
   },
   "repository": {
