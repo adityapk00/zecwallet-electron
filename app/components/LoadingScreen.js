@@ -19,6 +19,18 @@ import { NO_CONNECTION } from '../utils/utils';
 import Logo from '../assets/img/logobig.gif';
 import zcashdlogo from '../assets/img/zcashdlogo.gif';
 
+const locateZcashConfDir = () => {
+  if (os.platform() === 'darwin') {
+    return path.join(remote.app.getPath('appData'), 'Zcash');
+  }
+
+  if (os.platform() === 'linux') {
+    return path.join(remote.app.getPath('home'), '.zcash');
+  }
+
+  return path.join(remote.app.getPath('appData'), 'Zcash');
+};
+
 const locateZcashConf = () => {
   if (os.platform() === 'darwin') {
     return path.join(remote.app.getPath('appData'), 'Zcash', 'zcash.conf');
@@ -219,6 +231,11 @@ class LoadingScreen extends Component<Props, LoadingScreenState> {
 
   createZcashconf = async () => {
     const { connectOverTor, enableFastSync } = this.state;
+
+    const dir = locateZcashConfDir();
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+    }
 
     const zcashConfPath = await locateZcashConf();
 
