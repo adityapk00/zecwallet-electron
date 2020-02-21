@@ -218,7 +218,7 @@ class LoadingScreen extends Component<Props, LoadingScreenState> {
     rpcConfig.username = confValues.rpcuser;
     rpcConfig.password = confValues.rpcpassword;
 
-    const isTestnet = (confValues.testnet && confValues.testnet === 1) || false;
+    const isTestnet = (confValues.testnet && confValues.testnet === '1') || false;
     const server = confValues.rpcbind || '127.0.0.1';
     const port = confValues.rpcport || (isTestnet ? '18232' : '8232');
     rpcConfig.url = `http://${server}:${port}`;

@@ -97,6 +97,8 @@
     "mac" : {
       "category": "public.app-category.productivity",
       "type": "distribution",
+      "hardenedRuntime": true,
+      "entitlements": "./configs/entitlements.mac.inherit.plist",
       "target": [
         "dmg"
       ],
