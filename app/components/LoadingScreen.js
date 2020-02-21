@@ -16,7 +16,7 @@ import RPC from '../rpc';
 import cstyles from './Common.css';
 import styles from './LoadingScreen.css';
 import { NO_CONNECTION } from '../utils/utils';
-import Logo from '../assets/img/logobig.gif';
+import Logo from '../assets/img/logobig.png';
 import zcashdlogo from '../assets/img/zcashdlogo.gif';
 
 const locateZcashConfDir = () => {
